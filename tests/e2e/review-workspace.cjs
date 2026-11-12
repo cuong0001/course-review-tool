@@ -1,0 +1,64 @@
+/* Offline browser checks. Run: node tests/e2e/review-workspace.cjs */
+const {chromium}=require('@playwright/test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const os=require('node:os');
+const path=require('node:path');
+const {pathToFileURL}=require('node:url');
+(async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'review-browser-'));
+  const browser=await chromium.launch({channel:'chrome',headless:true});
+  try {
+    const context=await browser.newContext({acceptDownloads:true});
+    const page=await context.newPage();
+    const errors=[],network=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))network.push(r.url());});
+    const root=path.resolve(__dirname,'../..');
+    const lesson=fs.readFileSync(path.join(root,'tests/fixtures/lesson_content.jsonl'),'utf8').split('\n')[0];
+    const question=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/question_bank.jsonl'),'utf8').split('\n').find(l=>l&&JSON.parse(l).human_review_status==='pending'));
+    const question2={...question,question_id:question.question_id+'_next'};
+    const sample=path.join(dir,'sample.jsonl');fs.writeFileSync(sample,lesson+'\n'+JSON.stringify(question)+'\n'+JSON.stringify(question2)+'\n');
+    await page.goto(pathToFileURL(path.join(root,'review.html')).href);
+    await page.locator('#reviewer').fill('An');await page.locator('#switch').click();
+    await page.locator('#files').setInputFiles(sample);
+    await page.getByText('REQUIRED: shown to learners now',{exact:true}).waitFor();
+    assert.equal(await page.locator('textarea').count(),9);
+    assert.match(await page.locator('#item').innerText(),/NO REAL SOURCE/);
+    await page.getByLabel('Notes for section T04_2-intuition',{exact:true}).fill('Sửa ví dụ — ghi chú');
+    await page.getByLabel('Overall notes / what should be fixed').fill('Check the explanation');
+    await page.getByLabel('Flag an issue').check();
+    await page.reload();await page.locator('#files').setInputFiles(sample);
+    await page.getByLabel('Notes for section T04_2-intuition',{exact:true}).waitFor();
+    assert.equal(await page.getByLabel('Notes for section T04_2-intuition',{exact:true}).inputValue(),'Sửa ví dụ — ghi chú');
+    assert.equal(await page.getByLabel('Flag an issue').isChecked(),true);
+    await page.locator('#type').selectOption('question');
+    await page.getByRole('button',{name:'Next',exact:true}).click();
+    assert.match(await page.locator('#item h2').innerText(),/_next$/);
+    await page.getByRole('button',{name:'Previous',exact:true}).click();
+    await page.getByLabel('Overall notes / what should be fixed').fill('Question note');
+    for(const box of await page.locator('.checks input').all())await box.check();
+    await page.locator('#approve').click();
+    let download=page.waitForEvent('download');await page.locator('#decisions').click();let file=await download;
+    const finalized=JSON.parse(fs.readFileSync(await file.path(),'utf8'));assert.equal(finalized.decisions.length,1);assert.equal(finalized.decisions[0].id,question.question_id);
+    await page.getByLabel('Flag an issue').check();assert.equal(await page.locator('#approve').isDisabled(),true);
+    download=page.waitForEvent('download');await page.locator('#export').click();file=await download;const exported=path.join(dir,'package.json');await file.saveAs(exported);
+    const other=await context.newPage();await other.goto(page.url());await other.locator('#reviewer').fill('Hieu');await other.locator('#switch').click();await other.locator('#files').setInputFiles(sample);await other.getByLabel('Overall notes / what should be fixed').waitFor();assert.equal(await other.getByLabel('Overall notes / what should be fixed').inputValue(),'');
+    const freshContext=await browser.newContext();const fresh=await freshContext.newPage();await fresh.goto(page.url());await fresh.locator('#import').setInputFiles(exported);await fresh.getByText(/Package restored/).waitFor();await fresh.locator('#files').setInputFiles(sample);await fresh.getByLabel('Notes for section T04_2-intuition',{exact:true}).waitFor();assert.equal(await fresh.getByLabel('Notes for section T04_2-intuition',{exact:true}).inputValue(),'Sửa ví dụ — ghi chú');
+    await fresh.getByLabel('Overall notes / what should be fixed').fill('Local conflict');await fresh.locator('#import').setInputFiles(exported);await fresh.getByText(/Conflicting saved reviews/).waitFor();
+    // Fingerprint mismatch clears verification while retaining notes.
+    await page.getByLabel('Flag an issue').uncheck();await page.locator('#approve').click();question.stem+=' Changed source';fs.writeFileSync(sample,lesson+'\n'+JSON.stringify(question)+'\n'+JSON.stringify(question2)+'\n');await page.locator('#files').setInputFiles(sample);await page.getByText(/source content changed/).waitFor();assert.equal(await page.locator('.checks input:checked').count(),0);assert.equal(await page.getByLabel('Overall notes / what should be fixed').inputValue(),'Question note');
+    await page.setViewportSize({width:375,height:812});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    await page.keyboard.press('Tab');assert.notEqual(await page.evaluate(()=>document.activeElement.tagName),'BODY');
+    await page.screenshot({path:path.join(dir,'review-mobile.png'),fullPage:true});
+    await page.setViewportSize({width:1280,height:900});
+    await page.locator('#type').selectOption('lesson');
+    await page.screenshot({path:path.join(dir,'review-desktop.png'),fullPage:true});
+    await page.locator('#files').setInputFiles([path.join(root,'tests/fixtures/video_clips.jsonl'),path.join(root,'tests/fixtures/learning_resources.jsonl'),path.join(root,'tests/fixtures/activities.jsonl')]);
+    await page.locator('#type').selectOption('video');await page.getByText('License: MISSING — verify permitted use',{exact:true}).waitFor();
+    await page.locator('#type').selectOption('resource');await page.getByText('No items in this view.',{exact:false}).waitFor();await page.locator('#extras').check();await page.getByText(/License: CC BY/).waitFor();
+    await page.locator('#type').selectOption('activity');assert.ok((await page.locator('#item').innerText()).includes('reference solution cpp'));
+    await page.evaluate(()=>{Storage.prototype.setItem=function(){throw Error('storage unavailable');};});await page.getByLabel('Overall notes / what should be fixed').fill('Storage failure note');await page.getByText('Not saved—export a backup',{exact:true}).waitFor();
+    assert.deepEqual(errors,[]);assert.deepEqual(network,[]);
+    console.log('PASS: offline import, lesson notes, reload, question decisions, flags, export/import, reviewer separation, conflicts, source changes, 375px, keyboard, storage failure; no network requests.');
+    console.log('Screenshot: '+path.join(dir,'review-mobile.png'));
+  }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

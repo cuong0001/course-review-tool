@@ -1,0 +1,1 @@
+{"resource_id": "resource_test", "title": "Synthetic resource fixture", "url": "https://example.com/resource", "topic_ids": ["T_TEST"], "license_name": "CC BY 4.0 (synthetic fixture only)", "license_url": "https://example.com/license", "human_review_status": "approved"}

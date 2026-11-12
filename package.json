@@ -1,0 +1,16 @@
+{
+  "name": "course-review-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline course review workspace",
+  "scripts": {
+    "test": "node --test tests/unit/review-core.test.cjs",
+    "test:browser": "node tests/e2e/review-workspace.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

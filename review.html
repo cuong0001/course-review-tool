@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Team review desk</title><link rel="stylesheet" href="review.css"></head>
+<body>
+<header><h1>Team review desk</h1><p>Read, flag issues, and leave notes. Export your work and send the file to the owner.</p>
+<div class="toolbar"><label>Reviewer <input id="reviewer" placeholder="An, Hieu, or your name" autocomplete="name"></label><button id="switch">Open reviewer workspace</button><strong id="saved" role="status">Enter your name to begin</strong></div>
+<div class="toolbar"><label>Load dataset files <input id="files" type="file" multiple accept=".jsonl"></label><label>Import review package <input id="import" type="file" accept=".json"></label><button id="export">Export review package</button><button id="decisions">Export finalized decisions</button></div>
+<p id="message" role="status" aria-live="polite"></p></header>
+<main id="drop"><section aria-label="Review progress"><h2>Your workspace</h2><p>Choose JSONL files above or drop them here. Reopen the same files to resume after a reload.</p><button id="continue">Continue reviewing</button><div id="progress"></div></section>
+<div class="toolbar"><label>Review type <select id="type"><option value="lesson">Reading guides — priority</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label><label><input id="extras" type="checkbox"> Include resources and activities</label><label>Topic <select id="topic"><option value="">All topics</option></select></label><label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Unreviewed</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option></select></label></div>
+<div class="workspace"><nav aria-label="Review queue"><h2>Review queue</h2><div id="queue"></div></nav><article id="item" aria-label="Current review"><p>Load files and choose an item to begin.</p></article></div>
+</main><script src="review-core.js"></script><script src="review-renderers.js"></script><script src="review.js"></script></body></html>

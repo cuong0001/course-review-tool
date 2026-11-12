@@ -1,0 +1,1 @@
+{"activity_id": "activity_test", "title_en": "Synthetic activity fixture", "topic_ids": ["T_TEST"], "problem_statement": "Return the number one.", "reference_solution_cpp": "int main() { return 1; }", "human_review_status": "approved"}

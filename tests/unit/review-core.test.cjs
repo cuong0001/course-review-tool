@@ -1,0 +1,9 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const C=require('../../review-core.js');
+function approved(){const s=C.blank();s.fingerprint='a'.repeat(64);s.checks=Object.fromEntries(Object.keys(C.checks.question).map(k=>[k,true]));C.finalize(s,'question','approve');return s;}
+test('approval requires every check and resolved flags',()=>{const s=C.blank();assert.throws(()=>C.finalize(s,'question','approve'));Object.assign(s,approved(),{flag:true});assert.throws(()=>C.finalize(s,'question','approve'));});
+test('notes and flags invalidate finalized decisions',()=>{for(const [k,v]of [['notes','Fix'],['flag',true],['sections',{block:'Fix'}],['checks',{}]]){const s=approved();C.edit(s,k,v);assert.equal(s.decision,null);assert.equal(s.decided_at,null);}});
+test('unfinished work never exports as a decision; changed sources excluded',()=>{const s=approved(),k='question:q';assert.equal(C.decisions('An',{[k]:s},{[k]:{kind:'question',id:'q',fingerprint:'b'.repeat(64)}}).decisions.length,0);C.edit(s,'notes','draft');assert.equal(C.decisions('An',{[k]:s},{[k]:{kind:'question',id:'q',fingerprint:s.fingerprint}}).decisions.length,0);});
+test('section notes survive JSON round trip and become comments',()=>{const s=approved();s.sections={intro:'Sửa ví dụ'};const p={format:'course-review-package',version:1,reviewer:'Hieu',exported_at:new Date().toISOString(),items:[{item_type:'question',id:'q',state:s}]};const restored=C.validatePackage(JSON.parse(JSON.stringify(p)));assert.match(C.comment(restored.items[0].state),/\[intro\] Sửa ví dụ/);});
+test('malformed and duplicate imports rejected',()=>{assert.throws(()=>C.validatePackage({}));const p={format:'course-review-package',version:1,reviewer:'An',exported_at:new Date().toISOString(),items:[{item_type:'question',id:'q',state:approved()}]};p.items.push(p.items[0]);assert.throws(()=>C.validatePackage(p));});
