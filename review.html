@@ -1,13 +1,33 @@
 <!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DSA team review desk</title><link rel="stylesheet" href="review.css"></head>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSA review · Study Companion</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="review.css">
+</head>
 <body>
-<header><h1>DSA team review desk</h1><p>CSC10004 · Data Structures and Algorithms</p><p>Read, flag issues, and leave notes. Export your work and send the file to the owner.</p>
-<div class="toolbar"><label>Reviewer <select id="reviewer"><option value="">Choose your name</option><option>Cường</option><option>Hiếu</option><option>An</option><option>Hải</option><option>Huy</option><option>Khánh</option></select></label><button id="switch">Open reviewer workspace</button><strong id="saved" role="status">Enter your name to begin</strong></div>
-<div class="toolbar"><button id="export">Export review package</button><button id="decisions">Export finalized decisions</button></div>
-<details><summary>Import saved reviews or newer data</summary><div class="toolbar"><label>Load newer / additional dataset files <input id="files" type="file" multiple accept=".jsonl"></label><label>Import review package <input id="import" type="file" accept=".json"></label></div></details>
-<p id="message" role="status" aria-live="polite"></p></header>
-<main id="drop"><section aria-label="Review progress"><h2>Your workspace</h2><p>Your assigned DSA questions and reading guides load automatically. Choose your name to begin.</p><p id="dataset-summary"></p><details><summary>Team assignment overview</summary><div id="team-summary"></div></details><button id="continue">Continue reviewing</button><div id="progress"></div></section>
-<div class="toolbar"><label>Assignment view <select id="assignment-scope"><option value="mine">My assignment</option><option value="all">All assignments (owner overview)</option></select></label><label>Review type <select id="type"><option value="lesson">Reading guides — priority</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label><label><input id="extras" type="checkbox"> Include resources and activities</label><label>Topic <select id="topic"><option value="">All topics</option></select></label><label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Unreviewed</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option></select></label></div>
-<div class="workspace"><nav aria-label="Review queue"><h2>Review queue</h2><div id="queue"></div></nav><article id="item" aria-label="Current review"><p>Load files and choose an item to begin.</p></article></div>
-</main><script src="data/dsa-review-data.js"></script><script src="review-assignments.js"></script><script src="review-core.js"></script><script src="review-renderers.js"></script><script src="review.js"></script></body></html>
+<a class="skip-link" href="#item">Skip to current review</a>
+<header class="app-header">
+<div class="brand"><span class="brand-mark" aria-hidden="true">SC</span><div><h1>DSA review desk</h1><p>Study Companion · CSC10004</p></div></div>
+<div class="header-controls"><label>Reviewer <select id="reviewer"><option value="">Choose your name</option><option>Cường</option><option>Hiếu</option><option>An</option><option>Hải</option><option>Huy</option><option>Khánh</option></select></label><button id="switch">Open workspace</button><button id="theme" aria-pressed="false">Dark mode</button></div>
+<div class="export-controls"><strong id="saved" role="status">Choose your name to begin</strong><button id="export" class="primary">Export review package</button><button id="decisions">Export finalized decisions</button></div>
+<p id="message" role="status" aria-live="polite"></p>
+</header>
+<main id="drop" class="app-layout">
+<aside class="sidebar" aria-label="Assignment and review navigation">
+<section aria-label="Review progress"><h2>Your workspace</h2><p class="sidebar-help">Choose your name. Your assigned DSA content loads automatically.</p><button id="continue">Continue reviewing</button><div id="progress"></div></section>
+<details class="filters" open><summary>Assignment and filters</summary>
+<label>Assignment view <select id="assignment-scope"><option value="mine">My assignment</option><option value="all">All assignments (owner overview)</option></select></label>
+<label>Review type <select id="type"><option value="lesson">Reading guides — priority</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
+<label>Topic <select id="topic"><option value="">All topics</option></select></label>
+<label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Unreviewed</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option></select></label>
+<label class="check-label"><input id="extras" type="checkbox"> Include resources and activities</label>
+</details>
+<nav class="queue-nav" aria-label="Review queue"><h2>Review queue</h2><div id="queue"></div></nav>
+<details><summary>Team allocation and dataset</summary><p id="dataset-summary"></p><div id="team-summary"></div></details>
+<details><summary>Import saved reviews or newer data</summary><label>Import review package <input id="import" type="file" accept=".json"></label><label>Load newer / additional dataset files <input id="files" type="file" multiple accept=".jsonl"></label><p class="sidebar-help">You can also drop JSONL files onto this window.</p></details>
+</aside>
+<article id="item" tabindex="-1" aria-label="Current review"><section class="empty-state"><p class="eyebrow">Your team's review workspace</p><h2>Choose your name to start</h2><p>Read the guide or question, open its sources, and record what needs fixing. Notes and decisions save automatically in this browser.</p></section></article>
+</main>
+<script src="vendor/katex/katex.min.js"></script><script src="data/dsa-review-data.js"></script><script src="review-assignments.js"></script><script src="review-core.js"></script><script src="review-renderers.js"></script><script src="review.js"></script>
+</body></html>

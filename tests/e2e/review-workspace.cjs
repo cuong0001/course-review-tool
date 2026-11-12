@@ -19,6 +19,7 @@ const {pathToFileURL}=require('node:url');
     const sample=path.join(dir,'sample.jsonl');fs.writeFileSync(sample,lesson+'\n'+JSON.stringify(question)+'\n'+JSON.stringify(question2)+'\n');
     const app=path.join(dir,'app');fs.mkdirSync(path.join(app,'data'),{recursive:true});
     for(const filename of ['review.html','review.css','review-core.js','review-renderers.js','review-assignments.js','review.js'])fs.copyFileSync(path.join(root,filename),path.join(app,filename));
+    fs.cpSync(path.join(root,'vendor'),path.join(app,'vendor'),{recursive:true});
     fs.writeFileSync(path.join(app,'data/dsa-review-data.js'),'globalThis.DSAReviewData = '+JSON.stringify({members:['Cường','Hiếu','An','Hải','Huy','Khánh'],assignments:{question:{},lesson:{}},records:[],summary:{approved_questions:0,pending_questions:0,revise_questions:0,lessons:0}})+';');
     await page.goto(pathToFileURL(path.join(app,'review.html')).href);
     await page.locator('#assignment-scope').selectOption('all');

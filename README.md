@@ -10,7 +10,7 @@ If you used the old tool inside the course project, export a review package ther
 
 ## Review in five steps
 
-1. Keep this folder together: `review.html`, `review.css`, `review-core.js`, `review-renderers.js`, `review-assignments.js`, `review.js`, and the `data/` folder. Double-click **review.html** to open it in a current Chrome or Edge browser.
+1. Keep this folder together: `review.html`, `review.css`, `review-core.js`, `review-renderers.js`, `review-assignments.js`, `review.js`, and the `data/` and `vendor/` folders. Double-click **review.html** to open it in a current Chrome or Edge browser.
 2. Choose **Cường**, **Hiếu**, **An**, **Hải**, **Huy**, or **Khánh**. Your assigned DSA content appears automatically.
 3. Choose **Reading guides** or **Questions**. By default, only your assignment is shown. No file picker is needed. The optional **Load newer / additional dataset files** control can replace snapshot records with newer course files; source links open only when clicked.
 4. Choose a review type and topic. Read the item and open its sources. Write overall notes or notes beside a reading-guide section. Flag problems. Your notes save as you type. Use **Next** to continue without making a final decision. When finished, choose **Verified**, **Needs fixes**, or **Reject**. Verification requires every check and no unresolved flag; the other decisions require notes. Editing a finalized review returns it to in-progress.
@@ -22,7 +22,15 @@ Use **Import review package** to resume on another device. It restores the revie
 
 Reading guides are highest priority even though the old data claims they were approved. Questions include pending items first, grouped by topic, then items needing revision. Existing approved questions are excluded. Resources and activities appear only after checking **Include resources and activities**. Videos are the final review type. Missing sources and licenses are displayed as warnings; never tick a verification check you have not actually performed.
 
-Lesson text, code, tables, and all trace steps are visible. Full block data remains available in expandable sections. Basic bold and inline code are formatted; unsupported Markdown and mathematical notation remain as source text. No external renderer is loaded. The tool does not compile code or verify source claims automatically. Avoid editing the same reviewer workspace in multiple tabs at once.
+Lesson text, code, tables, and all trace steps are visible. Full block data remains available in expandable sections. Basic Markdown and inline code are formatted. LaTeX renders through the bundled KaTeX renderer and embedded local fonts: `$...$`, `$$...$$`, `\(...\)`, and `\[...\]` are supported. Code samples remain literal. Invalid formulas show their original source with a warning style, so they can still be flagged. No CDN or network request is needed. The tool does not compile code or verify source claims automatically. Avoid editing the same reviewer workspace in multiple tabs at once.
+
+## Reading and reviewing
+
+The layout follows the course project's reading styles: assignment filters and the queue on the left, readable lesson/question content in the center, and notes plus verification controls beside it on wide screens. On smaller screens these sections stack. Previous/Next controls sit above the content. Code samples, wide tables, and large equations have their own scroll areas and can be reached by keyboard.
+
+Use **Dark mode** / **Light mode** to choose the project-style palette; that choice is remembered locally. Review notes, checklist ticks, decisions, and item position keep the same automatic-save behavior as before. Export a review package before finishing.
+
+KaTeX 0.19.1 is copied from the course project's pinned distribution. Its fonts are embedded in the local stylesheet for reliable `file://` use. The MIT license and source information are under `vendor/katex/`.
 
 ## DSA allocation
 

@@ -27,21 +27,55 @@ function status(s){return s.decision?'finished':s.flag?'flagged':s.updated_at?'i
 function eligible(){return Object.entries(loaded).filter(([,i])=>$('assignment-scope').value==='all'||ReviewAssignments.belongs(DSAReviewData,i,db.reviewer)).filter(([,i])=>!['resource','activity'].includes(i.kind)||$('extras').checked).filter(([,i])=>i.kind!=='question'||['pending','revise'].includes(i.record.human_review_status));}
 function items(){const topic=$('topic').value,filter=$('filter').value;return eligible().filter(([k,i])=>i.kind===$('type').value&&(!topic||[i.record.topic_id,...(i.record.topic_ids||[])].includes(topic))&&(filter==='all'||(filter==='flagged'?state(k).flag:status(state(k))===filter))).sort((a,b)=>{const rank=i=>i.record.human_review_status==='revise'?1:0;return rank(a[1])-rank(b[1])||(a[1].record.topic_id||'').localeCompare(b[1].record.topic_id||'')||a[1].id.localeCompare(b[1].id);});}
 function progress(){const target=$('progress');target.replaceChildren();target.append(node('h3',db.reviewer+($('assignment-scope').value==='mine'?' — your assigned work':' — viewing all team assignments')));const all=eligible();for(const kind of ['overall',...Object.keys(C.ids).filter(kind=>all.some(([,item])=>item.kind===kind))]){const rows=all.filter(([,i])=>kind==='overall'||i.kind===kind),done=rows.filter(([k])=>state(k).decision).length;const row=node('div',`${kind}: ${done} / ${rows.length} finished`,'progress-row'),bar=node('progress');bar.max=rows.length||1;bar.value=done;bar.setAttribute('aria-label',`${kind} completion`);row.append(bar);target.append(row);}target.append(node('p',`${session.size} items finalized this session`));}
-function render(){if(!db.reviewer)return;progress();const rows=items();$('queue').replaceChildren();for(const [k,i]of rows){const b=button(`${i.id} · ${status(state(k))}${state(k).flag?' · flagged':''}`,()=>open(k));b.setAttribute('aria-current',String(k===active));$('queue').append(b);}if(!rows.some(([k])=>k===active))active=rows[0]?.[0]||'';if(active){workspace().position=active;drawItem();save();}else $('item').replaceChildren(node('p','No items in this view. Load a file or change the filters.'));}
+function render(){if(!db.reviewer)return;progress();const rows=items();if(!rows.some(([k])=>k===active))active=rows[0]?.[0]||'';$('queue').replaceChildren();for(const [k,i]of rows){const b=button(`${i.id} · ${status(state(k))}${state(k).flag?' · flagged':''}`,()=>open(k));const preview=node('div',undefined,'queue-preview');ReviewRender.inline(preview,i.record.title||i.record.stem||i.record.lecture_title||'');b.append(preview);b.setAttribute('aria-current',String(k===active));$('queue').append(b);}if(!rows.some(([k])=>k===active))active=rows[0]?.[0]||'';if(active){workspace().position=active;drawItem();save();}else $('item').replaceChildren(node('p','No items in this view. Load a file or change the filters.'));}
 function open(k){active=k;workspace().position=k;save();render();$('item').scrollIntoView({block:'start'});}
 function note(parent,label,value,onchange){const l=node('label',label),t=node('textarea');t.value=value;t.addEventListener('input',()=>onchange(t.value));l.append(t);parent.append(l);}
 function edited(k,field,value){const s=state(k);C.edit(s,field,value);s.fingerprint=loaded[k].fingerprint;session.delete(k);save();progress();updateActions();$('decision-status').textContent='In progress';}
-function detail(parent,value,label='Details'){if(value===undefined||value===null)return;if(typeof value==='object'){if(Array.isArray(value)){for(const [index,v]of value.entries())detail(parent,v,`${label} ${index+1}`);}else{for(const [k,v]of Object.entries(value))detail(parent,v,k.replaceAll('_',' '));}}else{parent.append(node('strong',label),node('div',String(value),'text'));}}
+function detail(parent,value,label='Details'){if(value===undefined||value===null)return;if(typeof value==='object'){if(Array.isArray(value)){for(const [index,v]of value.entries())detail(parent,v,`${label} ${index+1}`);}else{for(const [k,v]of Object.entries(value))detail(parent,v,k.replaceAll('_',' '));}}else{parent.append(node('strong',label),rich(String(value)));}}
 function drawBlock(parent,block){
   const section=ReviewRender.block(parent,block);
   note(section, 'Notes for section '+block.id, state(active).sections[block.id]||'', value=>edited(active,'sections',{...state(active).sections,[block.id]:value}));
 }
-function drawItem(){const {kind,id,record:r}=loaded[active],s=state(active);s.fingerprint=loaded[active].fingerprint;const panel=$('item');panel.replaceChildren();panel.append(node('h2',r.title||r.lecture_title||r.title_en||id),node('p',`${id} · ${r.topic_id||(r.topic_ids||[]).join(', ')}`));if(kind==='lesson')panel.append(node('p','REQUIRED: shown to learners now','warning'));
-  if(kind==='question'){panel.append(node('div',r.stem,'text'));for(const o of r.options||[]){const correct=o.option_id===r.correct_option_id;panel.append(node('div',`${o.option_id}. ${o.text}${correct?' — Correct answer':''}`,correct?'correct text':'option text'));if(!correct)panel.append(node('p',r.distractor_explanations?.[o.option_id]||'Missing distractor explanation','text'));}panel.append(node('h3','Answer explanation'),node('div',r.answer_explanation,'text'),node('p',`Verification method: ${r.verification_method||'Not provided'}`));}
-  else if(kind==='lesson'){for(const b of r.blocks||[])drawBlock(panel,b);}
-  else{for(const [field,value]of Object.entries(r)){if(!['approved_by','approved_at','reviewer_comment','human_review_status','review_status'].includes(field))detail(panel,value,field.replaceAll('_',' '));}}
-  const refs=node('section');refs.append(node('h3','Sources and references'));const sourceUrls=urls(r);sourceUrls.forEach(u=>link(refs,u));if(kind==='video'&&r.video_id)link(refs,`https://www.youtube.com/watch?v=${encodeURIComponent(r.video_id)}&t=${r.start_seconds||0}s`);if(!sourceUrls.length||(r.source_ids||[]).some(v=>v.startsWith('editorial_source_')))refs.append(node('p',`NO REAL SOURCE${r.source_ids?.length?': '+r.source_ids.join(', '):''}`,'warning'));if(['video','resource'].includes(kind)){refs.append(node('p',`License: ${r.license_name||r.license?.name||'MISSING — verify permitted use'}`,r.license_name||r.license?.name?'':'warning'));}panel.append(refs);
-  const flagLabel=node('label','Flag an issue '),flag=node('input');flag.type='checkbox';flag.checked=s.flag;flag.onchange=()=>edited(active,'flag',flag.checked);flagLabel.append(flag);panel.append(flagLabel);note(panel,'Overall notes / what should be fixed',s.notes,value=>edited(active,'notes',value));const checks=node('fieldset',undefined,'checks');checks.append(node('legend','Verification checks'));for(const [key,label]of Object.entries(C.checks[kind])){const l=node('label',label+' '),input=node('input');input.type='checkbox';input.checked=s.checks[key]===true;input.onchange=()=>edited(active,'checks',{...state(active).checks,[key]:input.checked});l.prepend(input);checks.append(l);}panel.append(checks);const current=node('p',s.decision?`Final decision: ${s.decision} by ${db.reviewer} at ${s.decided_at}`:'In progress','status');current.id='decision-status';panel.append(current);const actions=node('div',undefined,'toolbar');for(const [choice,label]of [['approve','Verified'],['revise','Needs fixes'],['reject','Reject']]){const b=button(label,()=>{try{C.finalize(state(active),kind,choice);session.add(active);save();render();message('Decision saved. Export your review package when finished.');}catch(e){message(e.message);}});b.id=choice;if(choice==='approve')b.className='primary';actions.append(b);}panel.append(actions);const nav=node('div',undefined,'toolbar'),rows=items(),index=rows.findIndex(([k])=>k===active);const prev=button('Previous',()=>open(rows[index-1][0])),next=button('Next',()=>open(rows[index+1][0]));prev.disabled=index<=0;next.disabled=index>=rows.length-1;nav.append(prev,next);panel.append(nav);updateActions();}
+function rich(text,className='') {const element=node('div',undefined,className);ReviewRender.prose(element,text);return element;}
+function drawItem(){
+  const {kind,id,record:r}=loaded[active],s=state(active);s.fingerprint=loaded[active].fingerprint;
+  const panel=$('item'),content=node('section',undefined,'review-content'),review=node('aside',undefined,'review-panel');
+  panel.className='item-layout';panel.replaceChildren(content,review);review.setAttribute('aria-label','Notes and verification');
+  const rows=items(),index=rows.findIndex(([k])=>k===active),nav=node('div',undefined,'content-navigation');
+  const prev=button('Previous',()=>open(rows[index-1][0])),next=button('Next',()=>open(rows[index+1][0]));prev.disabled=index<=0;next.disabled=index>=rows.length-1;
+  nav.append(prev,node('span',`${index+1} of ${rows.length}`),next);content.append(nav);
+  content.append(node('p',`${kind==='lesson'?'Reading guide':kind==='question'?'Question':kind} · ${r.topic_id||(r.topic_ids||[]).join(', ')}`,'content-kicker'));
+  content.append(node('h2',r.title||r.lecture_title||r.title_en||id));
+  if(kind==='lesson')content.append(node('p','REQUIRED: shown to learners now','warning'));
+  if(kind==='question'){
+    content.append(rich(r.stem,'question-stem'));const options=node('div',undefined,'answer-options');
+    for(const option of r.options||[]){
+      const correct=option.option_id===r.correct_option_id,card=node('section',undefined,correct?'correct':'option'),heading=node('div',undefined,'option-heading'),copy=node('div',undefined,'option-copy');
+      if(correct)copy.append(node('strong','Correct answer','correct-badge'));
+      copy.append(rich(option.text));heading.append(node('span',option.option_id,'option-letter'),copy);card.append(heading);
+      if(!correct){const reason=node('div',undefined,'distractor-note');reason.append(node('strong','Why this distractor is wrong'),rich(r.distractor_explanations?.[option.option_id]||'Missing distractor explanation'));card.append(reason);}
+      options.append(card);
+    }
+    content.append(options);const explanation=node('section',undefined,'explanation');explanation.append(node('h3','Answer explanation'),rich(r.answer_explanation));content.append(explanation,node('p',`Verification method: ${r.verification_method||'Not provided'}`,'verification-method'));
+  }else if(kind==='lesson'){for(const block of r.blocks||[])drawBlock(content,block);}
+  else for(const [field,value]of Object.entries(r))if(!['approved_by','approved_at','reviewer_comment','human_review_status','review_status'].includes(field)){
+    if(/code|solution_cpp/.test(field)&&typeof value==='string'){content.append(node('h3',field.replaceAll('_',' ')));ReviewRender.code(content,value);}
+    else detail(content,value,field.replaceAll('_',' '));
+  }
+  const refs=node('section',undefined,'sources');refs.append(node('h3','Sources and references'));const sourceUrls=urls(r);sourceUrls.forEach(url=>link(refs,url));
+  if(kind==='video'&&r.video_id)link(refs,`https://www.youtube.com/watch?v=${encodeURIComponent(r.video_id)}&t=${r.start_seconds||0}s`);
+  if(!sourceUrls.length||(r.source_ids||[]).some(value=>value.startsWith('editorial_source_')))refs.append(node('p',`NO REAL SOURCE${r.source_ids?.length?': '+r.source_ids.join(', '):''}`,'warning'));
+  if(['video','resource'].includes(kind))refs.append(node('p',`License: ${r.license_name||r.license?.name||'MISSING — verify permitted use'}`,r.license_name||r.license?.name?'':'warning'));
+  content.append(refs);
+  review.append(node('h3','Your review'),node('p','Notes save automatically. Export a package before you finish.','sidebar-help'));
+  const flagLabel=node('label','Flag an issue '),flag=node('input');flagLabel.className='check-label';flag.type='checkbox';flag.checked=s.flag;flag.onchange=()=>edited(active,'flag',flag.checked);flagLabel.prepend(flag);review.append(flagLabel);
+  note(review,'Overall notes / what should be fixed',s.notes,value=>edited(active,'notes',value));
+  const checks=node('fieldset',undefined,'checks');checks.append(node('legend','Verification checks'));
+  for(const [key,label]of Object.entries(C.checks[kind])){const l=node('label',label+' '),input=node('input');input.type='checkbox';input.checked=s.checks[key]===true;input.onchange=()=>edited(active,'checks',{...state(active).checks,[key]:input.checked});l.prepend(input);checks.append(l);}review.append(checks);
+  const current=node('p',s.decision?`Final decision: ${s.decision} by ${db.reviewer} at ${s.decided_at}`:'In progress','status');current.id='decision-status';current.setAttribute('aria-live','polite');review.append(current);
+  const actions=node('div',undefined,'toolbar');
+  for(const [choice,label]of [['approve','Verified'],['revise','Needs fixes'],['reject','Reject']]){const action=button(label,()=>{try{C.finalize(state(active),kind,choice);session.add(active);save();render();message('Decision saved. Export your review package when finished.');}catch(error){message(error.message);}});action.id=choice;if(choice==='approve')action.className='primary';actions.append(action);}review.append(actions);updateActions();
+}
 function updateActions(){if(!active||!$('approve'))return;const s=state(active);$('approve').disabled=s.flag||Object.keys(C.checks[loaded[active].kind]).some(k=>s.checks[k]!==true);$('revise').disabled=$('reject').disabled=!C.comment(s).trim();}
 function download(value,filename){try{const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json;charset=utf-8'}));const a=node('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);message(`Export requested: ${filename}. Check your downloads and send the file to the owner.`);}catch(e){message(`Export failed: ${e.message}. Keep this window open.`);}}
 
@@ -68,7 +102,7 @@ async function loadBundled(){
   }catch(error){message('Could not load bundled DSA content: '+error.message);}
 }
 const bundledReady=loadBundled();
-$('reviewer').onchange=()=>$('switch').click();
+$('reviewer').onchange=async()=>{await $('switch').onclick();if(matchMedia('(max-width:760px)').matches)$('item').scrollIntoView({block:'start'});};
 
 $('switch').onclick=async()=>{await bundledReady;const name=$('reviewer').value.trim();if(!name){message('Choose your name.');return;}db.reviewer=name;if(!Object.hasOwn(db.people,name))Object.defineProperty(db.people,name,{value:{states:{},position:''},enumerable:true,writable:true,configurable:true});$('assignment-scope').value='mine';reconcileWorkspace();active=workspace().position;$('topic').value='';$('filter').value='all';$('type').value=loaded[active]?.kind||'lesson';session=new Set();save();render();};
 $('files').onchange=e=>loadFiles(e.target.files);$('drop').ondragover=e=>e.preventDefault();$('drop').ondrop=e=>{e.preventDefault();loadFiles(e.dataTransfer.files);};
@@ -80,3 +114,8 @@ $('continue').onclick=()=>{if(!nameRequired())return;const k=workspace().positio
 // Refresh topic choices after file loads without changing the selected topic.
 const originalRender=render;render=function(){const previous=$('topic').value;const topics=[...new Set(eligible().flatMap(([,i])=>[i.record.topic_id,...(i.record.topic_ids||[])]).filter(Boolean))].sort();$('topic').replaceChildren(new Option('All topics',''),...topics.map(t=>new Option(t,t)));$('topic').value=topics.includes(previous)?previous:'';originalRender();};
 selectReviewer(db.reviewer||'');$('assignment-scope').value=workspace()?.scope||'mine';if(db.reviewer){active=workspace()?.position||'';if(storageBroken)$('saved').textContent='Not saved—export a backup';else $('saved').textContent='Local workspace restored — loading assigned DSA content';render();}
+
+
+function applyTheme(theme){document.documentElement.dataset.theme=theme;$('theme').textContent=theme==='dark'?'Light mode':'Dark mode';$('theme').setAttribute('aria-pressed',String(theme==='dark'));}
+try{applyTheme(localStorage.getItem('course-review-theme')||'light');}catch{applyTheme('light');}
+$('theme').onclick=()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme(theme);try{localStorage.setItem('course-review-theme',theme);}catch{message('Theme changed for this visit. Browser storage is unavailable.');}};

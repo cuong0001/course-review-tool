@@ -9,7 +9,7 @@ const A=require('../../review-assignments.js');
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))requests.push(r.url());});
   const root=path.resolve(__dirname,'../..'),sandbox={};vm.runInNewContext(fs.readFileSync(path.join(root,'data/dsa-review-data.js'),'utf8'),sandbox);const data=sandbox.DSAReviewData;
   await page.goto(pathToFileURL(path.join(root,'review.html')).href);
-  await page.getByText(/229 approved questions excluded/).waitFor();
+  await page.getByText(/229 approved questions excluded/).waitFor({state:'attached'});
   assert.deepEqual(await page.locator('#reviewer option').allTextContents(),['Choose your name',...data.members]);
   for(const member of data.members){
    await page.locator('#reviewer').selectOption(member);
