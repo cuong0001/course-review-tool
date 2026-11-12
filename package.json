@@ -4,8 +4,8 @@
   "private": true,
   "description": "Offline course review workspace",
   "scripts": {
-    "test": "node --test tests/unit/review-core.test.cjs",
-    "test:browser": "node tests/e2e/review-workspace.cjs"
+    "test": "node --test tests/unit/*.test.cjs",
+    "test:browser": "node tests/e2e/review-workspace.cjs && node tests/e2e/dsa-assignments.cjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0"
