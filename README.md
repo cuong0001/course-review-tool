@@ -11,48 +11,50 @@ If you used the old tool inside the course project, export a review package ther
 ## Review in five steps
 
 1. Keep this folder together: `review.html`, `review.css`, `review-core.js`, `review-diff.js`, `review-renderers.js`, `review-assignments.js`, `review.js`, and the `data/` and `vendor/` folders. Double-click **review.html** to open it in a current Chrome or Edge browser.
-2. Choose **Cường**, **Hiếu**, **An**, **Hải**, **Huy**, or **Khánh**. Your assigned DSA content appears automatically.
-3. Choose **Reading guides** or **Questions**. By default, only your assignment is shown. No file picker is needed. The optional **Load newer / additional dataset files** control can replace snapshot records with newer course files; source links open only when clicked.
-4. Choose a review type and topic. Read the item and open its sources. Write overall notes or notes beside a reading-guide section. Flag problems. Your notes save as you type. Use **Next** to continue without making a final decision. When finished, choose **Verified**, **Needs fixes**, or **Reject**. Verification requires every check and no unresolved flag; the other decisions require notes. Editing a finalized review returns it to in-progress.
-5. Click **Export review package** before closing and send the downloaded JSON file to the owner. Keep a backup yourself. The package includes unfinished notes, flags, section notes, checks, and final decisions.
+2. Choose your name at the top: **Cường**, **Hiếu**, **An**, **Hải**, **Huy** or **Khánh**. Your assigned items load automatically.
+3. Read the item. The question (or reading guide) fills most of the screen. The correct answer is marked **✓**, and the reason each wrong answer is wrong is shown under it.
+4. Decide, in the panel on the right:
+   - **Approve** if it is correct. Approving confirms the checklist shown when you hover the button: the source supports it, the answer is correct, each wrong answer is wrong for a stated reason, and the facts and code are accurate.
+   - Otherwise write what should change in **Notes**, then choose **Needs changes**, or **Reject** if the item should be removed.
+   - For a reading guide, hover a section and click **+ Note** to leave a note on that section.
+   - **Flag an issue** marks an item to come back to. A flagged item cannot be approved until the flag is cleared.
+5. Click **Export** before closing and send the downloaded JSON file to the owner. Keep a copy yourself. The file holds your notes, flags and decisions, including unfinished ones.
 
-**Saved locally** means saved in this browser profile for this HTML location. Reopening the page restores your selected member, current item, and notes. Assigned DSA content loads automatically. Moving the folder, changing browsers, private browsing, or clearing browser storage can remove access to the save. Export regularly. If you see **Not saved—export a backup**, keep the window open and export immediately.
+**Saved** (top right) means saved in this browser profile for this HTML location. Reopening the page restores your name, your position and your notes. Moving the folder, changing browsers, private browsing or clearing browser storage can lose the save, so export regularly. If you see **Not saved—export a backup**, keep the window open and export immediately.
 
-Use **Import review package** to resume on another device. It restores the reviewer name too. Reviews for different people stay separate. A conflicting import is refused without overwriting local work: export the local workspace first and inspect the other package in a different browser profile. There is no automatic multi-person merge.
+The **⋯** menu holds everything else: dark mode, text size, showing LaTeX source, hiding the queue, keyboard shortcuts, **Export finalized decisions**, **Import review package** (to resume on another device; a conflicting import is refused without overwriting local work), **Load newer dataset files**, and the team allocation.
 
-Reading guides are highest priority even though the old data claims they were approved. Questions include pending items first, grouped by topic, then items needing revision. Existing approved questions are excluded. Resources and activities appear only after checking **Include resources and activities**. Videos are the final review type. Missing sources and licenses are displayed as warnings; never tick a verification check you have not actually performed.
+Reading guides come first. Questions are grouped by topic; approved questions are excluded. Resources and activities appear only after ticking **Include resources and activities** in the queue. Missing sources and licences show as warnings. Never approve something you have not actually checked.
 
-Lesson text, code, tables, and all trace steps are visible. Full block data remains available in expandable sections. Basic Markdown and inline code are formatted. LaTeX renders through the bundled KaTeX renderer and embedded local fonts: `$...$`, `$$...$$`, `\(...\)`, and `\[...\]` are supported. Code samples remain literal. Invalid formulas show their original source with a warning style, so they can still be flagged. No CDN or network request is needed. The tool does not compile code or verify source claims automatically. Avoid editing the same reviewer workspace in multiple tabs at once.
+LaTeX renders through the bundled KaTeX and its local fonts: `$...$`, `$$...$$`, `\(...\)` and `\[...\]` are supported, and inline formulas sit on the text line. Code samples stay literal. A formula that cannot render shows its source in a warning style, so it can still be noted. No network request is needed. The tool does not compile code or check sources by itself. Avoid editing the same reviewer workspace in several tabs at once.
 
 ## Working faster
 
-- **Queue.** Every entry shows its status as a word (Not started, In progress, Flagged, Verified, Needs fixes, Rejected), plus *changed* when the item differs from its previous version.
-- **Search** (`/` or Ctrl+K) matches IDs, item text and your own notes. Enter opens the first match, and Esc clears the search.
-- **Show → Changed since last version** lists only items that changed.
-- **What changed.** A changed item opens with a panel showing each changed field before and after, rendered side by side. **Exact text changes** shows the word-level edits. Use it to confirm that a reworded or re-notated item still says the same thing.
-- **LaTeX source.** Hover a formula to see its source. **View → Show LaTeX source** (or `T`) prints the source under every formula.
-- **Navigation.** **Previous**, **Next** and **Next not finished** sit at the top of the item and stay visible while you scroll. Finishing an item that leaves the current view moves you to the item that followed it, not back to the top.
-- **Undo decision** appears after Verified / Needs fixes / Reject. It restores the item exactly as it was before the decision. Any later edit to that item withdraws the Undo, so newer notes are never overwritten.
-- **Why a button is disabled.** A line under the decision buttons says what is missing, for example "Tick 2 more checks to verify."
-- **View options:** text size, LaTeX source and focus mode (which hides the sidebar). They are remembered in this browser. They are display preferences only and never contain course content.
+- **Queue.** Hover the thin rail on the left (or press `/`) to open the queue, its filters and search. Each entry shows its status: Not started, In progress, Flagged, Approved, Needs changes or Rejected. **Show → Changed since last version** lists only items that changed.
+- **Search** (`/` or Ctrl+K) matches IDs, item text and your own notes. Enter opens the first match; Esc clears the search.
+- **Only the current version is shown.** Review the item as it is now; there is no before/after comparison.
+- **LaTeX source.** Hover a formula to see its source, or turn on **⋯ → Show LaTeX source** (`T`) to print it under every formula.
+- **Navigation.** **‹ ›** and **Next unfinished** sit at the top of the item. Finishing an item that leaves the current view moves you to the item after it, not back to the top.
+- **Undo** appears after a decision and restores the item exactly as it was. Any later edit to that item withdraws it, so newer notes are never overwritten.
+- **Hide the queue** (in the ⋯ menu) gives the item the full width. View preferences are remembered in this browser and never contain course content.
 
 | Keys | Action |
 |---|---|
-| Alt+→ / Alt+←, or J / K | Next / previous item in the queue |
-| U | Next item not finished |
+| Alt+→ / Alt+←, or J / K | Next / previous item |
+| U | Next unfinished item |
 | / or Ctrl+K | Search |
-| N | Overall notes |
+| N | Notes |
 | F | Flag or unflag |
 | T | Show or hide LaTeX source |
 | ? | All shortcuts |
 
-Single-key shortcuts are ignored while you type in a box. No shortcut makes a final decision.
+Single-key shortcuts are ignored while you type in a box. No shortcut makes a decision.
 
 ## Reading and reviewing
 
-The layout follows the course project's reading styles: assignment filters and the queue on the left, readable lesson/question content in the center, and notes plus verification controls beside it on wide screens. On smaller screens these sections stack. Previous/Next controls sit above the content. Code samples, wide tables, and large equations have their own scroll areas and can be reached by keyboard.
+The layout is deliberately minimal: one slim header row, the item across most of the width, and a small notes-and-decision panel on the right. The queue and the tools stay hidden until you hover or open them. On narrow screens the queue, the item and the panel stack. Code samples, wide tables and large equations scroll inside their own areas and can be reached by keyboard.
 
-Use **Dark mode** / **Light mode** to choose the project-style palette; that choice is remembered locally. Review notes, checklist ticks, decisions, and item position keep the same automatic-save behavior as before. Export a review package before finishing.
+Dark mode is remembered locally. Notes, flags, decisions and position save automatically. Export before finishing.
 
 KaTeX 0.19.1 is copied from the course project's pinned distribution. Its fonts are embedded in the local stylesheet for reliable `file://` use. The MIT license and source information are under `vendor/katex/`.
 

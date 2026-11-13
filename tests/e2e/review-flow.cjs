@@ -1,4 +1,4 @@
-/* Reviewer workflow: what-changed panel, LaTeX source, keyboard, search, stable navigation, undo, view options. */
+/* Reviewer workflow: minimal layout (hover queue, no before/after panel), LaTeX source, keyboard, search, stable navigation, undo, view options. */
 const {chromium} = require('@playwright/test');
 const assert = require('node:assert/strict'), path = require('node:path'), os = require('node:os'), fs = require('node:fs');
 const {pathToFileURL} = require('node:url');
@@ -29,21 +29,27 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 
     await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
     await page.locator('#reviewer').selectOption('An'); await page.locator('#type').selectOption('question');
     const h2 = () => page.locator('#item h2').first().textContent();
+    // The queue is a rail that opens on hover; hover it before clicking an entry.
+    const pick = async n => { await page.locator('.rail-tab').hover({force: true}); await page.locator('#queue button').nth(n).click(); };
 
-    // Queue: status chips, changed marker, count; "Changed since last version" filter.
+    // Queue: status chips, count; "Changed since last version" filter. The panel is hidden until hovered.
     assert.equal(await page.locator('#queue button').count(), 3);
-    assert.match(await page.locator('#queue button').first().textContent(), /^Q_T05_1_01 · Not started changed/);
+    assert.match(await page.locator('#queue button').first().textContent(), /^Q_T05_1_01 · Not started/);
+    assert.equal(await page.locator('.rail-panel').evaluate(e => getComputedStyle(e).opacity), '0');
+    await page.locator('.rail-tab').hover({force: true}); await page.waitForTimeout(250);
+    assert.equal(await page.locator('.rail-panel').evaluate(e => getComputedStyle(e).opacity), '1');
+    await page.mouse.move(900, 600);
     assert.match(await page.locator('#queue-count').textContent(), /3 items · 0 finished/);
     await page.locator('#filter').selectOption('changed'); assert.equal(await page.locator('#queue button').count(), 1); await page.locator('#filter').selectOption('all');
 
-    // What changed: before shows the old plain text as code, after renders the formula; exact text diff on request.
-    const panel = page.locator('.changes');
-    assert.match(await panel.locator('summary').first().textContent(), /2 fields · compared with run TEST · was approved by An/);
-    assert.equal(await panel.locator('.change-before code').first().textContent(), 'Theta(n^2)');
-    assert.ok(await panel.locator('.change-after .katex').count() >= 2);
-    await panel.locator('.change-source summary').first().click();
-    assert.ok(await panel.locator('.source-diff del').count() >= 1 && await panel.locator('.source-diff ins').count() >= 1);
-    await page.screenshot({path: path.join(shots, 'changes-desktop.png'), fullPage: true});
+    // Only the current version is shown: no before/after panel, and the new text renders its formulas.
+    assert.equal(await page.locator('.changes, .change-before, .source-diff').count(), 0);
+    assert.ok(await page.locator('.question-stem .katex').count() >= 1 && await page.locator('.explanation .katex').count() >= 1);
+    // Inline formulas sit on the text baseline (not shifted as an inline-block).
+    assert.equal(await page.locator('.question-stem .learning-math').first().evaluate(e => getComputedStyle(e).display + '/' + getComputedStyle(e).verticalAlign), 'inline/baseline');
+    // The content takes most of the width.
+    assert.ok(await page.locator('.review-content').evaluate(e => e.getBoundingClientRect().width) > 1000);
+    await page.screenshot({path: path.join(shots, 'question-desktop.png'), fullPage: true});
 
     // LaTeX source: hover title, toggle with T, preference survives reload.
     assert.match(await page.locator('.question-stem .learning-math').first().getAttribute('title'), /LaTeX source: \$\\Theta\(n\^2\)\$/);
@@ -62,10 +68,11 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 
     await page.keyboard.type('jkfu notes'); assert.equal(await h2(), 'Q_T05_1_02');
     assert.equal(await page.locator('#overall-notes').inputValue(), 'jkfu notes'); assert.equal(await page.locator('#flag').isChecked(), false);
     await page.locator('#overall-notes').press('Alt+ArrowLeft'); assert.equal(await h2(), 'Q_T05_1_01');
-    await page.locator('body').click({position: {x: 5, y: 5}}); await page.keyboard.press('f');
+    await page.locator('.review-content').click({position: {x: 600, y: 5}}); await page.keyboard.press('f');
     assert.equal(await page.locator('#flag').isChecked(), true); assert.match(await page.locator('#queue button[aria-current=true] .chip').textContent(), /Flagged/);
     await page.keyboard.press('f'); assert.equal(await page.locator('#flag').isChecked(), false);
-    assert.equal(await page.locator('#decision-help').textContent(), 'Tick 4 more checks to verify. Write a note to choose Needs fixes or Reject.');
+    assert.equal(await page.locator('#decision-help').textContent(), '');
+    assert.equal(await page.locator('#approve').isDisabled(), false); assert.equal(await page.locator('#revise').isDisabled(), true);
 
     // Search: ID, content and the reviewer's own notes; Enter opens the first match; Esc clears.
     await page.keyboard.press('/'); assert.equal(await page.evaluate(() => document.activeElement.id), 'search');
@@ -75,29 +82,32 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 
     await page.locator('#search').fill('jkfu'); await page.waitForTimeout(250); assert.equal(await page.locator('#queue button').count(), 1);
     await page.locator('#search').press('Escape'); assert.equal(await page.locator('#search').inputValue(), ''); assert.equal(await page.locator('#queue button').count(), 3);
     await page.locator('#search').fill('zzz-no-match'); await page.waitForTimeout(250);
-    await page.getByText('No items in this view.', {exact: false}).waitFor(); await page.getByRole('button', {name: 'Clear search and filters'}).click();
+    await page.getByText('No items in this view.', {exact: false}).waitFor();
+    await page.locator('#search').blur(); await page.mouse.move(900, 600); await page.getByRole('button', {name: 'Clear search and filters'}).click();
     assert.equal(await page.locator('#queue button').count(), 3);
 
     // Stable navigation: finishing an item while showing "In progress" moves to the item after it, not the top.
-    await page.locator('#queue button').nth(2).click(); await page.locator('#overall-notes').fill('third note');
+    await pick(2); await page.locator('#overall-notes').fill('third note');
     await page.locator('#filter').selectOption('in-progress'); assert.equal(await page.locator('#queue button').count(), 3);
-    await page.locator('#queue button').nth(1).click(); assert.equal(await h2(), 'Q_T05_1_02');
-    await page.getByRole('button', {name: 'Needs fixes', exact: true}).click();
+    await pick(1); assert.equal(await h2(), 'Q_T05_1_02');
+    await page.mouse.move(900, 600); await page.getByRole('button', {name: 'Needs changes', exact: true}).click();
     assert.equal(await page.locator('#queue button').count(), 2, 'finished item leaves the in-progress view');
     assert.equal(await h2(), 'Q_T05_1_03', 'moved to the item that followed, not back to the top');
-    await page.locator('#filter').selectOption('all'); await page.locator('#queue button').nth(1).click();
-    assert.match(await page.locator('#decision-status').textContent(), /Final decision: Needs fixes/);
+    await page.locator('#filter').selectOption('all'); await pick(1); await page.mouse.move(900, 600);
+    assert.match(await page.locator('#decision-status').textContent(), /^Needs changes · /);
 
     // Undo restores the state before the decision (notes kept); any edit after a decision withdraws Undo.
     assert.equal(await page.locator('#undo').isVisible(), true); await page.locator('#undo').click();
-    assert.equal(await page.locator('#decision-status').textContent(), 'In progress'); assert.equal(await page.locator('#overall-notes').inputValue(), 'jkfu notes');
-    await page.getByRole('button', {name: 'Needs fixes', exact: true}).click(); assert.equal(await page.locator('#undo').isVisible(), true);
+    assert.equal(await page.locator('#decision-status').textContent(), ''); assert.equal(await page.locator('#overall-notes').inputValue(), 'jkfu notes');
+    await page.getByRole('button', {name: 'Needs changes', exact: true}).click(); assert.equal(await page.locator('#undo').isVisible(), true);
     await page.locator('#overall-notes').fill('jkfu notes, more'); assert.equal(await page.locator('#undo').isVisible(), false);
-    assert.equal(await page.locator('#decision-status').textContent(), 'In progress');
+    assert.equal(await page.locator('#decision-status').textContent(), '');
 
-    // "Next not finished" skips finished items.
-    await page.getByRole('button', {name: 'Needs fixes', exact: true}).click();
-    await page.locator('#queue button').nth(0).click(); await page.keyboard.press('u'); assert.equal(await h2(), 'Q_T05_1_03');
+    // Approve needs no checklist: it records every check as confirmed. "Next unfinished" skips finished items.
+    await page.getByRole('button', {name: 'Approve', exact: true}).click();
+    assert.match(await page.locator('#decision-status').textContent(), /^Approved · /);
+    assert.match(await page.locator('#approve').getAttribute('title'), /Approving confirms:[\s\S]*The correct answer is correct/);
+    await pick(0); await page.mouse.move(900, 600); await page.keyboard.press('u'); assert.equal(await h2(), 'Q_T05_1_03');
 
     // Shortcut dialog, focus mode, text size; all persist as display preferences only.
     await page.keyboard.press('?'); assert.equal(await page.locator('#shortcuts').isVisible(), true);
@@ -112,13 +122,13 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 
     assert.equal(await page.evaluate(() => document.documentElement.style.fontSize), '');
 
     // Dark theme and phone width: no horizontal scroll.
-    await page.locator('#theme').click(); await page.locator('#queue button').nth(0).click();
-    await page.screenshot({path: path.join(shots, 'changes-dark.png'), fullPage: true});
+    await page.locator('#theme').click(); await pick(0); await page.mouse.move(900, 600);
+    await page.screenshot({path: path.join(shots, 'question-dark.png'), fullPage: true});
     await page.setViewportSize({width: 375, height: 812});
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-    await page.screenshot({path: path.join(shots, 'changes-mobile.png'), fullPage: true});
+    await page.screenshot({path: path.join(shots, 'question-mobile.png'), fullPage: true});
     assert.deepEqual(errors, []); assert.deepEqual(network, []);
-    console.log('PASS: what-changed panel and exact diff, LaTeX source toggle, keyboard shortcuts (safe while typing), search incl. notes, stable navigation after a decision, undo and its withdrawal, next not finished, dialog, focus mode, text size, dark, 375px; no network requests.');
+    console.log('PASS: minimal layout (hover queue, wide content, no before/after panel, baseline math), one-click approve, LaTeX source toggle, keyboard shortcuts (safe while typing), search incl. notes, stable navigation after a decision, undo and its withdrawal, next not finished, dialog, focus mode, text size, dark, 375px; no network requests.');
     console.log('Screenshots: ' + shots);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });
