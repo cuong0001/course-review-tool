@@ -7,8 +7,11 @@ const ReviewRender = (() => {
     try{
       if(!globalThis.katex||formula.length>5000)throw Error('Math renderer unavailable or expression too long');
       katex.render(formula,span,{displayMode:display,output:'htmlAndMathml',throwOnError:true,trust:false,strict:'ignore',maxExpand:1000,maxSize:10});
-    }catch(error){span.className='math-fallback';span.textContent=source;span.title='Formula could not be rendered; original source is shown.';}
-    parent.append(span);return span;
+      span.title='LaTeX source: '+source;
+    }catch(error){span.className='math-fallback';span.textContent=source;span.title='Formula could not be rendered; original source is shown.';parent.append(span);return span;}
+    // The exact source stays available for checking notation: hidden unless "Show LaTeX source" is on.
+    const tex=el('code',source);tex.className='tex-source'+(display?' tex-source-block':'');
+    parent.append(span,tex);return span;
   }
   function code(parent,text,language=''){
     const pre=el('pre'),content=el('code',text);pre.tabIndex=0;pre.setAttribute('aria-label','Code sample or original source');if(language)content.dataset.language=language;
@@ -58,7 +61,8 @@ const ReviewRender = (() => {
     for(const field of fields){const th=el('th',field.replaceAll('_',' '));th.scope='col';header.append(th);}grid.append(header);
     for(const row of rows){const tr=el('tr');for(const field of fields){const td=el('td'),value=row[field];
       if(value&&typeof value==='object')td.textContent=JSON.stringify(value);
-      else if(/bound|complexity/.test(field)&&/\\[A-Za-z]/.test(String(value)))math(td,String(value));
+      // Delimited math ($...$) renders as text plus formulas; only legacy undelimited TeX cells go to KaTeX whole.
+      else if(/bound|complexity/.test(field)&&/\\[A-Za-z]/.test(String(value))&&!String(value).includes('$'))math(td,String(value));
       else inline(td,String(value??''));tr.append(td);
     }grid.append(tr);}wrap.append(grid);parent.append(wrap);
   }

@@ -1,3 +1,35 @@
+# Review workspace verification — 2026-11-13
+
+- **`npm test`:** 12 unit tests passed, 0 failed. The 4 new tests cover:
+  - field-level diffs, with review metadata ignored;
+  - readable labels;
+  - word-level diffs;
+  - `build-dsa-snapshot.cjs --compare-with` recording changes while leaving records byte-identical.
+- **All four browser suites passed in Chrome through `file://`.**
+  - In the existing suites, `review-diff.js` was added to the copied file list, and the assignment test now reads its expected counts from the bundled data.
+  - The new `review-flow.cjs` covers:
+    - the what-changed panel (before/after rendered, exact word diff);
+    - the LaTeX source tooltip and toggle, persisted;
+    - Alt+arrows, J/K, U, N, F, T, / and ? shortcuts, with letters typed into notes staying in notes;
+    - search over IDs, text and notes, with Enter and Esc;
+    - the empty-state "Clear search and filters";
+    - after a decision, moving to the following item rather than the top;
+    - Undo, and Undo being withdrawn after a later edit;
+    - the disabled-button explanation;
+    - the shortcut dialog;
+    - focus mode and text size, persisted;
+    - dark theme and 375 px with no horizontal scroll;
+    - no page errors and no network requests.
+- **Screenshots inspected:** the desktop changes panel, the LaTeX source toggle, and the dark-theme layout at 375 px.
+- **Not done:** no Edge/Firefox/Safari run, no physical phone, and no screen-reader session.
+- **Snapshot rebuilt** from candidate run `20261113T071319Z` (audit repairs, re-audit wording follow-up, Q_T05_3_07 punctuation), using `--compare-with` against `data/curated`.
+  - Contents: 90 approved questions excluded, 486 pending questions, 21 guides, 400 changed items (156 previously approved). Unit 12/12 and all 4 browser suites pass after the rebuild.
+  - Owners were kept; the 139 newly pending questions were spread 23–24 per member, giving 81 questions each.
+  - The pinned values in `assignments.test.cjs` were updated to match.
+  - **Bug found and fixed:** on this real data, `math-readability.cjs` found 30 complexity-table cells that fell back to raw text. Cells containing `$` were being passed whole to KaTeX. `$`-delimited cells now render inline.
+  - After the fix, all 2,668 real formulas render with no fallback.
+- **Also inspected:** a screenshot of a real changed question (Q_T01_1_01, "was approved by An").
+
 # Offline math and reading UI verification — 2026-11-12
 
 ## Results
