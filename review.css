@@ -204,7 +204,7 @@ input[type=file] {
 }
 .app-layout {
   display:grid;
-  grid-template-columns:255px minmax(0,1fr);
+  grid-template-columns:300px minmax(0,1fr);
   gap:24px;
   max-width:1800px;
   margin:auto;
@@ -239,8 +239,22 @@ input[type=file] {
 .sidebar details>label {
   margin-top:12px
 }
+.filters {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:0 10px
+}
 .filters label {
-  margin:10px 0
+  margin:6px 0;
+  font-size:.9rem
+}
+.filters select {
+  min-height:40px;
+  padding:7px 8px;
+  font-size:.92rem
+}
+.filters .check-label {
+  grid-column:1/-1
 }
 .check-label,.checks label {
   display:flex;
@@ -267,7 +281,8 @@ progress {
   color:var(--muted)
 }
 #queue {
-  max-height:430px;
+  position:relative;
+  max-height:min(64vh,680px);
   overflow:auto;
   padding:3px
 }
@@ -275,9 +290,9 @@ progress {
   display:block;
   text-align:left;
   width:100%;
-  margin:0 0 8px;
-  padding:12px;
-  font-size:.95rem;
+  margin:0 0 6px;
+  padding:9px 11px;
+  font-size:.92rem;
   overflow-wrap:anywhere;
   background:var(--surface)
 }
@@ -289,9 +304,9 @@ progress {
   display:block;
   color:var(--muted);
   font-weight:400;
-  font-size:.95rem;
-  margin-top:5px;
-  line-height:1.45
+  font-size:.9rem;
+  margin-top:4px;
+  line-height:1.4
 }
 #item {
   min-width:0;
@@ -683,7 +698,7 @@ summary {
 label, legend, .header-controls > *, .export-controls > *, .brand > div { min-width: 0; overflow-wrap: anywhere; }
 legend { max-width: 100%; }
 .content-navigation { flex-wrap: wrap; }
-@media (max-width: 420px) { .filters[open] { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) { .filters { grid-template-columns: minmax(0, 1fr); } }
 
 /* Anchor accessible MathML to its formula instead of the page. */
 .learning-math { position: relative; }
@@ -694,3 +709,93 @@ legend { max-width: 100%; }
 
 /* Queue entries are previews; the selected item always shows the full content. */
 .queue-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+
+/* ---------------------------------------------------------------- review workspace additions */
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
+kbd { font:600 .78em/1 Consolas,monospace; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:2px 5px; background:var(--soft); color:var(--ink); white-space:nowrap }
+.message-row { grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+.message-row #message { flex:1 1 300px }
+.message-row:has(#message:empty):has(#undo[hidden]) { display:none }
+#saved.save-error { color:var(--warning); background:var(--warning-bg); padding:4px 10px; border-radius:7px }
+
+/* View options: progressive disclosure for display preferences. */
+.view-menu { position:relative }
+.view-menu > summary { list-style:none; border:1px solid var(--line); border-radius:9px; padding:10px 12px; min-height:44px; font-weight:600; background:var(--surface); display:flex; align-items:center; cursor:pointer }
+.view-menu > summary::-webkit-details-marker { display:none }
+.view-menu > summary::after { content:"▾"; margin-left:6px }
+.view-panel { position:absolute; right:0; top:calc(100% + 6px); z-index:30; width:min(300px,calc(100vw - 32px)); background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 10px 30px rgb(0 0 0 / .16); display:grid; gap:12px }
+.view-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-weight:500 }
+.segmented { display:flex; align-items:center; gap:6px }
+.segmented button { min-height:38px; padding:4px 10px }
+.segmented output { min-width:3.4em; text-align:center; font-variant-numeric:tabular-nums }
+
+/* Sidebar: progress, then the queue with its filters and search. */
+.workspace-summary #continue { margin-top:6px; width:100% }
+.search-row { display:flex; gap:6px; margin:10px 0 4px }
+.search-row input { flex:1; min-width:0 }
+.search-row button { padding:8px 10px }
+.queue-count { margin:4px 0 8px; color:var(--muted); font-size:.9rem }
+.chip { display:inline-block; font-size:.76rem; font-weight:650; line-height:1.2; padding:3px 8px; border-radius:999px; border:1px solid var(--line); background:var(--soft); color:var(--muted); vertical-align:1px; white-space:nowrap }
+.chip-in-progress { background:var(--selected); color:var(--ink); border-color:var(--accent) }
+.chip-flagged, .chip-revise, .chip-reject { background:var(--warning-bg); color:var(--warning); border-color:var(--warning) }
+.chip-approve { background:var(--success-bg); color:var(--success); border-color:var(--success) }
+.queue-flag { color:var(--warning); font-size:.84rem }
+.queue-changed { font-size:.76rem; font-weight:650; color:var(--accent); margin-left:2px; text-transform:uppercase; letter-spacing:.03em }
+
+/* Reading panel: navigation stays reachable while reading long items. */
+.content-navigation { position:sticky; top:0; z-index:5; background:var(--surface); margin:-28px -28px 22px; padding:14px 28px; border-radius:14px 14px 0 0 }
+.content-navigation .position { margin-right:auto; margin-left:4px; font-variant-numeric:tabular-nums }
+.content-kicker .chip { margin-left:4px }
+.item-title { display:flex; gap:12px; align-items:flex-start; justify-content:space-between }
+.item-title h2 { margin-bottom:14px }
+.copy-id { min-height:34px; padding:4px 10px; font-size:.85rem; flex:none }
+
+/* What changed: before/after rendered side by side, exact text differences on request. */
+.changes { border:1px solid var(--accent); border-radius:12px; background:var(--soft); padding:14px 18px; margin:6px 0 24px }
+.changes > summary { font-weight:650; color:var(--accent) }
+.change-field { border-top:1px solid var(--line); padding:12px 0 6px }
+.change-field h4 { margin:0 0 8px; font-size:.95rem; color:var(--muted) }
+.change-field h4::first-letter { text-transform:uppercase }
+.change-pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px }
+.change-before, .change-after { background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-size:1rem; min-width:0 }
+.change-after { border-color:var(--success) }
+.change-tag { display:block; font-size:.74rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin-bottom:4px }
+.change-source > summary { font-size:.9rem; color:var(--muted); margin-top:8px }
+.source-diff { font:.9rem/1.65 Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px }
+del { background:#fbdada; color:#7a1c1c; text-decoration:line-through }
+ins { background:#d6f0da; color:#1d5428; text-decoration:underline }
+:root[data-theme=dark] del { background:#4a2324; color:#f6c9c9 }
+:root[data-theme=dark] ins { background:#1f3d27; color:#c4ecc9 }
+
+/* LaTeX source for checking notation; hidden unless View → Show LaTeX source. */
+.tex-source { display:none }
+.show-tex .tex-source { display:inline-block; margin-left:4px; font-size:.8em; color:var(--muted); background:var(--soft); border:1px dashed var(--line) }
+.show-tex .tex-source-block { display:block; width:max-content; max-width:100%; margin:0 0 8px }
+.show-tex .queue-preview .tex-source { display:none }
+
+/* Focus mode: the reading panel takes the full width. */
+.focus-mode .app-layout { grid-template-columns:minmax(0,1fr) }
+.focus-mode .sidebar { display:none }
+
+/* Review panel helpers. */
+.flag-label kbd { margin-left:auto }
+.decision-help { font-size:.9rem; color:var(--muted); margin:8px 0 0 }
+.decision-help:empty { display:none }
+.next-open-panel { width:100%; margin-top:12px }
+
+/* Shortcut dialog. */
+dialog { border:1px solid var(--line); border-radius:14px; background:var(--surface); color:var(--ink); padding:22px 26px; max-width:min(560px,calc(100vw - 32px)) }
+dialog::backdrop { background:rgb(0 0 0 / .4) }
+dialog h2 { font-size:1.3rem; margin-bottom:6px }
+.shortcut-table td { border:none; border-bottom:1px solid var(--line); padding:8px 10px }
+.shortcut-table td:first-child { white-space:nowrap }
+dialog form { margin-top:16px; text-align:right }
+
+@media (max-width:900px) { .change-pair { grid-template-columns:minmax(0,1fr) } }
+@media (max-width:760px) {
+  .content-navigation { margin:-18px -18px 16px; padding:10px 18px }
+  .content-navigation .position { flex-basis:100%; order:-1; margin:0 }
+  #queue { max-height:240px }
+  .view-menu { position:static; flex:1 1 100% }
+  .view-panel { position:static; width:100%; margin-top:8px; box-shadow:none }
+}
