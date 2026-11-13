@@ -58,12 +58,12 @@ KaTeX 0.19.1 is copied from the course project's pinned distribution. Its fonts 
 
 ## DSA allocation
 
-The bundled read-only snapshot is built from the candidate dataset of run `20261113T051109Z` (the notation pass on top of repairs R01–R08). It is compared with the current course data (`data/curated`). Its contents:
+The bundled read-only snapshot is built from the candidate dataset of run `20261113T063110Z` (repairs for the Codex and Gemini pre-human audits, on top of the notation pass). It is compared with the current course data (`data/curated`). Its contents:
 
 - **90 approved questions**, excluded from review;
 - **486 pending questions**;
 - **21 reading guides**, which need real review despite their old demo approval labels;
-- **401 items marked *changed***, 157 of which were approved in the course data.
+- **400 items marked *changed***, 156 of which were approved in the course data.
 
 Choose **Show → Changed since last version** to see only the changed items. The snapshot is a review copy; the canonical dataset stays in the course project, which this tool does not change.
 
@@ -89,7 +89,7 @@ node scripts/build-dsa-snapshot.cjs "PATH_TO_COURSE_PROJECT/data/curated"
 To let reviewers see what changed (for example a notation-only run), also pass the older dataset:
 
 ```bash
-node scripts/build-dsa-snapshot.cjs "PATH_TO_NEW/data/curated" --compare-with "PATH_TO_OLD/data/curated" --label "run 20261113T051109Z"
+node scripts/build-dsa-snapshot.cjs "PATH_TO_NEW/data/curated" --compare-with "PATH_TO_OLD/data/curated" --label "run 20261113T063110Z"
 ```
 
 Each changed question or guide then carries a field-level change list (`DSAReviewData.changes`). The records themselves stay byte-for-byte the course data, so their fingerprints are unaffected. Loading newer JSONL files in the tool gives the same panel, compared with the bundled version.

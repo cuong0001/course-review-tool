@@ -13,8 +13,8 @@ globalThis.DSAReviewData = {
   ],
   "source_sha256": {
     "course.json": "fcd14db7e50df933813f89bc5b268f9de37aca8ca22e8130099da36d3bbede35",
-    "question_bank.jsonl": "b549af1d8fea066433014f5561b65dd78f66f31d52f9b932fd4083adaa18e4d3",
-    "lesson_content.jsonl": "47afb29dc0d7cc5e1300ee70b1ae93a8a95a12fe9f4ea12c36f10d3f3bc2ff93"
+    "question_bank.jsonl": "8641937ae80943607404f263daaddb450cf307f16945ea880c76de3ff266bdfe",
+    "lesson_content.jsonl": "a9ed2f5b81b81b8831177a066b391179d4f78d423a3a25ba398f9ec6ba4f4faa"
   },
   "summary": {
     "total_questions": 576,
@@ -543,7 +543,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T00_1",
       "concept_id": "C00",
       "locale": "en",
-      "revision": 3,
+      "revision": 4,
       "title": "C/C++ Arrays, Functions, Structs, and Parameter Passing",
       "learning_objective_ids": [
         "T00_1_LO1",
@@ -569,7 +569,7 @@ globalThis.DSAReviewData = {
           "type": "prose",
           "section": "intuition",
           "required": true,
-          "body_md": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying while the compiler strictly prohibits modifications, combining optimal zero-copy performance with caller safety."
+          "body_md": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects any modification made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
         },
         {
           "id": "T00_1-invariant",
@@ -685,7 +685,7 @@ globalThis.DSAReviewData = {
           "language": "cpp",
           "standard": "c++17",
           "caption": "Parameter Passing Semantics and 2D Row-Major Indexing in C++",
-          "source": "#include <iostream>\n#include <vector>\n\nstruct Point {\n    int x;\n    int y;\n};\n\n// Pass-by-value: operates on a local copy; caller remains unchanged\nvoid modifyByValue(Point p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-reference: binds alias to caller variable; modifies caller directly\nvoid modifyByReference(Point& p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-const-reference: eliminates copying overhead while enforcing immutability\nint computeSum(const Point& p) {\n    return p.x + p.y;\n}\n\n// 2D Row-Major Offset Calculation: address(r, c) = base + (r * cols + c)\nint get2DElement(const int* matrix, int rows, int cols, int r, int c) {\n    if (r < 0 || r >= rows || c < 0 || c >= cols) {\n        return -1; // Out-of-bounds safety guard\n    }\n    return matrix[r * cols + c];\n}"
+          "source": "#include <iostream>\n#include <vector>\n\nstruct Point {\n    int x;\n    int y;\n};\n\n// Pass-by-value: operates on a local copy; caller remains unchanged\nvoid modifyByValue(Point p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-reference: binds alias to caller variable; modifies caller directly\nvoid modifyByReference(Point& p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-const-reference: no copy, and read-only access through p\n// (another non-const reference to the same object could still modify it)\nint computeSum(const Point& p) {\n    return p.x + p.y;\n}\n\n// 2D Row-Major Offset Calculation: address(r, c) = base + (r * cols + c)\nint get2DElement(const int* matrix, int rows, int cols, int r, int c) {\n    if (r < 0 || r >= rows || c < 0 || c >= cols) {\n        return -1; // Out-of-bounds safety guard\n    }\n    return matrix[r * cols + c];\n}"
         },
         {
           "id": "T00_1-complexity",
@@ -957,7 +957,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T01_1",
       "concept_id": "C01",
       "locale": "en",
-      "revision": 4,
+      "revision": 5,
       "title": "Algorithms, Data Structures, and Abstract Data Types (ADT)",
       "learning_objective_ids": [
         "T01_1_LO1",
@@ -1125,8 +1125,8 @@ globalThis.DSAReviewData = {
           "type": "code",
           "language": "cpp",
           "standard": "c++17",
-          "caption": "Abstract ADT Interface and Concrete ArraySet Implementation in C++",
-          "source": "#include <vector>\n#include <algorithm>\n#include <cassert>\n\n// ADT Interface Contract (Pure Virtual Interface)\ntemplate <typename T>\nclass ISetADT {\npublic:\n    virtual ~ISetADT() = default;\n    virtual bool contains(const T& item) const = 0;\n    virtual bool insert(const T& item) = 0;\n    virtual bool remove(const T& item) = 0;\n    virtual size_t size() const = 0;\n};\n\n// Concrete Physical Data Structure Implementation (Unordered Array Set)\ntemplate <typename T>\nclass ArraySet : public ISetADT<T> {\nprivate:\n    std::vector<T> elements;\n\npublic:\n    bool contains(const T& item) const override {\n        return std::find(elements.begin(), elements.end(), item) != elements.end();\n    }\n\n    bool insert(const T& item) override {\n        if (contains(item)) return false; // Invariant: No duplicates allowed\n        elements.push_back(item);\n        return true;\n    }\n\n    bool remove(const T& item) override {\n        auto it = std::find(elements.begin(), elements.end(), item);\n        if (it == elements.end()) return false;\n        // O(1) unordered removal: swap target with last element, then pop\n        *it = std::move(elements.back());\n        elements.pop_back();\n        return true;\n    }\n\n    size_t size() const override {\n        return elements.size();\n    }\n};"
+          "caption": "Set ADT Contract and a Concrete ArraySet Implementation in C++",
+          "source": "#include <vector>\n#include <algorithm>\n#include <cstddef>\n\n// Set ADT contract (WHAT): insert(x) adds x if it is absent, remove(x) deletes x if it is present,\n// contains(x) reports membership, and size() counts the items. A set never holds duplicates.\n// ArraySet is one data structure (HOW) that fulfils this contract, using an unsorted std::vector.\nclass ArraySet {\nprivate:\n    std::vector<int> elements; // private: client code cannot break the no-duplicates invariant\n\npublic:\n    bool contains(int item) const {\n        return std::find(elements.begin(), elements.end(), item) != elements.end();\n    }\n\n    bool insert(int item) {\n        if (contains(item)) return false; // Invariant: no duplicates allowed\n        elements.push_back(item);\n        return true;\n    }\n\n    bool remove(int item) {\n        auto it = std::find(elements.begin(), elements.end(), item);\n        if (it == elements.end()) return false;\n        // O(1) unordered removal: copy the last element into the gap, then pop\n        *it = elements.back();\n        elements.pop_back();\n        return true;\n    }\n\n    std::size_t size() const {\n        return elements.size();\n    }\n};"
         },
         {
           "id": "T01_1-complexity",
@@ -1167,14 +1167,14 @@ globalThis.DSAReviewData = {
           "id": "T01_1-checkpoint",
           "type": "checkpoint",
           "prompt": "Can two radically different data structures implement the exact same Abstract Data Type (ADT)?",
-          "reveal_md": "Yes. An ADT specifies only the public logical interface (what operations exist and their contracts). For example, the Queue ADT (enqueue, dequeue, front) can be implemented identically using either a circular array or a singly linked list.",
+          "reveal_md": "Yes. An ADT specifies only the operations and their contracts, not how the data is stored. For example, the Set ADT in this guide can be implemented with an unsorted array (as `ArraySet` does) or with a sorted array searched by binary search; client code that only calls `insert`, `remove` and `contains` works with either.",
           "affects_mastery": false
         },
         {
           "id": "T01_1-deep-dive",
           "type": "deep_dive",
-          "title": "Deep Dive: Polymorphic Decoupling via Abstract Classes",
-          "body_md": "By programming against abstract interfaces (`ISetADT<T>`) rather than concrete structs (`ArraySet`), large software architectures achieve loose coupling (Dependency Inversion Principle). Algorithms (such as search or sorting routines) can receive any conforming data structure implementation without code modification."
+          "title": "Deep Dive (Optional): Writing the Contract as a C++ Interface",
+          "body_md": "Optional, later C++ material. The contract itself can also be written as code: an abstract class whose operations are pure virtual functions (for example `virtual bool insert(int item) = 0;`). `ArraySet`, a sorted-array set and a hash set could all implement it, and code written against that interface would accept any of them unchanged. You do not need this C++ feature for the early topics of this course."
         },
         {
           "id": "T01_1-candidate-scope",
@@ -3057,7 +3057,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T04_2",
       "concept_id": "C04",
       "locale": "en",
-      "revision": 4,
+      "revision": 5,
       "title": "Open Addressing: Linear Probing and Tombstone Deletion",
       "learning_objective_ids": [
         "T04_2_LO1",
@@ -3238,7 +3238,7 @@ globalThis.DSAReviewData = {
           "language": "cpp",
           "standard": "c++17",
           "caption": "Tested C++17 Linear Probing Hash Table with Tombstones",
-          "source": "#include <vector>\n#include <optional>\n#include <functional>\n\nenum class SlotState { EMPTY, OCCUPIED, DELETED };\n\ntemplate <typename K, typename V>\nclass LinearProbingMap {\nprivate:\n    struct Entry {\n        K key;\n        V value;\n        SlotState state = SlotState::EMPTY;\n    };\n\n    std::vector<Entry> table;\n    size_t capacity;\n    size_t occupied_count = 0;\n\n    size_t hash(const K& key) const {\n        return std::hash<K>{}(key) % capacity;\n    }\n\npublic:\n    explicit LinearProbingMap(size_t cap = 5) : table(cap), capacity(cap) {}\n\n    bool insert(const K& key, const V& val) {\n        size_t idx = hash(key);\n        std::optional<size_t> first_tombstone;\n\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].value = val; // In-place update succeeds even if table is full\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::DELETED) {\n                if (!first_tombstone) first_tombstone = probe_idx;\n            } else { // EMPTY\n                if (occupied_count >= capacity) return false;\n                size_t target_idx = first_tombstone.value_or(probe_idx);\n                table[target_idx] = {key, val, SlotState::OCCUPIED};\n                occupied_count++;\n                return true;\n            }\n        }\n        if (first_tombstone && occupied_count < capacity) {\n            table[*first_tombstone] = {key, val, SlotState::OCCUPIED};\n            occupied_count++;\n            return true;\n        }\n        return false;\n    }\n\n    std::optional<V> find(const K& key) const {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) return table[probe_idx].value;\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return std::nullopt; // Invariant: stop ONLY on EMPTY\n            }\n        }\n        return std::nullopt;\n    }\n\n    bool remove(const K& key) {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].state = SlotState::DELETED; // Place tombstone\n                    occupied_count--;\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return false;\n            }\n        }\n        return false;\n    }\n};"
+          "source": "#include <vector>\n#include <optional>\n#include <functional>\n#include <stdexcept>\n\nenum class SlotState { EMPTY, OCCUPIED, DELETED };\n\ntemplate <typename K, typename V>\nclass LinearProbingMap {\nprivate:\n    struct Entry {\n        K key;\n        V value;\n        SlotState state = SlotState::EMPTY;\n    };\n\n    std::vector<Entry> table;\n    size_t capacity;\n    size_t occupied_count = 0;\n\n    size_t hash(const K& key) const {\n        return std::hash<K>{}(key) % capacity;\n    }\n\npublic:\n    explicit LinearProbingMap(size_t cap = 5) : table(cap), capacity(cap) {\n        if (cap == 0) throw std::invalid_argument(\"capacity must be positive\"); // hash() divides by capacity\n    }\n\n    bool insert(const K& key, const V& val) {\n        size_t idx = hash(key);\n        std::optional<size_t> first_tombstone;\n\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].value = val; // In-place update succeeds even if table is full\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::DELETED) {\n                if (!first_tombstone) first_tombstone = probe_idx;\n            } else { // EMPTY\n                if (occupied_count >= capacity) return false;\n                size_t target_idx = first_tombstone.value_or(probe_idx);\n                table[target_idx] = {key, val, SlotState::OCCUPIED};\n                occupied_count++;\n                return true;\n            }\n        }\n        if (first_tombstone && occupied_count < capacity) {\n            table[*first_tombstone] = {key, val, SlotState::OCCUPIED};\n            occupied_count++;\n            return true;\n        }\n        return false;\n    }\n\n    std::optional<V> find(const K& key) const {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) return table[probe_idx].value;\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return std::nullopt; // Invariant: stop ONLY on EMPTY\n            }\n        }\n        return std::nullopt;\n    }\n\n    bool remove(const K& key) {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].state = SlotState::DELETED; // Place tombstone\n                    occupied_count--;\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return false;\n            }\n        }\n        return false;\n    }\n};"
         },
         {
           "id": "T04_2-complexity",
@@ -3249,15 +3249,15 @@ globalThis.DSAReviewData = {
               "operation": "Search (Hit)",
               "average_bound": "$O(1 / (1 - \\alpha))$",
               "worst_bound": "$O(M)$",
-              "assumptions": "Uniform hashing, \\alpha = n / M < 0.7",
-              "explanation": "Average probe length under linear probing is approximately 0.5 * (1 + 1 / (1 - alpha))."
+              "assumptions": "Uniform hashing, $\\alpha = n / M < 0.7$",
+              "explanation": "Average probe length under linear probing is approximately $0.5 \\cdot (1 + 1 / (1 - \\alpha))$."
             },
             {
               "operation": "Search (Miss) / Insert",
               "average_bound": "$O(1 / (1 - \\alpha)^2)$",
               "worst_bound": "$O(M)$",
               "assumptions": "Load factor strictly bounded away from 1",
-              "explanation": "Primary clustering causes consecutive occupied slots to merge, quadratic degradation as alpha -> 1."
+              "explanation": "Primary clustering causes consecutive occupied slots to merge, quadratic degradation as $\\alpha \\to 1$."
             },
             {
               "operation": "Delete",
@@ -3273,7 +3273,7 @@ globalThis.DSAReviewData = {
           "type": "callout",
           "variant": "warning",
           "title": "Tombstone Accumulation Pitfall",
-          "body_md": "Over continuous operations, repeated deletions saturate the array with `DELETED` markers. Even if the table holds only a single active key, lookups scan across every historical tombstone, degrading average performance to $O(M)$. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
+          "body_md": "Only a rehash turns a `DELETED` marker back into `EMPTY`, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
         },
         {
           "id": "T04_2-checkpoint",
@@ -3303,7 +3303,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T04_3",
       "concept_id": "C04",
       "locale": "en",
-      "revision": 3,
+      "revision": 4,
       "title": "Quadratic Probing, Double Hashing, and Rehashing",
       "learning_objective_ids": [
         "T04_3_LO1",
@@ -3329,7 +3329,7 @@ globalThis.DSAReviewData = {
           "type": "prose",
           "section": "intuition",
           "required": true,
-          "body_md": "Linear probing uses consecutive slots and can form primary clusters. Quadratic probing changes the offset with $i^2$, but keys with the same initial hash still share a probe sequence. Double hashing uses (h1(k) + i*h2(k)) mod M. Keys that collide in h1 may have different steps, but can also collide in both hashes. To visit every slot, require gcd(h2(k), M)=1.\\n\\nRehashing allocates a new table and recomputes positions for live keys. Capacity choice and load threshold are implementation policies. Prime capacity is convenient, not mandatory."
+          "body_md": "Linear probing uses consecutive slots and can form primary clusters. Quadratic probing changes the offset with $i^2$, but keys with the same initial hash still share a probe sequence. Double hashing uses (h1(k) + i*h2(k)) mod M. Keys that collide in h1 may have different steps, but can also collide in both hashes. To visit every slot, require gcd(h2(k), M)=1.\n\nRehashing allocates a new table and recomputes positions for live keys. Capacity choice and load threshold are implementation policies. Prime capacity is convenient, not mandatory."
         },
         {
           "id": "T04_3-invariant",
@@ -3749,7 +3749,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T05_2",
       "concept_id": "C05",
       "locale": "en",
-      "revision": 3,
+      "revision": 4,
       "title": "Big-O Asymptotic Notation, Growth Rates, and Complexity Classes",
       "learning_objective_ids": [
         "T05_2_LO1",
@@ -3775,7 +3775,7 @@ globalThis.DSAReviewData = {
           "type": "prose",
           "section": "intuition",
           "required": true,
-          "body_md": "Choose a cost model and input parameter before analyzing growth. $O(g(n))$ is an eventual upper bound, $\\Omega(g(n))$ an eventual lower bound, and $\\Theta(g(n))$ a matching pair of bounds, with positive constants. Any of these can describe a best-case, worst-case, or expected cost function. They do not name those cases.\\n\\nRepresentative functions grow in this eventual order: 1, $\\log n$, $\\sqrt{n}$, n, $n \\log n$, $n^2$, $n^3$, $2^n$, n!. Big-O classes are sets, so a chain of strict numerical inequalities between O-symbols is misleading."
+          "body_md": "Choose a cost model and input parameter before analyzing growth. $O(g(n))$ is an eventual upper bound, $\\Omega(g(n))$ an eventual lower bound, and $\\Theta(g(n))$ a matching pair of bounds, with positive constants. Any of these can describe a best-case, worst-case, or expected cost function. They do not name those cases.\n\nRepresentative functions grow in this eventual order: 1, $\\log n$, $\\sqrt{n}$, n, $n \\log n$, $n^2$, $n^3$, $2^n$, n!. Big-O classes are sets, so a chain of strict numerical inequalities between O-symbols is misleading."
         },
         {
           "id": "T05_2-invariant",
@@ -5782,7 +5782,7 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "C",
-          "text": "A procedure that uses recursion cannot be classified as an algorithm."
+          "text": "The procedure cannot be an algorithm because no upper bound on its number of loop iterations is stated in advance."
         },
         {
           "option_id": "D",
@@ -5790,10 +5790,10 @@ globalThis.DSAReviewData = {
         }
       ],
       "correct_option_id": "B",
-      "answer_explanation": "B: the required property is termination for every positive integer input. Each arithmetic step is already unambiguous. Recursion or the number of parameters does not establish termination. A C++ implementation would separately need overflow and resource limits; those are excluded by the mathematical model here.",
+      "answer_explanation": "The required property is termination for every positive integer input. Each arithmetic step is already unambiguous. An algorithm does not need an iteration bound stated in advance or a particular number of inputs; it must stop on every valid input. A C++ implementation would separately need overflow and resource limits; those are excluded by the mathematical model here.",
       "distractor_explanations": {
         "A": "Arithmetic operations `n / 2` and `3 * n + 1` are completely deterministic and unambiguous.",
-        "C": "Recursive procedures (such as Merge Sort or Euclidean GCD) are standard algorithms when termination is proven.",
+        "C": "Finiteness requires that the procedure stop on every valid input; it does not require a bound on the number of steps to be stated in advance.",
         "D": "Algorithms can take zero, one, or more inputs."
       },
       "difficulty_estimate": "medium",
@@ -5810,8 +5810,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "",
-      "version": "1.2.1"
+      "reviewer_comment": "Revised in run 20261113T063110Z for audit finding(s) AUD-09 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.2"
     },
     {
       "question_id": "Q_T01_1_06",
@@ -6121,7 +6121,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T01_2",
       "learning_objective_id": "T01_2_LO2",
       "question_category": "tracing_application",
-      "stem": "Suppose a stadium ticketing system stores active reservations indexed by dense seat number `0 .. N - 1` (`N = 100,000` fixed seats), frequently performs exact lookups and status updates by seat number `id`, and never inserts or deletes seats in the middle of the numbered block. Which T01_2 structure best fits this workload?",
+      "stem": "Suppose a stadium ticketing system stores active reservations indexed by dense seat number `0 .. N - 1` (`N = 100,000` fixed seats), frequently performs exact lookups and status updates by seat number `id`, and never inserts or deletes seats in the middle of the numbered block. Which data structure best fits this workload?",
       "options": [
         {
           "option_id": "A",
@@ -6162,8 +6162,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Remediated QQUAL-11: reframed around T01_2 contiguous indexing vs linked traversal; reset approval to pending. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Remediated QQUAL-11: reframed around T01_2 contiguous indexing vs linked traversal; reset approval to pending. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) AUD-08 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T01_2_03",
@@ -7643,7 +7643,7 @@ globalThis.DSAReviewData = {
         }
       ],
       "correct_option_id": "C",
-      "answer_explanation": "As shown in Open Data Structures Section 2.3 (`ArrayQueue::resize`), the wrap-around boundary in the old array (`index 3 -> index 0`) is no longer the end of the new array of size 8 (`index 3 -> index 4`). You must unwrap the cycle by copying `oldArr[(front + i) % oldCap]` into `newArr[i]` (`0 .. count-1`) and setting `front = 0, rear = count`.",
+      "answer_explanation": "The wrap-around boundary in the old array (`index 3 -> index 0`) is no longer the end of the new array of size 8 (`index 3 -> index 4`). You must unwrap the cycle by copying `oldArr[(front + i) % oldCap]` into `newArr[i]` (`0 .. count-1`) and setting `front = 0, rear = count`.",
       "distractor_explanations": {
         "A": "Unwrapping via `(front + i) % oldCap` strictly preserves FIFO order.",
         "B": "Copying between heap arrays of different sizes is standard in C++.",
@@ -7663,8 +7663,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Revised in run 20261113T043252Z: LO T03_2_LO3 -> T03_2_LO2: asks how to unwrap a full circular queue on resize via (front + i) % oldCap; LO2 is modulo wrap-around tracing, LO3 is empty/full distinction.",
-      "version": "1.2.3"
+      "reviewer_comment": "Revised in run 20261113T043252Z: LO T03_2_LO3 -> T03_2_LO2: asks how to unwrap a full circular queue on resize via (front + i) % oldCap; LO2 is modulo wrap-around tracing, LO3 is empty/full distinction. | Revised in run 20261113T063110Z for audit finding(s) AUD-11 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.4"
     },
     {
       "question_id": "Q_T03_2_11",
@@ -7673,31 +7673,31 @@ globalThis.DSAReviewData = {
       "topic_id": "T03_2",
       "learning_objective_id": "T03_2_LO1",
       "question_category": "concept_invariant",
-      "stem": "When performing level-by-level (breadth-first) expansion from a starting item in a FIFO queue, why does capturing `int sz = q.size();` once before the inner `for` loop accurately isolate one entire level?",
+      "stem": "Which of the following real-world or algorithmic tasks naturally requires a FIFO Queue rather than a LIFO Stack?",
       "options": [
         {
           "option_id": "A",
-          "text": "`sz` locks in the exact count of nodes from the current level before newly discovered child nodes are pushed to the back of the FIFO queue."
+          "text": "Breadth-First Search (BFS) level-order exploration of a graph or tree, and fair first-come-first-served print/CPU job buffering."
         },
         {
           "option_id": "B",
-          "text": "Because `q.size()` shrinks to `0` automatically after one `push()` call."
+          "text": "Managing active function activation frames and return addresses on the runtime call stack during nested recursive function calls."
         },
         {
           "option_id": "C",
-          "text": "Because FIFO queues sort nodes by depth automatically on every push."
+          "text": "Evaluating postfix (Reverse Polish Notation) arithmetic expressions and matching nested opening/closing delimiters in a compiler."
         },
         {
           "option_id": "D",
-          "text": "Because `q.size()` returns the maximum capacity of the queue rather than the item count."
+          "text": "Implementing the 'Undo' history of a text editor."
         }
       ],
       "correct_option_id": "A",
-      "answer_explanation": "Because newly discovered next-level items are appended to the *rear* of the FIFO queue while the current level is popped from the *front*, saving `sz = q.size()` at the start of the outer iteration guarantees the inner `for` loop processes only the `sz` nodes belonging to the current level.",
+      "answer_explanation": "BFS explores vertices in non-decreasing order of distance (level-by-level), which requires processing vertices discovered earlier before vertices discovered later (FIFO Queue).",
       "distractor_explanations": {
-        "B": "`q.size()` grows whenever new child nodes are pushed inside the loop.",
-        "C": "A FIFO queue maintains arrival order, not automatic depth sorting.",
-        "D": "`std::queue::size()` returns the current number of stored elements."
+        "B": "Function call/return follows LIFO order (the most recently called function returns first).",
+        "C": "Postfix evaluation operates on the most recently pushed operands (LIFO Stack).",
+        "D": "Undo reverses the most recent edit first (LIFO Stack)."
       },
       "difficulty_estimate": "easy",
       "misconception_tags": [
@@ -7713,8 +7713,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "",
-      "version": "1.2.1"
+      "reviewer_comment": "Restored the approved wording (F07; fields: stem, options, answer_explanation, distractor_explanations) in run 20261113T063110Z, with $...$ notation as in run 20261113T051109Z; needs re-approval.",
+      "version": "1.2.2"
     },
     {
       "question_id": "Q_T03_2_12",
@@ -8097,7 +8097,7 @@ globalThis.DSAReviewData = {
       "answer_explanation": "A complete binary tree of height `h` (in edges) holds between $2^h$ and $2^{h+1} - 1$ nodes. Because $2^3 = 8 \\le 10 \\le 15 = 2^4 - 1$, its edge height is $\\lfloor \\log_2(10) \\rfloor = 3$ (with 4 levels holding `1, 2, 4, 3` nodes).",
       "distractor_explanations": {
         "A": "4 is the number of node levels ($\\lfloor \\log_2 10 \\rfloor + 1$), not the edge-count height.",
-        "C": "10 is the height of a degenerate chain, which is impossible for a complete binary tree.",
+        "C": "10 is the number of nodes, not the height; even a chain of 10 nodes has only 9 edges, and a complete binary tree is much shorter.",
         "D": "A binary tree of edge-height 2 can hold at most $2^3 - 1 = 7$ nodes."
       },
       "difficulty_estimate": "easy",
@@ -8114,8 +8114,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F05 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T04_1_04",
@@ -8537,7 +8537,7 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "C",
-          "text": "`search(k)` probes past `DELETED` until it finds `k` or reaches `EMPTY`; `insert(k)` remembers the first `DELETED` slot, probes on to `EMPTY` to confirm `k` is absent, then writes `k` there."
+          "text": "`search(k)` probes past `DELETED` until it finds `k` or reaches `EMPTY`; `insert(k)` remembers the first `DELETED` slot, probes on to `EMPTY` to check whether `k` is already stored, and writes `k` there only if it is not."
         },
         {
           "option_id": "D",
@@ -8565,8 +8565,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Revised in run 20261113T043252Z: R02: stated linear probing and the always-one-EMPTY-slot invariant so the stopping rule terminates; plainer stem/options; insert explanation covers finding k.",
-      "version": "1.2.3"
+      "reviewer_comment": "Revised in run 20261113T043252Z: R02: stated linear probing and the always-one-EMPTY-slot invariant so the stopping rule terminates; plainer stem/options; insert explanation covers finding k. | Revised in run 20261113T063110Z for audit finding(s) AUD-11 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.4"
     },
     {
       "question_id": "Q_T04_2_04",
@@ -8675,7 +8675,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T04_2",
       "learning_objective_id": "T04_2_LO3",
       "question_category": "edge_cases_complexity",
-      "stem": "Suppose an Open-Addressing hash table of size `M = 100` maintains `N <= 30` active `OCCUPIED` keys by performing millions of interleaved `insert` and `erase` operations (using `DELETED` tombstones) without ever rehashing. What happens to the time complexity of `search(k)` for absent keys over time?",
+      "stem": "Suppose an Open-Addressing hash table of size `M = 100` maintains `N <= 30` active `OCCUPIED` keys by performing millions of interleaved `insert` and `erase` operations (using `DELETED` tombstones) without ever rehashing. What can happen to the worst-case time of `search(k)` for absent keys over time?",
       "options": [
         {
           "option_id": "A",
@@ -8691,14 +8691,14 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "D",
-          "text": "Even though `N / M <= 0.30`, every formerly used slot eventually becomes `OCCUPIED` or `DELETED` with zero `EMPTY` slots left, degrading unsuccessful `search(k)` to $\\Theta(M)$ time."
+          "text": "Only a rehash turns a `DELETED` slot back into `EMPTY`, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
         }
       ],
       "correct_option_id": "D",
-      "answer_explanation": "Even if an array has only `1` active key (`n = 1`), searching for a key `y` not in the table can probe across `M - 1` `TOMBSTONE` markers left behind by earlier deletions before encountering the single remaining `EMPTY` slot ($\\Theta(M)$ worst-case time). Resizing/rehashing when non-`EMPTY` slots (`active + deleted`) exceed `M/2` clears old tombstones and restores fast probes.",
+      "answer_explanation": "Only a rehash turns `DELETED` slots back into `EMPTY`, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes.",
       "distractor_explanations": {
         "A": "Unsuccessful searches suffer the most because they must continue until an `EMPTY` slot (or full cycle of `M` probes).",
-        "B": "`N / M` counts only live keys, but `search` must also traverse all `DELETED` tombstones.",
+        "B": "`N / M` counts only live keys, but `search` must also probe past `DELETED` tombstones, and nothing limits how many of them accumulate.",
         "C": "A slot cannot revert to `EMPTY` without rehashing or verifying no later keys depend on it."
       },
       "difficulty_estimate": "hard",
@@ -8715,8 +8715,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F03 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T04_2_10",
@@ -10378,7 +10378,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T05_3",
       "learning_objective_id": "T05_3_LO1",
       "question_category": "concept_invariant",
-      "stem": "In the comparison-tree model of sorting an array of `n` distinct elements (where algorithms may only decide order via pairwise `<` comparisons), how many leaves must the binary decision tree contain, and what is the resulting worst-case comparison lower bound?",
+      "stem": "In the decision-tree proof of the lower bound for comparison-based sorting of `n` distinct elements, what do the internal nodes, leaves, and height of the binary decision tree represent?",
       "options": [
         {
           "option_id": "A",
@@ -10418,8 +10418,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Removed C09/C10 forward references from Q_T05_3_01 distractors; kept conceptual proof model intact. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.3"
+      "reviewer_comment": "Removed C09/C10 forward references from Q_T05_3_01 distractors; kept conceptual proof model intact. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Restored the approved wording (F04/AUD-03; fields: stem) in run 20261113T063110Z, with $...$ notation as in run 20261113T051109Z; needs re-approval.",
+      "version": "1.2.4"
     },
     {
       "question_id": "Q_T05_3_02",
@@ -10678,31 +10678,31 @@ globalThis.DSAReviewData = {
       "topic_id": "T05_3",
       "learning_objective_id": "T05_3_LO2",
       "question_category": "tracing_application",
-      "stem": "Compare two path problems on an unweighted graph `G` with `V` vertices: (1) finding a shortest path from `s` to `t`, and (2) finding a *longest simple path* (no repeated vertices) from `s` to `t`. Which statement about their computational complexity classes is true?",
+      "stem": "Compare two seemingly similar graph problems on a graph `G = (V, E)` with non-negative edge weights:\n(1) Shortest Simple Path: Does there exist a simple path from `s` to `t` of total weight `<= K`?\n(2) Longest Simple Path (or Hamiltonian Path): Does there exist a simple path from `s` to `t` of total weight `>= K` (or visiting all `|V|` vertices without repeating any vertex)?\nWhat are their complexity classifications?",
       "options": [
         {
           "option_id": "A",
-          "text": "Shortest Path requires checking all `V!` vertex permutations ($O(V!)$ time)."
+          "text": "Both are undecidable."
         },
         {
           "option_id": "B",
-          "text": "Both Shortest Path and Longest Simple Path are NP-Complete on all graphs."
+          "text": "Both Shortest Simple Path and Longest Simple Path are solvable in $O((V + E) \\log V)$ time by negating all edge weights and running Dijkstra's algorithm."
         },
         {
           "option_id": "C",
-          "text": "Longest Simple Path is easily solved in $O(V)$ time by simply scanning neighbors greedily."
+          "text": "Shortest Simple Path is NP-Complete and Longest Simple Path is in P."
         },
         {
           "option_id": "D",
-          "text": "Shortest Path lies in `P` (solvable efficiently in polynomial steps), whereas Longest Simple Path (and Hamiltonian Path) is NP-Complete (`no known polynomial-time algorithm`)."
+          "text": "Shortest Simple Path is tractable in P (solvable in $O((V + E) \\log V)$ via Dijkstra), whereas Longest Simple Path / Hamiltonian Path is NP-Complete."
         }
       ],
       "correct_option_id": "D",
-      "answer_explanation": "Small changes in problem definitions can shift a problem across complexity classes: shortest paths naturally avoid cycles ($O(V + E)$ in `P`), whereas forbidding repeated vertices when maximizing path length encodes Hamiltonian Path (`NP-Complete`), with no known polynomial-time algorithm.",
+      "answer_explanation": "Shortest Simple Path with non-negative weights exhibits optimal substructure and is solved in polynomial time by Dijkstra's algorithm. In contrast, Longest Simple Path contains Hamiltonian Path as a special case and is NP-Complete (negating edge weights creates negative cycles and breaks Dijkstra.).",
       "distractor_explanations": {
-        "A": "Shortest Path runs in polynomial time without brute-force permutation search.",
-        "B": "Finding minimum-hop paths avoids cycles automatically and runs in polynomial time, so Shortest Path is in `P`.",
-        "C": "Avoiding repeated vertices across arbitrary cycles prevents simple local greedy algorithms from finding longest paths."
+        "A": "Both problems have finite search spaces (at most `|V|!` simple paths) and are decidable.",
+        "B": "Dijkstra fails on negative edge weights, and Bellman-Ford cannot find longest simple paths when negative cycles exist.",
+        "C": "Reverses the two problems."
       },
       "difficulty_estimate": "medium",
       "misconception_tags": [
@@ -10718,8 +10718,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Restored the approved wording (F02/AUD-04; fields: stem, options, answer_explanation, distractor_explanations) in run 20261113T063110Z, with $...$ notation as in run 20261113T051109Z; needs re-approval.",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T05_3_08",
@@ -11678,7 +11678,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T06_2",
       "learning_objective_id": "T06_2_LO2",
       "question_category": "tracing_application",
-      "stem": "In a sorted array of `n = 1,000,000` ($\\approx 2^{20}$) elements, what is the maximum number of midpoint probes (`A[mid]` inspections) that standard 3-way Binary Search (`==`, `<`, `>`) will ever perform in the worst case?",
+      "stem": "In a sorted array of `n = 1,000,000` (about $2^{20}$) elements, what is the maximum number of midpoint probes (`A[mid]` inspections) that standard 3-way Binary Search (`==`, `<`, `>`) will ever perform in the worst case?",
       "options": [
         {
           "option_id": "A",
@@ -11690,7 +11690,7 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "C",
-          "text": "20 probes (since $\\lfloor \\log_2(1{,}000{,}000) \\rfloor + 1 = 19 + 1 = 20$ since $2^{19} = 524{,}288 \\le 1{,}000{,}000 < 1{,}048{,}576 = 2^{20}$)."
+          "text": "20 probes (since $\\lfloor \\log_2(1{,}000{,}000) \\rfloor + 1 = 19 + 1 = 20$, because $2^{19} = 524{,}288 \\le 1{,}000{,}000 < 1{,}048{,}576 = 2^{20}$)."
         },
         {
           "option_id": "D",
@@ -11718,8 +11718,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Revised in run 20261113T043252Z: LO T06_2_LO1 -> T06_2_LO2: asks the worst-case number of midpoint probes; T06_2_LO2 is 'count exact comparisons'. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.4"
+      "reviewer_comment": "Revised in run 20261113T043252Z: LO T06_2_LO1 -> T06_2_LO2: asks the worst-case number of midpoint probes; T06_2_LO2 is 'count exact comparisons'. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) AUD-11, AUD-12 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.5"
     },
     {
       "question_id": "Q_T06_2_10",
@@ -16632,27 +16632,27 @@ globalThis.DSAReviewData = {
       "options": [
         {
           "option_id": "A",
-          "text": "(i) Base 10: `x / (10 * p)`; (ii) Base 256: `x % 8`."
+          "text": "`(x >> p) & 0xFF`"
         },
         {
           "option_id": "B",
-          "text": "(i) Base 10: `(x % 10^p) / 10`; (ii) Base 256: `(x << (8 * p)) | 0xFF`."
+          "text": "`(x << (8 * p)) | 0xFF`"
         },
         {
           "option_id": "C",
-          "text": "(i) Base 10: `(x / 10^p) % 10`; (ii) Base 256: `(x >> (8 * p)) & 0xFF`."
+          "text": "`(x >> (8 * p)) & 0xFF`"
         },
         {
           "option_id": "D",
-          "text": "(i) Base 10: `x % 10`; (ii) Base 256: `x & 0xFF` for all `p`."
+          "text": "`x & 0xFF` for every `p`"
         }
       ],
       "correct_option_id": "C",
-      "answer_explanation": "Dividing by $b^p$ shifts the `p`-th base-`b` digit into the units position, and `% b` extracts that digit (`(x / 10^p) % 10`). When $b = 2^r$ ($256 = 2^8$), integer division by $256^p = 2^{8p}$ is a right bit-shift `x >> (8 * p)`, and `% 256` is a bitwise AND `& 0xFF` (`255`).",
+      "answer_explanation": "Byte `p` holds bits `8 * p` to `8 * p + 7`. Shifting right by `8 * p` bits (`x >> (8 * p)`, the same as dividing by $256^p = 2^{8p}$) moves that byte into the lowest 8 bits, and `& 0xFF` (the same as `% 256`) keeps only those 8 bits.",
       "distractor_explanations": {
-        "A": "Divides by `10 * p` (which divides by 0 at `p = 0`) instead of $10^p$.",
-        "B": "`(x % 10^p)` for `p = 0` is `x % 1 == 0`, which is always 0.",
-        "D": "Extracts only the `p = 0` least significant digit on every pass."
+        "A": "It shifts by `p` bits instead of `8 * p` bits, so for `p >= 1` the result mixes bits from two neighbouring bytes.",
+        "B": "Shifting left moves byte `p` away from the low end, and `| 0xFF` sets the low 8 bits to `1` instead of keeping only them.",
+        "D": "`x & 0xFF` always returns byte `0`; it ignores `p`."
       },
       "difficulty_estimate": "medium",
       "misconception_tags": [
@@ -16668,8 +16668,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) AUD-02 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T09_4_07",
@@ -16844,7 +16844,7 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "D",
-          "text": "LSD runs left-safe stable passes right-to-left ($\\Theta(W\\cdot n)$ for fixed length `W`); MSD recurses left-to-right per bucket, suiting variable string lengths."
+          "text": "LSD runs stable passes from the rightmost digit to the leftmost ($\\Theta(W\\cdot n)$ for fixed length `W`); MSD recurses left-to-right per bucket, suiting variable string lengths."
         }
       ],
       "correct_option_id": "D",
@@ -16868,8 +16868,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) AUD-10 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T09_4_11",
@@ -20048,7 +20048,7 @@ globalThis.DSAReviewData = {
         }
       ],
       "correct_option_id": "B",
-      "answer_explanation": "The Red-Black height bound follows directly from combining the Black-Height Property (which guarantees a complete binary tree of Black depth `bh`, giving $n \\ge 2^{bh} - 1$) with the Red Property (which forbids consecutive Red nodes, so the longest path can alternate `Black - Red - Black - Red ...` and be at most twice the length of the shortest all-Black path: $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$).",
+      "answer_explanation": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (Merging each Red node into its Black parent gives the same count: every leaf of the merged tree sits at depth `bh`, and every node has 2 to 4 children.) (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$.",
       "distractor_explanations": {
         "A": "Paths in a Red-Black tree can differ in length by up to a factor of `2` (an all-Black path of length `bh` vs an alternating Black-Red path of length `2 * bh`).",
         "C": "Black nodes can have Black children.",
@@ -20068,8 +20068,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.2"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F13 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.3"
     },
     {
       "question_id": "Q_T10_6_03",
@@ -25631,7 +25631,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T13_1",
       "learning_objective_id": "T13_1_LO2",
       "question_category": "code_trace",
-      "stem": "A student memoizes a recursion but uses `0` to mean \"not computed yet\":\n```cpp\nstd::vector<int> memo(n + 1, 0);           // 0 means \"not computed yet\"\nint solve(int i) {\n    if (i <= 1) return 0;\n    if (memo[i] != 0) return memo[i];       // reuse a saved answer\n    return memo[i] = std::max(solve(i - 1) + cost1[i], solve(i - 2) + cost2[i]);\n}\n```\nEvery `cost1[i]` and `cost2[i]` is `0`, so the correct answer for every state is `0`. What goes wrong when `solve(n)` is called for a large `n`?",
+      "stem": "A student memoizes a recursion but uses `0` to mean \"not computed yet\":\n```cpp\n// given: int n; std::vector<int> cost1(n + 1, 0), cost2(n + 1, 0);\nstd::vector<int> memo(n + 1, 0);           // 0 means \"not computed yet\"\nint solve(int i) {\n    if (i <= 1) return 0;\n    if (memo[i] != 0) return memo[i];       // reuse a saved answer\n    return memo[i] = std::max(solve(i - 1) + cost1[i], solve(i - 2) + cost2[i]);\n}\n```\nEvery `cost1[i]` and `cost2[i]` is `0`, so the correct answer for every state is `0`. What goes wrong when `solve(n)` is called for a large `n`?",
       "options": [
         {
           "option_id": "A",
@@ -25671,8 +25671,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Revised in run 20261113T043252Z: R01: removed the false Theta(2^n) bound (true call count is 2F(n+1)-1, exponential); stated all-zero costs explicitly; plain-language key and explanation; fixed distractor D's explanation. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.4"
+      "reviewer_comment": "Revised in run 20261113T043252Z: R01: removed the false Theta(2^n) bound (true call count is 2F(n+1)-1, exponential); stated all-zero costs explicitly; plain-language key and explanation; fixed distractor D's explanation. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) AUD-11 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.5"
     },
     {
       "question_id": "Q_T13_1_07",
@@ -26252,7 +26252,7 @@ globalThis.DSAReviewData = {
         }
       ],
       "correct_option_id": "C",
-      "answer_explanation": "Walking backward from `(m, n)` until `i` or `j` reaches `0` visits the matched LCS characters from right to left, so collecting `X[i - 1]` along the walk and reversing at the end (or prepending, or printing on recursive unwind) gives the LCS in left-to-right order. Each step lowers `i` or `j` (or both) by `1`, so the walk takes at most `m + n` steps: $O(m + n)$ time, with no separate `b[i][j]` table.",
+      "answer_explanation": "Walking backward from `(m, n)` until `i` or `j` reaches `0` visits the matched LCS characters from right to left, so collecting `X[i - 1]` along the walk and reversing once at the end (or printing on the way back out of a recursive walk) gives the LCS in left-to-right order. Each step lowers `i` or `j` (or both) by `1`, so the walk takes at most `m + n` steps: $O(m + n)$ time, with no separate `b[i][j]` table.",
       "distractor_explanations": {
         "A": "The arrow table `b[i][j]` is purely pedagogical; `X[i-1] == Y[j-1]` and `c[i-1][j] >= c[i][j-1]` recover the arrow in $O(1)$ time.",
         "B": "Many cells satisfy `c[i][j] > c[i - 1][j - 1]`, including cells on different paths, so the scan prints more characters than one LCS has (for `X = \"ABC\"`, `Y = \"BCA\"` it prints 7 characters, but the LCS length is 2), and it costs $O(m \\cdot n)$, not $O(m + n)$.",
@@ -26272,8 +26272,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Revised in run 20261113T043252Z: R03/R04: replaced invalid greedy counterexamples with X=ABC, Y=BCA (greedy A vs optimal BC); made distractor B's explanation exact; LO T13_2_LO3 -> T13_2_LO2 (reconstruction by backtracking); kept the reverse step. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.4"
+      "reviewer_comment": "Revised in run 20261113T043252Z: R03/R04: replaced invalid greedy counterexamples with X=ABC, Y=BCA (greedy A vs optimal BC); made distractor B's explanation exact; LO T13_2_LO3 -> T13_2_LO2 (reconstruction by backtracking); kept the reverse step. | Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F06 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.5"
     },
     {
       "question_id": "Q_T13_2_07",
@@ -27242,7 +27242,7 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "B",
-          "text": "There are `(n - 1)!` directed tours; since $24! \\sim 6.2 \\times 10^{23}$, brute-force enumeration takes $\\Theta(n!)$ factorial time."
+          "text": "There are `(n - 1)!` directed tours (and $(n - 1)!/2$ undirected tours when costs are symmetric); since $24! \\sim 6.2 \\times 10^{23}$, brute-force enumeration takes $\\Theta(n!)$ factorial time."
         },
         {
           "option_id": "C",
@@ -27274,8 +27274,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked).",
-      "version": "1.2.1"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F04 (codex/gemini 20261113 pre-human audits).",
+      "version": "1.2.2"
     },
     {
       "question_id": "Q_T14_2_03",
@@ -29581,7 +29581,7 @@ globalThis.DSAReviewData = {
   ],
   "changes": {
     "lesson:lesson_T00_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -29591,6 +29591,18 @@ globalThis.DSAReviewData = {
           "label": "source ids 0",
           "before": "editorial_source_foundations_01",
           "after": "RES_T00_1_01"
+        },
+        {
+          "path": "blocks[0].body_md",
+          "label": "block T00 1-intuition body md",
+          "before": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying while the compiler strictly prohibits modifications, combining optimal zero-copy performance with caller safety.",
+          "after": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects any modification made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
+        },
+        {
+          "path": "blocks[3].source",
+          "label": "block T00 1-code source",
+          "before": "#include <iostream>\n#include <vector>\n\nstruct Point {\n    int x;\n    int y;\n};\n\n// Pass-by-value: operates on a local copy; caller remains unchanged\nvoid modifyByValue(Point p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-reference: binds alias to caller variable; modifies caller directly\nvoid modifyByReference(Point& p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-const-reference: eliminates copying overhead while enforcing immutability\nint computeSum(const Point& p) {\n    return p.x + p.y;\n}\n\n// 2D Row-Major Offset Calculation: address(r, c) = base + (r * cols + c)\nint get2DElement(const int* matrix, int rows, int cols, int r, int c) {\n    if (r < 0 || r >= rows || c < 0 || c >= cols) {\n        return -1; // Out-of-bounds safety guard\n    }\n    return matrix[r * cols + c];\n}",
+          "after": "#include <iostream>\n#include <vector>\n\nstruct Point {\n    int x;\n    int y;\n};\n\n// Pass-by-value: operates on a local copy; caller remains unchanged\nvoid modifyByValue(Point p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-reference: binds alias to caller variable; modifies caller directly\nvoid modifyByReference(Point& p) {\n    p.x += 10;\n    p.y += 10;\n}\n\n// Pass-by-const-reference: no copy, and read-only access through p\n// (another non-const reference to the same object could still modify it)\nint computeSum(const Point& p) {\n    return p.x + p.y;\n}\n\n// 2D Row-Major Offset Calculation: address(r, c) = base + (r * cols + c)\nint get2DElement(const int* matrix, int rows, int cols, int r, int c) {\n    if (r < 0 || r >= rows || c < 0 || c >= cols) {\n        return -1; // Out-of-bounds safety guard\n    }\n    return matrix[r * cols + c];\n}"
         },
         {
           "path": "blocks[4].rows[0].average_bound",
@@ -29709,7 +29721,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T00_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -29855,7 +29867,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T01_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -29871,6 +29883,18 @@ globalThis.DSAReviewData = {
           "label": "block T01 1-intuition body md",
           "before": "In computer science, we rigorously differentiate three fundamental levels of abstraction:\n1. **Computational Problem:** A formal mathematical relation specifying valid inputs and required outputs (e.g. searching for target $x$ in a collection).\n2. **Algorithm:** A finite, step-by-step procedure that solves a problem correctly for every valid input. An algorithm must satisfy five core criteria: Input, Output, Definiteness (unambiguous steps), Finiteness (must terminate), and Effectiveness (basic feasible operations).\n3. **Abstract Data Type (ADT) vs. Data Structure:** An ADT defines a mathematical model of a data collection purely by **what** operations can be performed (the interface contract and behavioral invariants), such as `SetADT` providing `insert`, `remove`, and `contains`. In contrast, a data structure is the physical realization of **how** data is organized in computer memory (e.g., an unsorted array vs. a balanced binary search tree).",
           "after": "In computer science, we rigorously differentiate three fundamental levels of abstraction:\n1. **Computational Problem:** A formal mathematical relation specifying valid inputs and required outputs (e.g. searching for target $x$ in a collection).\n2. **Algorithm:** A finite, step-by-step procedure that solves a problem correctly for every valid input. An algorithm must satisfy five core criteria: Input, Output, Definiteness (unambiguous steps), Finiteness (must terminate), and Effectiveness (basic feasible operations).\n3. **Abstract Data Type (ADT) vs. Data Structure:** An ADT defines a mathematical model of a data collection purely by **what** operations can be performed (the interface contract and behavioral invariants), such as `SetADT` providing `insert`, `remove`, and `contains`. In contrast, a data structure is the physical realization of **how** data is organized in computer memory (e.g., an unsorted array vs. a sorted array or linked list)."
+        },
+        {
+          "path": "blocks[3].caption",
+          "label": "block T01 1-code caption",
+          "before": "Abstract ADT Interface and Concrete ArraySet Implementation in C++",
+          "after": "Set ADT Contract and a Concrete ArraySet Implementation in C++"
+        },
+        {
+          "path": "blocks[3].source",
+          "label": "block T01 1-code source",
+          "before": "#include <vector>\n#include <algorithm>\n#include <cassert>\n\n// ADT Interface Contract (Pure Virtual Interface)\ntemplate <typename T>\nclass ISetADT {\npublic:\n    virtual ~ISetADT() = default;\n    virtual bool contains(const T& item) const = 0;\n    virtual bool insert(const T& item) = 0;\n    virtual bool remove(const T& item) = 0;\n    virtual size_t size() const = 0;\n};\n\n// Concrete Physical Data Structure Implementation (Unordered Array Set)\ntemplate <typename T>\nclass ArraySet : public ISetADT<T> {\nprivate:\n    std::vector<T> elements;\n\npublic:\n    bool contains(const T& item) const override {\n        return std::find(elements.begin(), elements.end(), item) != elements.end();\n    }\n\n    bool insert(const T& item) override {\n        if (contains(item)) return false; // Invariant: No duplicates allowed\n        elements.push_back(item);\n        return true;\n    }\n\n    bool remove(const T& item) override {\n        auto it = std::find(elements.begin(), elements.end(), item);\n        if (it == elements.end()) return false;\n        // O(1) unordered removal: swap target with last element, then pop\n        *it = std::move(elements.back());\n        elements.pop_back();\n        return true;\n    }\n\n    size_t size() const override {\n        return elements.size();\n    }\n};",
+          "after": "#include <vector>\n#include <algorithm>\n#include <cstddef>\n\n// Set ADT contract (WHAT): insert(x) adds x if it is absent, remove(x) deletes x if it is present,\n// contains(x) reports membership, and size() counts the items. A set never holds duplicates.\n// ArraySet is one data structure (HOW) that fulfils this contract, using an unsorted std::vector.\nclass ArraySet {\nprivate:\n    std::vector<int> elements; // private: client code cannot break the no-duplicates invariant\n\npublic:\n    bool contains(int item) const {\n        return std::find(elements.begin(), elements.end(), item) != elements.end();\n    }\n\n    bool insert(int item) {\n        if (contains(item)) return false; // Invariant: no duplicates allowed\n        elements.push_back(item);\n        return true;\n    }\n\n    bool remove(int item) {\n        auto it = std::find(elements.begin(), elements.end(), item);\n        if (it == elements.end()) return false;\n        // O(1) unordered removal: copy the last element into the gap, then pop\n        *it = elements.back();\n        elements.pop_back();\n        return true;\n    }\n\n    std::size_t size() const {\n        return elements.size();\n    }\n};"
         },
         {
           "path": "blocks[4].rows[0].average_bound",
@@ -29927,10 +29951,22 @@ globalThis.DSAReviewData = {
           "after": "Termination, correctness, and optimality are separate claims. A terminating heuristic is still an algorithm; it may return a feasible answer without guaranteeing an optimum. Correctness is judged against the stated contract. A decreasing nonnegative loop variant is one way to prove termination, but its absence from an explanation does not prove nontermination."
         },
         {
+          "path": "blocks[6].reveal_md",
+          "label": "block T01 1-checkpoint reveal md",
+          "before": "Yes. An ADT specifies only the public logical interface (what operations exist and their contracts). For example, the Queue ADT (enqueue, dequeue, front) can be implemented identically using either a circular array or a singly linked list.",
+          "after": "Yes. An ADT specifies only the operations and their contracts, not how the data is stored. For example, the Set ADT in this guide can be implemented with an unsorted array (as `ArraySet` does) or with a sorted array searched by binary search; client code that only calls `insert`, `remove` and `contains` works with either."
+        },
+        {
+          "path": "blocks[7].title",
+          "label": "block T01 1-deep-dive title",
+          "before": "Deep Dive: Polymorphic Decoupling via Abstract Classes",
+          "after": "Deep Dive (Optional): Writing the Contract as a C++ Interface"
+        },
+        {
           "path": "blocks[7].body_md",
           "label": "block T01 1-deep-dive body md",
           "before": "By programming against abstract interfaces (`ISetADT<T>`) rather than concrete structs (`ArraySet`), large software architectures achieve loose coupling (Dependency Inversion Principle). Algorithms (such as Dijkstra or Kruskal) can receive any conforming data structure implementation without code modification.",
-          "after": "By programming against abstract interfaces (`ISetADT<T>`) rather than concrete structs (`ArraySet`), large software architectures achieve loose coupling (Dependency Inversion Principle). Algorithms (such as search or sorting routines) can receive any conforming data structure implementation without code modification."
+          "after": "Optional, later C++ material. The contract itself can also be written as code: an abstract class whose operations are pure virtual functions (for example `virtual bool insert(int item) = 0;`). `ArraySet`, a sorted-array set and a hash set could all implement it, and code written against that interface would accept any of them unchanged. You do not need this C++ feature for the early topics of this course."
         },
         {
           "path": "source_ids[1]",
@@ -29971,7 +30007,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T01_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30123,7 +30159,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30239,7 +30275,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30337,7 +30373,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_3": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30459,7 +30495,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30563,7 +30599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30667,7 +30703,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_3": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30777,7 +30813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30887,7 +30923,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -30897,6 +30933,12 @@ globalThis.DSAReviewData = {
           "label": "source ids 0",
           "before": "editorial_source_hashing_01",
           "after": "RES_T04_2_01"
+        },
+        {
+          "path": "blocks[3].source",
+          "label": "block T04 2-code source",
+          "before": "#include <vector>\n#include <optional>\n#include <functional>\n\nenum class SlotState { EMPTY, OCCUPIED, DELETED };\n\ntemplate <typename K, typename V>\nclass LinearProbingMap {\nprivate:\n    struct Entry {\n        K key;\n        V value;\n        SlotState state = SlotState::EMPTY;\n    };\n\n    std::vector<Entry> table;\n    size_t capacity;\n    size_t occupied_count = 0;\n\n    size_t hash(const K& key) const {\n        return std::hash<K>{}(key) % capacity;\n    }\n\npublic:\n    explicit LinearProbingMap(size_t cap = 5) : table(cap), capacity(cap) {}\n\n    bool insert(const K& key, const V& val) {\n        size_t idx = hash(key);\n        std::optional<size_t> first_tombstone;\n\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].value = val; // In-place update succeeds even if table is full\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::DELETED) {\n                if (!first_tombstone) first_tombstone = probe_idx;\n            } else { // EMPTY\n                if (occupied_count >= capacity) return false;\n                size_t target_idx = first_tombstone.value_or(probe_idx);\n                table[target_idx] = {key, val, SlotState::OCCUPIED};\n                occupied_count++;\n                return true;\n            }\n        }\n        if (first_tombstone && occupied_count < capacity) {\n            table[*first_tombstone] = {key, val, SlotState::OCCUPIED};\n            occupied_count++;\n            return true;\n        }\n        return false;\n    }\n\n    std::optional<V> find(const K& key) const {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) return table[probe_idx].value;\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return std::nullopt; // Invariant: stop ONLY on EMPTY\n            }\n        }\n        return std::nullopt;\n    }\n\n    bool remove(const K& key) {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].state = SlotState::DELETED; // Place tombstone\n                    occupied_count--;\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return false;\n            }\n        }\n        return false;\n    }\n};",
+          "after": "#include <vector>\n#include <optional>\n#include <functional>\n#include <stdexcept>\n\nenum class SlotState { EMPTY, OCCUPIED, DELETED };\n\ntemplate <typename K, typename V>\nclass LinearProbingMap {\nprivate:\n    struct Entry {\n        K key;\n        V value;\n        SlotState state = SlotState::EMPTY;\n    };\n\n    std::vector<Entry> table;\n    size_t capacity;\n    size_t occupied_count = 0;\n\n    size_t hash(const K& key) const {\n        return std::hash<K>{}(key) % capacity;\n    }\n\npublic:\n    explicit LinearProbingMap(size_t cap = 5) : table(cap), capacity(cap) {\n        if (cap == 0) throw std::invalid_argument(\"capacity must be positive\"); // hash() divides by capacity\n    }\n\n    bool insert(const K& key, const V& val) {\n        size_t idx = hash(key);\n        std::optional<size_t> first_tombstone;\n\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].value = val; // In-place update succeeds even if table is full\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::DELETED) {\n                if (!first_tombstone) first_tombstone = probe_idx;\n            } else { // EMPTY\n                if (occupied_count >= capacity) return false;\n                size_t target_idx = first_tombstone.value_or(probe_idx);\n                table[target_idx] = {key, val, SlotState::OCCUPIED};\n                occupied_count++;\n                return true;\n            }\n        }\n        if (first_tombstone && occupied_count < capacity) {\n            table[*first_tombstone] = {key, val, SlotState::OCCUPIED};\n            occupied_count++;\n            return true;\n        }\n        return false;\n    }\n\n    std::optional<V> find(const K& key) const {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) return table[probe_idx].value;\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return std::nullopt; // Invariant: stop ONLY on EMPTY\n            }\n        }\n        return std::nullopt;\n    }\n\n    bool remove(const K& key) {\n        size_t idx = hash(key);\n        for (size_t i = 0; i < capacity; ++i) {\n            size_t probe_idx = (idx + i) % capacity;\n            if (table[probe_idx].state == SlotState::OCCUPIED) {\n                if (table[probe_idx].key == key) {\n                    table[probe_idx].state = SlotState::DELETED; // Place tombstone\n                    occupied_count--;\n                    return true;\n                }\n            } else if (table[probe_idx].state == SlotState::EMPTY) {\n                return false;\n            }\n        }\n        return false;\n    }\n};"
         },
         {
           "path": "blocks[4].rows[0].average_bound",
@@ -30911,6 +30953,18 @@ globalThis.DSAReviewData = {
           "after": "$O(M)$"
         },
         {
+          "path": "blocks[4].rows[0].assumptions",
+          "label": "block T04 2-complexity rows 0 assumptions",
+          "before": "Uniform hashing, \\alpha = n / M < 0.7",
+          "after": "Uniform hashing, $\\alpha = n / M < 0.7$"
+        },
+        {
+          "path": "blocks[4].rows[0].explanation",
+          "label": "block T04 2-complexity rows 0 explanation",
+          "before": "Average probe length under linear probing is approximately 0.5 * (1 + 1 / (1 - alpha)).",
+          "after": "Average probe length under linear probing is approximately $0.5 \\cdot (1 + 1 / (1 - \\alpha))$."
+        },
+        {
           "path": "blocks[4].rows[1].average_bound",
           "label": "block T04 2-complexity rows 1 average bound",
           "before": "O(1 / (1 - \\alpha)^2)",
@@ -30923,6 +30977,12 @@ globalThis.DSAReviewData = {
           "after": "$O(M)$"
         },
         {
+          "path": "blocks[4].rows[1].explanation",
+          "label": "block T04 2-complexity rows 1 explanation",
+          "before": "Primary clustering causes consecutive occupied slots to merge, quadratic degradation as alpha -> 1.",
+          "after": "Primary clustering causes consecutive occupied slots to merge, quadratic degradation as $\\alpha \\to 1$."
+        },
+        {
           "path": "blocks[4].rows[2].average_bound",
           "label": "block T04 2-complexity rows 2 average bound",
           "before": "O(1 / (1 - \\alpha))",
@@ -30933,6 +30993,12 @@ globalThis.DSAReviewData = {
           "label": "block T04 2-complexity rows 2 worst bound",
           "before": "O(M)",
           "after": "$O(M)$"
+        },
+        {
+          "path": "blocks[5].body_md",
+          "label": "block T04 2-warning body md",
+          "before": "Over continuous operations, repeated deletions saturate the array with `DELETED` markers. Even if the table holds only a single active key, lookups scan across every historical tombstone, degrading average performance to $O(M)$. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table.",
+          "after": "Only a rehash turns a `DELETED` marker back into `EMPTY`, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
         },
         {
           "path": "source_ids[1]",
@@ -30973,7 +31039,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_3": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30988,7 +31054,7 @@ globalThis.DSAReviewData = {
           "path": "blocks[0].body_md",
           "label": "block T04 3-intuition body md",
           "before": "In Open Addressing, linear probing ($h(k, i) = (h(k) + i) \\bmod M$) suffers from **primary clustering**: long contiguous blocks of occupied slots build up, dramatically increasing probe lengths.\n\nTo overcome this, advanced open addressing uses non-linear probe trajectories:\n1. **Quadratic Probing:** $h(k, i) = (h(k) + c_1 i + c_2 i^2) \\bmod M$. This eliminates primary clustering, though keys with the exact same initial hash still follow the same trajectory (**secondary clustering**).\n2. **Double Hashing:** $h(k, i) = (h_1(k) + i \\cdot h_2(k)) \\bmod M$. A second independent hash function $h_2(k)$ determines the probe jump step size for key $k$. Two keys colliding at $h_1(k)$ will jump with different step sizes, eliminating secondary clustering completely!\n\nWhen the load factor $\\alpha = N / M$ reaches an upper threshold (typically $\\alpha \\ge 0.7$), the table must perform **dynamic rehashing**: allocate a new prime-capacity array ($\\approx 2M$) and re-insert all live keys.",
-          "after": "Linear probing uses consecutive slots and can form primary clusters. Quadratic probing changes the offset with $i^2$, but keys with the same initial hash still share a probe sequence. Double hashing uses (h1(k) + i*h2(k)) mod M. Keys that collide in h1 may have different steps, but can also collide in both hashes. To visit every slot, require gcd(h2(k), M)=1.\\n\\nRehashing allocates a new table and recomputes positions for live keys. Capacity choice and load threshold are implementation policies. Prime capacity is convenient, not mandatory."
+          "after": "Linear probing uses consecutive slots and can form primary clusters. Quadratic probing changes the offset with $i^2$, but keys with the same initial hash still share a probe sequence. Double hashing uses (h1(k) + i*h2(k)) mod M. Keys that collide in h1 may have different steps, but can also collide in both hashes. To visit every slot, require gcd(h2(k), M)=1.\n\nRehashing allocates a new table and recomputes positions for live keys. Capacity choice and load threshold are implementation policies. Prime capacity is convenient, not mandatory."
         },
         {
           "path": "blocks[2].description",
@@ -31101,7 +31167,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31217,7 +31283,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31232,7 +31298,7 @@ globalThis.DSAReviewData = {
           "path": "blocks[0].body_md",
           "label": "block T05 2-intuition body md",
           "before": "Exact operation counts depend on compiler optimizations, CPU clock speed, and cache architecture. To compare algorithms objectively across machines, computer scientists analyze **asymptotic growth rates** as input size $n$ approaches infinity ($n \\to \\infty$).\n\nThe fundamental asymptotic notations are:\n- **$O(g(n))$ (Upper Bound):** $f(n) \\le c \\cdot g(n)$ for all $n \\ge n_0$. Describes worst-case growth ceiling.\n- **$\\Omega(g(n))$ (Lower Bound):** $f(n) \\ge c \\cdot g(n)$ for all $n \\ge n_0$. Describes best-case growth floor.\n- **$\\Theta(g(n))$ (Tight Bound):** $c_1 g(n) \\le f(n) \\le c_2 g(n)$. Both upper and lower bounds match asymptotically.\n\n**Standard Growth Hierarchy:**\n$O(1) < O(\\log n) < O(\\sqrt{n}) < O(n) < O(n \\log n) < O(n^2) < O(n^3) < O(2^n) < O(n!)$",
-          "after": "Choose a cost model and input parameter before analyzing growth. $O(g(n))$ is an eventual upper bound, $\\Omega(g(n))$ an eventual lower bound, and $\\Theta(g(n))$ a matching pair of bounds, with positive constants. Any of these can describe a best-case, worst-case, or expected cost function. They do not name those cases.\\n\\nRepresentative functions grow in this eventual order: 1, $\\log n$, $\\sqrt{n}$, n, $n \\log n$, $n^2$, $n^3$, $2^n$, n!. Big-O classes are sets, so a chain of strict numerical inequalities between O-symbols is misleading."
+          "after": "Choose a cost model and input parameter before analyzing growth. $O(g(n))$ is an eventual upper bound, $\\Omega(g(n))$ an eventual lower bound, and $\\Theta(g(n))$ a matching pair of bounds, with positive constants. Any of these can describe a best-case, worst-case, or expected cost function. They do not name those cases.\n\nRepresentative functions grow in this eventual order: 1, $\\log n$, $\\sqrt{n}$, n, $n \\log n$, $n^2$, $n^3$, $2^n$, n!. Big-O classes are sets, so a chain of strict numerical inequalities between O-symbols is misleading."
         },
         {
           "path": "blocks[1].body_md",
@@ -31411,7 +31477,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_3": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31503,7 +31569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T06_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31619,7 +31685,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T06_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31741,7 +31807,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_1": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -31833,7 +31899,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_2": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31919,7 +31985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_3": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -32053,7 +32119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32067,7 +32133,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32105,7 +32171,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32119,7 +32185,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32139,7 +32205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32153,7 +32219,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32173,7 +32239,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32229,7 +32295,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32249,7 +32315,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32269,7 +32335,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32331,7 +32397,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32343,15 +32409,27 @@ globalThis.DSAReviewData = {
           "after": "Consider this mathematical procedure on an arbitrary positive integer n, using exact unbounded integer arithmetic: stop if n = 1; otherwise replace n by n/2 when n is even, or by 3n+1 when n is odd, and repeat. Assume that universal termination has not been proved. Which algorithm property would a proof of the Collatz conjecture establish for this procedure? This is mathematical pseudocode, not a bounded C++17 implementation."
         },
         {
+          "path": "options[2].text",
+          "label": "option C",
+          "before": "A procedure that uses recursion cannot be classified as an algorithm.",
+          "after": "The procedure cannot be an algorithm because no upper bound on its number of loop iterations is stated in advance."
+        },
+        {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "Every individual step of the Collatz procedure is deterministic (definite), but because the Collatz conjecture remains unproven for all `n >= 1`, its universal termination (finiteness) is not formally established.",
-          "after": "B: the required property is termination for every positive integer input. Each arithmetic step is already unambiguous. Recursion or the number of parameters does not establish termination. A C++ implementation would separately need overflow and resource limits; those are excluded by the mathematical model here."
+          "after": "The required property is termination for every positive integer input. Each arithmetic step is already unambiguous. An algorithm does not need an iteration bound stated in advance or a particular number of inputs; it must stop on every valid input. A C++ implementation would separately need overflow and resource limits; those are excluded by the mathematical model here."
+        },
+        {
+          "path": "distractor_explanations.C",
+          "label": "why C is wrong",
+          "before": "Recursive procedures (such as Merge Sort or Euclidean GCD) are standard algorithms when termination is proven.",
+          "after": "Finiteness requires that the procedure stop on every valid input; it does not require a bound on the number of steps to be stated in advance."
         }
       ]
     },
     "question:Q_T01_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32413,7 +32491,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32433,7 +32511,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32495,7 +32573,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32515,7 +32593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32577,7 +32655,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32627,7 +32705,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32636,7 +32714,7 @@ globalThis.DSAReviewData = {
           "path": "stem",
           "label": "stem",
           "before": "Suppose a banking system processes millions of real-time ATM balance lookups and updates by exact 10-digit account number, rarely deletes accounts during peak hours, and never performs alphabetical or numerical range queries. Which data structure best fits these requirements?",
-          "after": "Suppose a stadium ticketing system stores active reservations indexed by dense seat number `0 .. N - 1` (`N = 100,000` fixed seats), frequently performs exact lookups and status updates by seat number `id`, and never inserts or deletes seats in the middle of the numbered block. Which T01_2 structure best fits this workload?"
+          "after": "Suppose a stadium ticketing system stores active reservations indexed by dense seat number `0 .. N - 1` (`N = 100,000` fixed seats), frequently performs exact lookups and status updates by seat number `id`, and never inserts or deletes seats in the middle of the numbered block. Which data structure best fits this workload?"
         },
         {
           "path": "options[0].text",
@@ -32689,7 +32767,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32751,7 +32829,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32789,7 +32867,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32827,7 +32905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "revise",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32889,7 +32967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32927,7 +33005,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32959,7 +33037,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32997,7 +33075,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33053,7 +33131,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33067,7 +33145,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33093,7 +33171,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33113,7 +33191,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33127,7 +33205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33189,7 +33267,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33245,7 +33323,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33283,7 +33361,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33333,7 +33411,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33377,7 +33455,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33439,7 +33517,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33483,7 +33561,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33515,7 +33593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33559,7 +33637,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33591,7 +33669,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33647,7 +33725,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33679,7 +33757,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33729,7 +33807,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33761,7 +33839,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33775,7 +33853,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33831,7 +33909,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33841,73 +33919,17 @@ globalThis.DSAReviewData = {
           "label": "learning objective id",
           "before": "T03_2_LO3",
           "after": "T03_2_LO2"
-        }
-      ]
-    },
-    "question:Q_T03_2_11": {
-      "compared_with": "the current course data (data/curated)",
-      "status_before": "approved",
-      "approved_by_before": "An",
-      "version_before": "1.2.0",
-      "fields": [
-        {
-          "path": "stem",
-          "label": "stem",
-          "before": "Which of the following real-world or algorithmic tasks naturally requires a FIFO Queue rather than a LIFO Stack?",
-          "after": "When performing level-by-level (breadth-first) expansion from a starting item in a FIFO queue, why does capturing `int sz = q.size();` once before the inner `for` loop accurately isolate one entire level?"
-        },
-        {
-          "path": "options[0].text",
-          "label": "option A",
-          "before": "Breadth-First Search (BFS) level-order exploration of a graph or tree, and fair first-come-first-served print/CPU job buffering.",
-          "after": "`sz` locks in the exact count of nodes from the current level before newly discovered child nodes are pushed to the back of the FIFO queue."
-        },
-        {
-          "path": "options[1].text",
-          "label": "option B",
-          "before": "Managing active function activation frames and return addresses on the runtime call stack during nested recursive function calls.",
-          "after": "Because `q.size()` shrinks to `0` automatically after one `push()` call."
-        },
-        {
-          "path": "options[2].text",
-          "label": "option C",
-          "before": "Evaluating postfix (Reverse Polish Notation) arithmetic expressions and matching nested opening/closing delimiters in a compiler.",
-          "after": "Because FIFO queues sort nodes by depth automatically on every push."
-        },
-        {
-          "path": "options[3].text",
-          "label": "option D",
-          "before": "Implementing the 'Undo' history of a text editor.",
-          "after": "Because `q.size()` returns the maximum capacity of the queue rather than the item count."
         },
         {
           "path": "answer_explanation",
           "label": "answer explanation",
-          "before": "BFS explores vertices in non-decreasing order of distance (level-by-level), which requires processing vertices discovered earlier before vertices discovered later (FIFO Queue).",
-          "after": "Because newly discovered next-level items are appended to the *rear* of the FIFO queue while the current level is popped from the *front*, saving `sz = q.size()` at the start of the outer iteration guarantees the inner `for` loop processes only the `sz` nodes belonging to the current level."
-        },
-        {
-          "path": "distractor_explanations.B",
-          "label": "why B is wrong",
-          "before": "Function call/return follows LIFO order (the most recently called function returns first).",
-          "after": "`q.size()` grows whenever new child nodes are pushed inside the loop."
-        },
-        {
-          "path": "distractor_explanations.C",
-          "label": "why C is wrong",
-          "before": "Postfix evaluation operates on the most recently pushed operands (LIFO Stack).",
-          "after": "A FIFO queue maintains arrival order, not automatic depth sorting."
-        },
-        {
-          "path": "distractor_explanations.D",
-          "label": "why D is wrong",
-          "before": "Undo reverses the most recent edit first (LIFO Stack).",
-          "after": "`std::queue::size()` returns the current number of stored elements."
+          "before": "As shown in Open Data Structures Section 2.3 (`ArrayQueue::resize`), the wrap-around boundary in the old array (`index 3 -> index 0`) is no longer the end of the new array of size 8 (`index 3 -> index 4`). You must unwrap the cycle by copying `oldArr[(front + i) % oldCap]` into `newArr[i]` (`0 .. count-1`) and setting `front = 0, rear = count`.",
+          "after": "The wrap-around boundary in the old array (`index 3 -> index 0`) is no longer the end of the new array of size 8 (`index 3 -> index 4`). You must unwrap the cycle by copying `oldArr[(front + i) % oldCap]` into `newArr[i]` (`0 .. count-1`) and setting `front = 0, rear = count`."
         }
       ]
     },
     "question:Q_T03_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33927,7 +33949,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33983,7 +34005,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34045,7 +34067,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34065,7 +34087,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34103,7 +34125,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34117,7 +34139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34143,7 +34165,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34185,6 +34207,12 @@ globalThis.DSAReviewData = {
           "after": "4 is the number of node levels ($\\lfloor \\log_2 10 \\rfloor + 1$), not the edge-count height."
         },
         {
+          "path": "distractor_explanations.C",
+          "label": "why C is wrong",
+          "before": "10 is the height of a degenerate chain, which is impossible for a complete binary tree.",
+          "after": "10 is the number of nodes, not the height; even a chain of 10 nodes has only 9 edges, and a complete binary tree is much shorter."
+        },
+        {
           "path": "distractor_explanations.D",
           "label": "why D is wrong",
           "before": "A binary tree of edge-height 2 can hold at most `2^3 - 1 = 7` nodes.",
@@ -34193,7 +34221,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34249,7 +34277,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34269,7 +34297,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34301,7 +34329,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34333,7 +34361,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34353,7 +34381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34373,7 +34401,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34423,7 +34451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34485,7 +34513,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34512,7 +34540,7 @@ globalThis.DSAReviewData = {
           "path": "options[2].text",
           "label": "option C",
           "before": "(1) `search(k)` continues probing past `DELETED` slots until finding `k` or hitting `EMPTY`; (2) `insert(k)` records the first `DELETED` slot, probes until `EMPTY` to verify `k` is absent, and inserts at that `DELETED` slot.",
-          "after": "`search(k)` probes past `DELETED` until it finds `k` or reaches `EMPTY`; `insert(k)` remembers the first `DELETED` slot, probes on to `EMPTY` to confirm `k` is absent, then writes `k` there."
+          "after": "`search(k)` probes past `DELETED` until it finds `k` or reaches `EMPTY`; `insert(k)` remembers the first `DELETED` slot, probes on to `EMPTY` to check whether `k` is already stored, and writes `k` there only if it is not."
         },
         {
           "path": "options[3].text",
@@ -34547,7 +34575,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34561,7 +34589,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34587,11 +34615,17 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
       "fields": [
+        {
+          "path": "stem",
+          "label": "stem",
+          "before": "Suppose an Open-Addressing hash table of size `M = 100` maintains `N <= 30` active `OCCUPIED` keys by performing millions of interleaved `insert` and `erase` operations (using `DELETED` tombstones) without ever rehashing. What happens to the time complexity of `search(k)` for absent keys over time?",
+          "after": "Suppose an Open-Addressing hash table of size `M = 100` maintains `N <= 30` active `OCCUPIED` keys by performing millions of interleaved `insert` and `erase` operations (using `DELETED` tombstones) without ever rehashing. What can happen to the worst-case time of `search(k)` for absent keys over time?"
+        },
         {
           "path": "options[0].text",
           "label": "option A",
@@ -34614,18 +34648,24 @@ globalThis.DSAReviewData = {
           "path": "options[3].text",
           "label": "option D",
           "before": "Even though `N / M <= 0.30`, every formerly used slot eventually becomes `OCCUPIED` or `DELETED` with zero `EMPTY` slots left, degrading unsuccessful `search(k)` to `Theta(M)` time.",
-          "after": "Even though `N / M <= 0.30`, every formerly used slot eventually becomes `OCCUPIED` or `DELETED` with zero `EMPTY` slots left, degrading unsuccessful `search(k)` to $\\Theta(M)$ time."
+          "after": "Only a rehash turns a `DELETED` slot back into `EMPTY`, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
         },
         {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "As detailed in Open Data Structures Section 5.2 (`LinearHashTable`), `search(k)` cannot stop at `DELETED` slots—it only stops at `EMPTY`. As tombstones accumulate, the effective load factor for searches is `(N_occupied + N_deleted) / M`. When all `EMPTY` slots are gone, unsuccessful searches scan all `M` slots unless the table periodically rehashes to purge tombstones.",
-          "after": "Even if an array has only `1` active key (`n = 1`), searching for a key `y` not in the table can probe across `M - 1` `TOMBSTONE` markers left behind by earlier deletions before encountering the single remaining `EMPTY` slot ($\\Theta(M)$ worst-case time). Resizing/rehashing when non-`EMPTY` slots (`active + deleted`) exceed `M/2` clears old tombstones and restores fast probes."
+          "after": "Only a rehash turns `DELETED` slots back into `EMPTY`, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes."
+        },
+        {
+          "path": "distractor_explanations.B",
+          "label": "why B is wrong",
+          "before": "`N / M` counts only live keys, but `search` must also traverse all `DELETED` tombstones.",
+          "after": "`N / M` counts only live keys, but `search` must also probe past `DELETED` tombstones, and nothing limits how many of them accumulate."
         }
       ]
     },
     "question:Q_T04_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34687,7 +34727,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34725,7 +34765,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34745,7 +34785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34777,7 +34817,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34791,7 +34831,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34829,7 +34869,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34855,7 +34895,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34881,7 +34921,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34931,7 +34971,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -34957,7 +34997,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -34977,7 +35017,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35021,7 +35061,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35065,7 +35105,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35115,7 +35155,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35153,7 +35193,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35209,7 +35249,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35259,7 +35299,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35309,7 +35349,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35341,7 +35381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35397,7 +35437,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35447,7 +35487,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35467,7 +35507,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35529,7 +35569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35591,7 +35631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35617,7 +35657,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35649,7 +35689,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35693,7 +35733,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35719,7 +35759,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35763,7 +35803,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35807,7 +35847,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35821,7 +35861,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35865,7 +35905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35927,17 +35967,11 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
       "fields": [
-        {
-          "path": "stem",
-          "label": "stem",
-          "before": "In the decision-tree proof of the lower bound for comparison-based sorting of `n` distinct elements, what do the internal nodes, leaves, and height of the binary decision tree represent?",
-          "after": "In the comparison-tree model of sorting an array of `n` distinct elements (where algorithms may only decide order via pairwise `<` comparisons), how many leaves must the binary decision tree contain, and what is the resulting worst-case comparison lower bound?"
-        },
         {
           "path": "options[1].text",
           "label": "option B",
@@ -35983,7 +36017,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36021,7 +36055,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36059,7 +36093,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36085,7 +36119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36129,7 +36163,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36155,69 +36189,27 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
       "fields": [
         {
-          "path": "stem",
-          "label": "stem",
-          "before": "Compare two seemingly similar graph problems on a graph `G = (V, E)` with non-negative edge weights:\n(1) Shortest Simple Path: Does there exist a simple path from `s` to `t` of total weight `<= K`?\n(2) Longest Simple Path (or Hamiltonian Path): Does there exist a simple path from `s` to `t` of total weight `>= K` (or visiting all `|V|` vertices without repeating any vertex)?\nWhat are their complexity classifications?",
-          "after": "Compare two path problems on an unweighted graph `G` with `V` vertices: (1) finding a shortest path from `s` to `t`, and (2) finding a *longest simple path* (no repeated vertices) from `s` to `t`. Which statement about their computational complexity classes is true?"
-        },
-        {
-          "path": "options[0].text",
-          "label": "option A",
-          "before": "Both are undecidable.",
-          "after": "Shortest Path requires checking all `V!` vertex permutations ($O(V!)$ time)."
-        },
-        {
           "path": "options[1].text",
           "label": "option B",
           "before": "Both Shortest Simple Path and Longest Simple Path are solvable in `O((V + E) log V)` time by negating all edge weights and running Dijkstra's algorithm.",
-          "after": "Both Shortest Path and Longest Simple Path are NP-Complete on all graphs."
-        },
-        {
-          "path": "options[2].text",
-          "label": "option C",
-          "before": "Shortest Simple Path is NP-Complete and Longest Simple Path is in P.",
-          "after": "Longest Simple Path is easily solved in $O(V)$ time by simply scanning neighbors greedily."
+          "after": "Both Shortest Simple Path and Longest Simple Path are solvable in $O((V + E) \\log V)$ time by negating all edge weights and running Dijkstra's algorithm."
         },
         {
           "path": "options[3].text",
           "label": "option D",
           "before": "Shortest Simple Path is tractable in P (solvable in `O((V + E) log V)` via Dijkstra), whereas Longest Simple Path / Hamiltonian Path is NP-Complete.",
-          "after": "Shortest Path lies in `P` (solvable efficiently in polynomial steps), whereas Longest Simple Path (and Hamiltonian Path) is NP-Complete (`no known polynomial-time algorithm`)."
-        },
-        {
-          "path": "answer_explanation",
-          "label": "answer explanation",
-          "before": "Shortest Simple Path with non-negative weights exhibits optimal substructure and is solved in polynomial time by Dijkstra's algorithm. In contrast, Longest Simple Path contains Hamiltonian Path as a special case and is NP-Complete (negating edge weights creates negative cycles and breaks Dijkstra.).",
-          "after": "Small changes in problem definitions can shift a problem across complexity classes: shortest paths naturally avoid cycles ($O(V + E)$ in `P`), whereas forbidding repeated vertices when maximizing path length encodes Hamiltonian Path (`NP-Complete`), with no known polynomial-time algorithm."
-        },
-        {
-          "path": "distractor_explanations.A",
-          "label": "why A is wrong",
-          "before": "Both problems have finite search spaces (at most `|V|!` simple paths) and are decidable.",
-          "after": "Shortest Path runs in polynomial time without brute-force permutation search."
-        },
-        {
-          "path": "distractor_explanations.B",
-          "label": "why B is wrong",
-          "before": "Dijkstra fails on negative edge weights, and Bellman-Ford cannot find longest simple paths when negative cycles exist.",
-          "after": "Finding minimum-hop paths avoids cycles automatically and runs in polynomial time, so Shortest Path is in `P`."
-        },
-        {
-          "path": "distractor_explanations.C",
-          "label": "why C is wrong",
-          "before": "Reverses the two problems.",
-          "after": "Avoiding repeated vertices across arbitrary cycles prevents simple local greedy algorithms from finding longest paths."
+          "after": "Shortest Simple Path is tractable in P (solvable in $O((V + E) \\log V)$ via Dijkstra), whereas Longest Simple Path / Hamiltonian Path is NP-Complete."
         }
       ]
     },
     "question:Q_T05_3_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36261,7 +36253,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36287,7 +36279,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36313,7 +36305,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36339,7 +36331,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36383,7 +36375,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36403,7 +36395,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36435,7 +36427,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36485,7 +36477,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36529,7 +36521,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36573,7 +36565,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36605,7 +36597,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36655,7 +36647,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36693,7 +36685,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36743,7 +36735,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36793,7 +36785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36819,7 +36811,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36839,7 +36831,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36854,13 +36846,13 @@ globalThis.DSAReviewData = {
           "path": "stem",
           "label": "stem",
           "before": "In a sorted array of `n = 1,000,000` (`approx 2^20`) elements, what is the maximum number of midpoint probes (`A[mid]` inspections) that standard 3-way Binary Search (`==`, `<`, `>`) will ever perform in the worst case?",
-          "after": "In a sorted array of `n = 1,000,000` ($\\approx 2^{20}$) elements, what is the maximum number of midpoint probes (`A[mid]` inspections) that standard 3-way Binary Search (`==`, `<`, `>`) will ever perform in the worst case?"
+          "after": "In a sorted array of `n = 1,000,000` (about $2^{20}$) elements, what is the maximum number of midpoint probes (`A[mid]` inspections) that standard 3-way Binary Search (`==`, `<`, `>`) will ever perform in the worst case?"
         },
         {
           "path": "options[2].text",
           "label": "option C",
           "before": "20 probes (since `floor(log2(1,000,000)) + 1 = 19 + 1 = 20` since `2^19 = 524,288 <= 1,000,000 < 1,048,576 = 2^20`).",
-          "after": "20 probes (since $\\lfloor \\log_2(1{,}000{,}000) \\rfloor + 1 = 19 + 1 = 20$ since $2^{19} = 524{,}288 \\le 1{,}000{,}000 < 1{,}048{,}576 = 2^{20}$)."
+          "after": "20 probes (since $\\lfloor \\log_2(1{,}000{,}000) \\rfloor + 1 = 19 + 1 = 20$, because $2^{19} = 524{,}288 \\le 1{,}000{,}000 < 1{,}048{,}576 = 2^{20}$)."
         },
         {
           "path": "answer_explanation",
@@ -36883,7 +36875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36933,7 +36925,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36965,7 +36957,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37015,7 +37007,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37029,7 +37021,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37061,7 +37053,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37117,7 +37109,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37173,7 +37165,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37193,7 +37185,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37219,7 +37211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37257,7 +37249,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37295,7 +37287,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37339,7 +37331,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37401,7 +37393,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37415,7 +37407,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37459,7 +37451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37479,7 +37471,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37493,7 +37485,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37519,7 +37511,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37545,7 +37537,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37607,7 +37599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37669,7 +37661,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37707,7 +37699,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37733,7 +37725,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37795,7 +37787,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37821,7 +37813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37853,7 +37845,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37867,7 +37859,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37881,7 +37873,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37937,7 +37929,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37993,7 +37985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38049,7 +38041,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38093,7 +38085,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38155,7 +38147,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38199,7 +38191,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38213,7 +38205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38233,7 +38225,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38253,7 +38245,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38315,7 +38307,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38377,7 +38369,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38439,7 +38431,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38501,7 +38493,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38563,7 +38555,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38583,7 +38575,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38639,7 +38631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38659,7 +38651,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38679,7 +38671,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38729,7 +38721,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38779,7 +38771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38823,7 +38815,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38837,7 +38829,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38863,7 +38855,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38883,7 +38875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38921,7 +38913,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38977,7 +38969,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39039,7 +39031,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39083,7 +39075,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39133,7 +39125,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39147,7 +39139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39209,7 +39201,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39247,7 +39239,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39303,7 +39295,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39335,7 +39327,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39385,7 +39377,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39399,7 +39391,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39449,7 +39441,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39487,7 +39479,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39549,7 +39541,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39587,7 +39579,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39601,7 +39593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39627,7 +39619,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39653,7 +39645,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39673,7 +39665,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39717,7 +39709,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39755,7 +39747,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39767,21 +39759,57 @@ globalThis.DSAReviewData = {
           "after": "In LSD Radix Sort, suppose we sort 32-bit unsigned `uint32_t` integers using base `b = 256` (`4` passes, extracting `1` byte = `8` bits per pass). How do we extract digit byte `p in {0, 1, 2, 3}` (where `p = 0` is the least significant byte) from integer `x` using fast bitwise operations?"
         },
         {
+          "path": "options[0].text",
+          "label": "option A",
+          "before": "(i) Base 10: `x / (10 * p)`; (ii) Base 256: `x % 8`.",
+          "after": "`(x >> p) & 0xFF`"
+        },
+        {
+          "path": "options[1].text",
+          "label": "option B",
+          "before": "(i) Base 10: `(x % 10^p) / 10`; (ii) Base 256: `(x << (8 * p)) | 0xFF`.",
+          "after": "`(x << (8 * p)) | 0xFF`"
+        },
+        {
+          "path": "options[2].text",
+          "label": "option C",
+          "before": "(i) Base 10: `(x / 10^p) % 10`; (ii) Base 256: `(x >> (8 * p)) & 0xFF`.",
+          "after": "`(x >> (8 * p)) & 0xFF`"
+        },
+        {
+          "path": "options[3].text",
+          "label": "option D",
+          "before": "(i) Base 10: `x % 10`; (ii) Base 256: `x & 0xFF` for all `p`.",
+          "after": "`x & 0xFF` for every `p`"
+        },
+        {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "Dividing by `b^p` shifts the `p`-th base-`b` digit into the units position, and `% b` extracts that digit (`(x / 10^p) % 10`). When `b = 2^r` (`256 = 2^8`), integer division by `256^p = 2^(8p)` is a right bit-shift `x >> (8 * p)`, and `% 256` is a bitwise AND `& 0xFF` (`255`).",
-          "after": "Dividing by $b^p$ shifts the `p`-th base-`b` digit into the units position, and `% b` extracts that digit (`(x / 10^p) % 10`). When $b = 2^r$ ($256 = 2^8$), integer division by $256^p = 2^{8p}$ is a right bit-shift `x >> (8 * p)`, and `% 256` is a bitwise AND `& 0xFF` (`255`)."
+          "after": "Byte `p` holds bits `8 * p` to `8 * p + 7`. Shifting right by `8 * p` bits (`x >> (8 * p)`, the same as dividing by $256^p = 2^{8p}$) moves that byte into the lowest 8 bits, and `& 0xFF` (the same as `% 256`) keeps only those 8 bits."
         },
         {
           "path": "distractor_explanations.A",
           "label": "why A is wrong",
           "before": "Divides by `10 * p` (which divides by 0 at `p = 0`) instead of `10^p`.",
-          "after": "Divides by `10 * p` (which divides by 0 at `p = 0`) instead of $10^p$."
+          "after": "It shifts by `p` bits instead of `8 * p` bits, so for `p >= 1` the result mixes bits from two neighbouring bytes."
+        },
+        {
+          "path": "distractor_explanations.B",
+          "label": "why B is wrong",
+          "before": "`(x % 10^p)` for `p = 0` is `x % 1 == 0`, which is always 0.",
+          "after": "Shifting left moves byte `p` away from the low end, and `| 0xFF` sets the low 8 bits to `1` instead of keeping only them."
+        },
+        {
+          "path": "distractor_explanations.D",
+          "label": "why D is wrong",
+          "before": "Extracts only the `p = 0` least significant digit on every pass.",
+          "after": "`x & 0xFF` always returns byte `0`; it ignores `p`."
         }
       ]
     },
     "question:Q_T09_4_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39843,7 +39871,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39863,7 +39891,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39872,12 +39900,12 @@ globalThis.DSAReviewData = {
           "path": "options[3].text",
           "label": "option D",
           "before": "MSD Radix Sort partitions by the most significant digit/character first into `k` buckets and recursively sorts each bucket on the next digit, handling variable-length strings and stopping early on buckets of size `<= 1`.",
-          "after": "LSD runs left-safe stable passes right-to-left ($\\Theta(W\\cdot n)$ for fixed length `W`); MSD recurses left-to-right per bucket, suiting variable string lengths."
+          "after": "LSD runs stable passes from the rightmost digit to the leftmost ($\\Theta(W\\cdot n)$ for fixed length `W`); MSD recurses left-to-right per bucket, suiting variable string lengths."
         }
       ]
     },
     "question:Q_T09_4_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39909,7 +39937,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39959,7 +39987,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39973,7 +40001,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40023,7 +40051,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40067,7 +40095,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40081,7 +40109,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40107,7 +40135,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40145,7 +40173,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40159,7 +40187,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40173,7 +40201,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40229,7 +40257,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40261,7 +40289,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40311,7 +40339,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40331,7 +40359,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40351,7 +40379,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40365,7 +40393,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40385,7 +40413,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40423,7 +40451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40473,7 +40501,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40529,7 +40557,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40543,7 +40571,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40563,7 +40591,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40619,7 +40647,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40639,7 +40667,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40653,7 +40681,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40667,7 +40695,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40729,7 +40757,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40743,7 +40771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40763,7 +40791,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40789,7 +40817,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40809,7 +40837,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40847,7 +40875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40861,7 +40889,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40905,7 +40933,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40937,7 +40965,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40970,7 +40998,7 @@ globalThis.DSAReviewData = {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "The Red-Black height bound follows directly from combining the Black-Height Property (which guarantees a complete binary tree of Black depth `bh`, giving `n >= 2^bh - 1`) with the Red Property (which forbids consecutive Red nodes, so the longest path can alternate `Black - Red - Black - Red ...` and be at most twice the length of the shortest all-Black path: `h <= 2 * bh <= 2 * log2(n + 1)`).",
-          "after": "The Red-Black height bound follows directly from combining the Black-Height Property (which guarantees a complete binary tree of Black depth `bh`, giving $n \\ge 2^{bh} - 1$) with the Red Property (which forbids consecutive Red nodes, so the longest path can alternate `Black - Red - Black - Red ...` and be at most twice the length of the shortest all-Black path: $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$)."
+          "after": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (Merging each Red node into its Black parent gives the same count: every leaf of the merged tree sits at depth `bh`, and every node has 2 to 4 children.) (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$."
         },
         {
           "path": "distractor_explanations.D",
@@ -40981,7 +41009,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40995,7 +41023,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41015,7 +41043,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41035,7 +41063,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41073,7 +41101,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41087,7 +41115,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41101,7 +41129,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41121,7 +41149,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41135,7 +41163,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41155,7 +41183,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41169,7 +41197,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41183,7 +41211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41197,7 +41225,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41223,7 +41251,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41243,7 +41271,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41257,7 +41285,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41319,7 +41347,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41339,7 +41367,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41389,7 +41417,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41403,7 +41431,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41417,7 +41445,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41461,7 +41489,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41487,7 +41515,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41501,7 +41529,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41515,7 +41543,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41541,7 +41569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41567,7 +41595,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41593,7 +41621,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41655,7 +41683,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41705,7 +41733,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41755,7 +41783,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41817,7 +41845,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41831,7 +41859,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41851,7 +41879,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41913,7 +41941,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41939,7 +41967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41995,7 +42023,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42045,7 +42073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42107,7 +42135,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42169,7 +42197,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42183,7 +42211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42239,7 +42267,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42259,7 +42287,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42291,7 +42319,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42329,7 +42357,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42343,7 +42371,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42375,7 +42403,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42395,7 +42423,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42445,7 +42473,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42459,7 +42487,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42473,7 +42501,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42511,7 +42539,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42525,7 +42553,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42557,7 +42585,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42571,7 +42599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42603,7 +42631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42617,7 +42645,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42631,7 +42659,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42645,7 +42673,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42665,7 +42693,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42691,7 +42719,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42723,7 +42751,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42743,7 +42771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42757,7 +42785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42807,7 +42835,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42863,7 +42891,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42877,7 +42905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42891,7 +42919,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42905,7 +42933,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42925,7 +42953,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42939,7 +42967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43001,7 +43029,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43027,7 +43055,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43053,7 +43081,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43079,7 +43107,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43111,7 +43139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43161,7 +43189,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43175,7 +43203,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43201,7 +43229,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43233,7 +43261,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43283,7 +43311,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43292,7 +43320,7 @@ globalThis.DSAReviewData = {
           "path": "stem",
           "label": "stem",
           "before": "A student attempts to write a Top-Down Memoized function in C++ for a DP problem where valid optimal answers can be `0` or negative integers, and writes:\n```cpp\nstd::vector<int> memo(n + 1, 0); // initialized to 0\nint solve(int i) {\n    if (i == 0) return 0;\n    if (memo[i] != 0) return memo[i]; // BUG!\n    memo[i] = /* expensive recurrence that happens to evaluate to 0 */;\n    return memo[i];\n}\n```\nWhat happens when many states `i` legitimately have an optimal answer of `0`?",
-          "after": "A student memoizes a recursion but uses `0` to mean \"not computed yet\":\n```cpp\nstd::vector<int> memo(n + 1, 0);           // 0 means \"not computed yet\"\nint solve(int i) {\n    if (i <= 1) return 0;\n    if (memo[i] != 0) return memo[i];       // reuse a saved answer\n    return memo[i] = std::max(solve(i - 1) + cost1[i], solve(i - 2) + cost2[i]);\n}\n```\nEvery `cost1[i]` and `cost2[i]` is `0`, so the correct answer for every state is `0`. What goes wrong when `solve(n)` is called for a large `n`?"
+          "after": "A student memoizes a recursion but uses `0` to mean \"not computed yet\":\n```cpp\n// given: int n; std::vector<int> cost1(n + 1, 0), cost2(n + 1, 0);\nstd::vector<int> memo(n + 1, 0);           // 0 means \"not computed yet\"\nint solve(int i) {\n    if (i <= 1) return 0;\n    if (memo[i] != 0) return memo[i];       // reuse a saved answer\n    return memo[i] = std::max(solve(i - 1) + cost1[i], solve(i - 2) + cost2[i]);\n}\n```\nEvery `cost1[i]` and `cost2[i]` is `0`, so the correct answer for every state is `0`. What goes wrong when `solve(n)` is called for a large `n`?"
         },
         {
           "path": "options[0].text",
@@ -43345,7 +43373,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43359,7 +43387,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43379,7 +43407,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43411,7 +43439,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43467,7 +43495,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43481,7 +43509,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43519,7 +43547,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43533,7 +43561,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43560,7 +43588,7 @@ globalThis.DSAReviewData = {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "At every step of the backward walk from `(m, n)`, either `i` decreases by 1, `j` decreases by 1, or both decrease by 1. Therefore the loop executes at most `m + n` iterations (`O(m + n)` time.) and needs zero extra `b[i][j]` arrow table because `X[i-1] == Y[j-1]` and comparing `c[i-1][j]` vs `c[i][j-1]` tells us the exact transition.",
-          "after": "Walking backward from `(m, n)` until `i` or `j` reaches `0` visits the matched LCS characters from right to left, so collecting `X[i - 1]` along the walk and reversing at the end (or prepending, or printing on recursive unwind) gives the LCS in left-to-right order. Each step lowers `i` or `j` (or both) by `1`, so the walk takes at most `m + n` steps: $O(m + n)$ time, with no separate `b[i][j]` table."
+          "after": "Walking backward from `(m, n)` until `i` or `j` reaches `0` visits the matched LCS characters from right to left, so collecting `X[i - 1]` along the walk and reversing once at the end (or printing on the way back out of a recursive walk) gives the LCS in left-to-right order. Each step lowers `i` or `j` (or both) by `1`, so the walk takes at most `m + n` steps: $O(m + n)$ time, with no separate `b[i][j]` table."
         },
         {
           "path": "distractor_explanations.A",
@@ -43583,7 +43611,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43597,7 +43625,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43653,7 +43681,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43679,7 +43707,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43735,7 +43763,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43761,7 +43789,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43781,7 +43809,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43795,7 +43823,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43809,7 +43837,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43841,7 +43869,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43867,7 +43895,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43899,7 +43927,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43925,7 +43953,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43940,7 +43968,7 @@ globalThis.DSAReviewData = {
           "path": "options[1].text",
           "label": "option B",
           "before": "There are `(n - 1)!` directed tours; since `24! ~ 6.2 x 10^{23}`, brute-force enumeration takes `Theta(n!)` factorial time.",
-          "after": "There are `(n - 1)!` directed tours; since $24! \\sim 6.2 \\times 10^{23}$, brute-force enumeration takes $\\Theta(n!)$ factorial time."
+          "after": "There are `(n - 1)!` directed tours (and $(n - 1)!/2$ undirected tours when costs are symmetric); since $24! \\sim 6.2 \\times 10^{23}$, brute-force enumeration takes $\\Theta(n!)$ factorial time."
         },
         {
           "path": "options[2].text",
@@ -43975,7 +44003,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44007,7 +44035,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44045,7 +44073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44071,7 +44099,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44091,7 +44119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44123,7 +44151,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44179,7 +44207,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44205,7 +44233,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44237,7 +44265,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44275,7 +44303,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44289,7 +44317,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44339,7 +44367,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44353,7 +44381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44415,7 +44443,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44429,7 +44457,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44455,7 +44483,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44475,7 +44503,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44507,7 +44535,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44527,7 +44555,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44559,7 +44587,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44573,7 +44601,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44587,7 +44615,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44601,7 +44629,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44615,7 +44643,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44629,7 +44657,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44661,7 +44689,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44681,7 +44709,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_12": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44695,7 +44723,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_01": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44715,7 +44743,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_02": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44747,7 +44775,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_03": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44785,7 +44813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_04": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44829,7 +44857,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_05": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44861,7 +44889,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_06": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44899,7 +44927,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_07": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44931,7 +44959,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_08": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44957,7 +44985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_09": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -45007,7 +45035,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_10": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -45045,7 +45073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_11": {
-      "compared_with": "the current course data (data/curated)",
+      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",

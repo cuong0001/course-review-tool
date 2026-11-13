@@ -22,8 +22,8 @@
     - no page errors and no network requests.
 - **Screenshots inspected:** the desktop changes panel, the LaTeX source toggle, and the dark-theme layout at 375 px.
 - **Not done:** no Edge/Firefox/Safari run, no physical phone, and no screen-reader session.
-- **Snapshot rebuilt** from candidate run `20261113T051109Z`, using `--compare-with` against `data/curated`.
-  - Contents: 90 approved questions excluded, 486 pending questions, 21 guides, 401 changed items (157 previously approved).
+- **Snapshot rebuilt** from candidate run `20261113T063110Z` (audit repairs), using `--compare-with` against `data/curated`.
+  - Contents: 90 approved questions excluded, 486 pending questions, 21 guides, 400 changed items (156 previously approved). Unit 12/12 and all 4 browser suites pass after the rebuild.
   - Owners were kept; the 139 newly pending questions were spread 23–24 per member, giving 81 questions each.
   - The pinned values in `assignments.test.cjs` were updated to match.
   - **Bug found and fixed:** on this real data, `math-readability.cjs` found 30 complexity-table cells that fell back to raw text. Cells containing `$` were being passed whole to KaTeX. `$`-delimited cells now render inline.
