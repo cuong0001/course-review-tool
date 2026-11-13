@@ -13,8 +13,8 @@ globalThis.DSAReviewData = {
   ],
   "source_sha256": {
     "course.json": "fcd14db7e50df933813f89bc5b268f9de37aca8ca22e8130099da36d3bbede35",
-    "question_bank.jsonl": "8641937ae80943607404f263daaddb450cf307f16945ea880c76de3ff266bdfe",
-    "lesson_content.jsonl": "a9ed2f5b81b81b8831177a066b391179d4f78d423a3a25ba398f9ec6ba4f4faa"
+    "question_bank.jsonl": "52d3c051632be94a7524ba419ee578058d82165d3d8c215b9df09142e0b5e578",
+    "lesson_content.jsonl": "9ced2268117bfb7feca9bf092776942463ca760380002153e254a5eba75cad61"
   },
   "summary": {
     "total_questions": 576,
@@ -543,7 +543,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T00_1",
       "concept_id": "C00",
       "locale": "en",
-      "revision": 4,
+      "revision": 5,
       "title": "C/C++ Arrays, Functions, Structs, and Parameter Passing",
       "learning_objective_ids": [
         "T00_1_LO1",
@@ -569,7 +569,7 @@ globalThis.DSAReviewData = {
           "type": "prose",
           "section": "intuition",
           "required": true,
-          "body_md": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects any modification made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
+          "body_md": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects changes to its ordinary (non-`mutable`) members made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
         },
         {
           "id": "T00_1-invariant",
@@ -3057,7 +3057,7 @@ globalThis.DSAReviewData = {
       "topic_id": "T04_2",
       "concept_id": "C04",
       "locale": "en",
-      "revision": 5,
+      "revision": 6,
       "title": "Open Addressing: Linear Probing and Tombstone Deletion",
       "learning_objective_ids": [
         "T04_2_LO1",
@@ -3273,7 +3273,7 @@ globalThis.DSAReviewData = {
           "type": "callout",
           "variant": "warning",
           "title": "Tombstone Accumulation Pitfall",
-          "body_md": "Only a rehash turns a `DELETED` marker back into `EMPTY`, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
+          "body_md": "In this implementation a `DELETED` marker stays until an insertion reuses it or a cleanup rehash removes it, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
         },
         {
           "id": "T04_2-checkpoint",
@@ -8691,11 +8691,11 @@ globalThis.DSAReviewData = {
         },
         {
           "option_id": "D",
-          "text": "Only a rehash turns a `DELETED` slot back into `EMPTY`, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
+          "text": "This table keeps each `DELETED` tombstone until an insertion reuses it or a cleanup rehash removes it, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
         }
       ],
       "correct_option_id": "D",
-      "answer_explanation": "Only a rehash turns `DELETED` slots back into `EMPTY`, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes.",
+      "answer_explanation": "Here a `DELETED` tombstone stays until an insertion reuses it or a cleanup rehash removes it, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes.",
       "distractor_explanations": {
         "A": "Unsuccessful searches suffer the most because they must continue until an `EMPTY` slot (or full cycle of `M` probes).",
         "B": "`N / M` counts only live keys, but `search` must also probe past `DELETED` tombstones, and nothing limits how many of them accumulate.",
@@ -8715,8 +8715,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F03 (codex/gemini 20261113 pre-human audits).",
-      "version": "1.2.3"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F03 (codex/gemini 20261113 pre-human audits). | Revised in run 20261113T070715Z for re-audit finding(s) RR01 (codex 20261113 rereview).",
+      "version": "1.2.4"
     },
     {
       "question_id": "Q_T04_2_10",
@@ -20048,7 +20048,7 @@ globalThis.DSAReviewData = {
         }
       ],
       "correct_option_id": "B",
-      "answer_explanation": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (Merging each Red node into its Black parent gives the same count: every leaf of the merged tree sits at depth `bh`, and every node has 2 to 4 children.) (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$.",
+      "answer_explanation": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$.",
       "distractor_explanations": {
         "A": "Paths in a Red-Black tree can differ in length by up to a factor of `2` (an all-Black path of length `bh` vs an alternating Black-Red path of length `2 * bh`).",
         "C": "Black nodes can have Black children.",
@@ -20068,8 +20068,8 @@ globalThis.DSAReviewData = {
       "human_review_status": "pending",
       "approved_by": null,
       "approved_at": null,
-      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F13 (codex/gemini 20261113 pre-human audits).",
-      "version": "1.2.3"
+      "reviewer_comment": "Notation-only change in 20261113T051109Z: plain math rewritten as LaTeX $...$; wording, numbers and answers unchanged (round-trip checked). | Revised in run 20261113T063110Z for audit finding(s) F13 (codex/gemini 20261113 pre-human audits). | Revised in run 20261113T070715Z for re-audit finding(s) RR03 (codex 20261113 rereview).",
+      "version": "1.2.4"
     },
     {
       "question_id": "Q_T10_6_03",
@@ -29581,7 +29581,7 @@ globalThis.DSAReviewData = {
   ],
   "changes": {
     "lesson:lesson_T00_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -29596,7 +29596,7 @@ globalThis.DSAReviewData = {
           "path": "blocks[0].body_md",
           "label": "block T00 1-intuition body md",
           "before": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying while the compiler strictly prohibits modifications, combining optimal zero-copy performance with caller safety.",
-          "after": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects any modification made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
+          "after": "In C and C++, understanding memory layout is essential for algorithmic reasoning. An array of $N$ elements of type $T$ occupies exactly $N \\times \\text{sizeof}(T)$ contiguous bytes in memory. The CPU accesses any element at index $i$ in $O(1)$ time by computing base pointer arithmetic: $\\text{address}(A[i]) = \\text{base} + i \\times \\text{sizeof}(T)$. For a 2D row-major array of dimensions $R \\times C$, element $(r, c)$ resides at flat offset $r \\times C + c$.\n\nWhen passing arguments to functions, C++ provides three distinct parameter-passing mechanisms:\n- **Pass-by-value (`T val`):** The function receives an independent copy of the caller argument. Modifications inside the function do not alter caller variables. However, copying large structs incurs $O(S)$ overhead, where $S = \\text{sizeof}(T)$.\n- **Pass-by-reference (`T& ref`):** The parameter binds as an alias to the caller original variable. Zero memory is copied, and mutations made via `ref` immediately affect the caller.\n- **Pass-by-const-reference (`const T& ref`):** Binds an alias without copying, and the compiler rejects changes to its ordinary (non-`mutable`) members made through this reference. The object itself is not frozen: another non-const reference to it can still change it. The result is zero-copy, read-only access."
         },
         {
           "path": "blocks[3].source",
@@ -29721,7 +29721,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T00_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -29867,7 +29867,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T01_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30007,7 +30007,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T01_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30159,7 +30159,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30275,7 +30275,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30373,7 +30373,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T02_3": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30495,7 +30495,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30599,7 +30599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30703,7 +30703,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T03_3": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30813,7 +30813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -30923,7 +30923,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -30998,7 +30998,7 @@ globalThis.DSAReviewData = {
           "path": "blocks[5].body_md",
           "label": "block T04 2-warning body md",
           "before": "Over continuous operations, repeated deletions saturate the array with `DELETED` markers. Even if the table holds only a single active key, lookups scan across every historical tombstone, degrading average performance to $O(M)$. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table.",
-          "after": "Only a rehash turns a `DELETED` marker back into `EMPTY`, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
+          "after": "In this implementation a `DELETED` marker stays until an insertion reuses it or a cleanup rehash removes it, so over a long run of insertions and deletions tombstones can accumulate (how many depends on where the keys hash). In the worst case the table holds a single active key, and an unsuccessful lookup scans past almost every slot before it reaches an `EMPTY` one: $O(M)$ probes. **Production mitigation:** Whenever $(n + \\text{tombstones}) / M > \\alpha_{\\text{max}}$, perform a compacting rehash into a clean table."
         },
         {
           "path": "source_ids[1]",
@@ -31039,7 +31039,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T04_3": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31167,7 +31167,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31283,7 +31283,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31477,7 +31477,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T05_3": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31569,7 +31569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T06_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31685,7 +31685,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T06_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31807,7 +31807,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_1": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "2",
@@ -31899,7 +31899,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_2": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -31985,7 +31985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "lesson:lesson_T07_3": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": null,
       "version_before": "1",
@@ -32119,7 +32119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32133,7 +32133,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32171,7 +32171,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32185,7 +32185,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32205,7 +32205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32219,7 +32219,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32239,7 +32239,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32295,7 +32295,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T00_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32315,7 +32315,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32335,7 +32335,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32397,7 +32397,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32429,7 +32429,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32491,7 +32491,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32511,7 +32511,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32573,7 +32573,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32593,7 +32593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32655,7 +32655,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32705,7 +32705,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32767,7 +32767,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32829,7 +32829,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32867,7 +32867,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32905,7 +32905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "revise",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -32967,7 +32967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33005,7 +33005,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33037,7 +33037,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33075,7 +33075,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33131,7 +33131,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T01_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33145,7 +33145,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33171,7 +33171,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33191,7 +33191,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33205,7 +33205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33267,7 +33267,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33323,7 +33323,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33361,7 +33361,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33411,7 +33411,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33455,7 +33455,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33517,7 +33517,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33561,7 +33561,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33593,7 +33593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T02_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33637,7 +33637,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33669,7 +33669,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33725,7 +33725,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33757,7 +33757,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33807,7 +33807,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33839,7 +33839,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33853,7 +33853,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33909,7 +33909,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33929,7 +33929,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -33949,7 +33949,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34005,7 +34005,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34067,7 +34067,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34087,7 +34087,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34125,7 +34125,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34139,7 +34139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34165,7 +34165,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T03_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34221,7 +34221,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34277,7 +34277,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34297,7 +34297,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34329,7 +34329,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34361,7 +34361,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34381,7 +34381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34401,7 +34401,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34451,7 +34451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34513,7 +34513,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34575,7 +34575,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34589,7 +34589,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34615,7 +34615,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34648,13 +34648,13 @@ globalThis.DSAReviewData = {
           "path": "options[3].text",
           "label": "option D",
           "before": "Even though `N / M <= 0.30`, every formerly used slot eventually becomes `OCCUPIED` or `DELETED` with zero `EMPTY` slots left, degrading unsuccessful `search(k)` to `Theta(M)` time.",
-          "after": "Only a rehash turns a `DELETED` slot back into `EMPTY`, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
+          "after": "This table keeps each `DELETED` tombstone until an insertion reuses it or a cleanup rehash removes it, so tombstones can accumulate until almost no `EMPTY` slots remain; even with `N / M <= 0.30`, an unsuccessful `search(k)` can then take $\\Theta(M)$ probes."
         },
         {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "As detailed in Open Data Structures Section 5.2 (`LinearHashTable`), `search(k)` cannot stop at `DELETED` slots—it only stops at `EMPTY`. As tombstones accumulate, the effective load factor for searches is `(N_occupied + N_deleted) / M`. When all `EMPTY` slots are gone, unsuccessful searches scan all `M` slots unless the table periodically rehashes to purge tombstones.",
-          "after": "Only a rehash turns `DELETED` slots back into `EMPTY`, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes."
+          "after": "Here a `DELETED` tombstone stays until an insertion reuses it or a cleanup rehash removes it, so tombstones can pile up; whether they do depends on which slots the keys hash to. In the worst case `1` key is live, `M - 2` slots are tombstones and `1` slot is `EMPTY`. A search for an absent key that starts just after the `EMPTY` slot probes all `M` slots before it stops: $\\Theta(M)$ time, although the live load factor is tiny. Rehashing when the non-`EMPTY` slots (`active + deleted`) exceed a threshold such as `M / 2` clears the tombstones and restores short probes."
         },
         {
           "path": "distractor_explanations.B",
@@ -34665,7 +34665,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34727,7 +34727,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34765,7 +34765,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34785,7 +34785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34817,7 +34817,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34831,7 +34831,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34869,7 +34869,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34895,7 +34895,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34921,7 +34921,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T04_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "An",
       "version_before": "1.2.0",
@@ -34971,7 +34971,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -34997,7 +34997,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35017,7 +35017,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35061,7 +35061,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35105,7 +35105,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35155,7 +35155,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35193,7 +35193,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35249,7 +35249,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35299,7 +35299,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35349,7 +35349,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35381,7 +35381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35437,7 +35437,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35487,7 +35487,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35507,7 +35507,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35569,7 +35569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35631,7 +35631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35657,7 +35657,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35689,7 +35689,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35733,7 +35733,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35759,7 +35759,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35803,7 +35803,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35847,7 +35847,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35861,7 +35861,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35905,7 +35905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -35967,7 +35967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36017,7 +36017,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36055,7 +36055,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36093,7 +36093,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36119,7 +36119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36163,7 +36163,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36189,7 +36189,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36209,7 +36209,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36253,7 +36253,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36279,7 +36279,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36305,7 +36305,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36331,7 +36331,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T05_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36375,7 +36375,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36395,7 +36395,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36427,7 +36427,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36477,7 +36477,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36521,7 +36521,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36565,7 +36565,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36597,7 +36597,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36647,7 +36647,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36685,7 +36685,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36735,7 +36735,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36785,7 +36785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36811,7 +36811,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36831,7 +36831,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36875,7 +36875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36925,7 +36925,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -36957,7 +36957,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T06_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37007,7 +37007,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37021,7 +37021,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37053,7 +37053,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37109,7 +37109,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37165,7 +37165,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37185,7 +37185,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37211,7 +37211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37249,7 +37249,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "approved",
       "approved_by_before": "Hieu",
       "version_before": "1.2.0",
@@ -37287,7 +37287,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37331,7 +37331,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37393,7 +37393,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37407,7 +37407,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37451,7 +37451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37471,7 +37471,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37485,7 +37485,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37511,7 +37511,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37537,7 +37537,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37599,7 +37599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37661,7 +37661,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37699,7 +37699,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37725,7 +37725,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37787,7 +37787,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37813,7 +37813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T07_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37845,7 +37845,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37859,7 +37859,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37873,7 +37873,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37929,7 +37929,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -37985,7 +37985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38041,7 +38041,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38085,7 +38085,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38147,7 +38147,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38191,7 +38191,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38205,7 +38205,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38225,7 +38225,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38245,7 +38245,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38307,7 +38307,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38369,7 +38369,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38431,7 +38431,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38493,7 +38493,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38555,7 +38555,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T08_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38575,7 +38575,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38631,7 +38631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38651,7 +38651,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38671,7 +38671,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38721,7 +38721,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38771,7 +38771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38815,7 +38815,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38829,7 +38829,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38855,7 +38855,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38875,7 +38875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38913,7 +38913,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -38969,7 +38969,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39031,7 +39031,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39075,7 +39075,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39125,7 +39125,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39139,7 +39139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39201,7 +39201,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39239,7 +39239,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39295,7 +39295,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39327,7 +39327,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39377,7 +39377,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39391,7 +39391,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39441,7 +39441,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39479,7 +39479,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39541,7 +39541,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39579,7 +39579,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39593,7 +39593,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39619,7 +39619,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39645,7 +39645,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39665,7 +39665,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39709,7 +39709,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39747,7 +39747,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39809,7 +39809,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39871,7 +39871,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39891,7 +39891,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39905,7 +39905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T09_4_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39937,7 +39937,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -39987,7 +39987,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40001,7 +40001,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40051,7 +40051,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40095,7 +40095,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40109,7 +40109,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40135,7 +40135,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40173,7 +40173,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40187,7 +40187,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40201,7 +40201,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40257,7 +40257,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40289,7 +40289,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40339,7 +40339,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40359,7 +40359,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40379,7 +40379,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40393,7 +40393,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40413,7 +40413,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40451,7 +40451,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40501,7 +40501,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40557,7 +40557,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40571,7 +40571,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40591,7 +40591,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40647,7 +40647,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40667,7 +40667,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40681,7 +40681,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40695,7 +40695,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40757,7 +40757,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_4_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40771,7 +40771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40791,7 +40791,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40817,7 +40817,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40837,7 +40837,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40875,7 +40875,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40889,7 +40889,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40933,7 +40933,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_5_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40965,7 +40965,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -40998,7 +40998,7 @@ globalThis.DSAReviewData = {
           "path": "answer_explanation",
           "label": "answer explanation",
           "before": "The Red-Black height bound follows directly from combining the Black-Height Property (which guarantees a complete binary tree of Black depth `bh`, giving `n >= 2^bh - 1`) with the Red Property (which forbids consecutive Red nodes, so the longest path can alternate `Black - Red - Black - Red ...` and be at most twice the length of the shortest all-Black path: `h <= 2 * bh <= 2 * log2(n + 1)`).",
-          "after": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (Merging each Red node into its Black parent gives the same count: every leaf of the merged tree sits at depth `bh`, and every node has 2 to 4 children.) (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$."
+          "after": "Two facts give the bound. (1) Every root-to-NIL path has the same number `bh` of Black nodes, and induction on height shows that a subtree whose root has black-height `bh` holds at least $2^{bh} - 1$ internal nodes, so $n \\ge 2^{bh} - 1$ and $bh \\le \\log_2(n + 1)$. (2) No Red node has a Red child, so at least half the nodes on any root-to-NIL path are Black, and $h \\le 2 \\cdot bh \\le 2 \\cdot \\log_2(n + 1)$."
         },
         {
           "path": "distractor_explanations.D",
@@ -41009,7 +41009,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41023,7 +41023,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41043,7 +41043,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41063,7 +41063,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41101,7 +41101,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41115,7 +41115,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41129,7 +41129,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_6_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41149,7 +41149,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41163,7 +41163,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41183,7 +41183,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41197,7 +41197,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41211,7 +41211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41225,7 +41225,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41251,7 +41251,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41271,7 +41271,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41285,7 +41285,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41347,7 +41347,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41367,7 +41367,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41417,7 +41417,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T10_7_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41431,7 +41431,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41445,7 +41445,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41489,7 +41489,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41515,7 +41515,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41529,7 +41529,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41543,7 +41543,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41569,7 +41569,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41595,7 +41595,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41621,7 +41621,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41683,7 +41683,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41733,7 +41733,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41783,7 +41783,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41845,7 +41845,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41859,7 +41859,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41879,7 +41879,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41941,7 +41941,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -41967,7 +41967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42023,7 +42023,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42073,7 +42073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42135,7 +42135,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T11_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42197,7 +42197,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42211,7 +42211,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42267,7 +42267,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42287,7 +42287,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42319,7 +42319,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42357,7 +42357,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42371,7 +42371,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42403,7 +42403,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42423,7 +42423,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42473,7 +42473,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42487,7 +42487,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42501,7 +42501,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42539,7 +42539,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42553,7 +42553,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42585,7 +42585,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42599,7 +42599,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42631,7 +42631,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42645,7 +42645,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42659,7 +42659,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42673,7 +42673,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42693,7 +42693,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42719,7 +42719,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42751,7 +42751,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42771,7 +42771,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42785,7 +42785,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42835,7 +42835,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42891,7 +42891,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42905,7 +42905,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42919,7 +42919,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_4_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42933,7 +42933,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42953,7 +42953,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -42967,7 +42967,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43029,7 +43029,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43055,7 +43055,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43081,7 +43081,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43107,7 +43107,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43139,7 +43139,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T12_5_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43189,7 +43189,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43203,7 +43203,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43229,7 +43229,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43261,7 +43261,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43311,7 +43311,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43373,7 +43373,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43387,7 +43387,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43407,7 +43407,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43439,7 +43439,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43495,7 +43495,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43509,7 +43509,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43547,7 +43547,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43561,7 +43561,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43611,7 +43611,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43625,7 +43625,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43681,7 +43681,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43707,7 +43707,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T13_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43763,7 +43763,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43789,7 +43789,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43809,7 +43809,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43823,7 +43823,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43837,7 +43837,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43869,7 +43869,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43895,7 +43895,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43927,7 +43927,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -43953,7 +43953,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44003,7 +44003,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44035,7 +44035,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44073,7 +44073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44099,7 +44099,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44119,7 +44119,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44151,7 +44151,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44207,7 +44207,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_2_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44233,7 +44233,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44265,7 +44265,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44303,7 +44303,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44317,7 +44317,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44367,7 +44367,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44381,7 +44381,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44443,7 +44443,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44457,7 +44457,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44483,7 +44483,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44503,7 +44503,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44535,7 +44535,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44555,7 +44555,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T14_3_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44587,7 +44587,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44601,7 +44601,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44615,7 +44615,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44629,7 +44629,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44643,7 +44643,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44657,7 +44657,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44689,7 +44689,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44709,7 +44709,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_1_12": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44723,7 +44723,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_01": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44743,7 +44743,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_02": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44775,7 +44775,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_03": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44813,7 +44813,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_04": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44857,7 +44857,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_05": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44889,7 +44889,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_06": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44927,7 +44927,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_07": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44959,7 +44959,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_08": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -44985,7 +44985,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_09": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -45035,7 +45035,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_10": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
@@ -45073,7 +45073,7 @@ globalThis.DSAReviewData = {
       ]
     },
     "question:Q_T15_2_11": {
-      "compared_with": "run 20261113T063110Z (audit repairs) vs data/curated",
+      "compared_with": "run 20261113T070715Z (re-audit wording follow-up) vs data/curated",
       "status_before": "pending",
       "approved_by_before": null,
       "version_before": "1.2.0",
