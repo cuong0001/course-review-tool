@@ -8,47 +8,53 @@
 <body>
 <a class="skip-link" href="#item">Skip to current review</a>
 <header class="app-header">
-<div class="brand"><span class="brand-mark" aria-hidden="true">SC</span><div><h1>DSA review desk</h1><p>Study Companion · CSC10004</p></div></div>
-<div class="header-controls"><label>Reviewer <select id="reviewer"><option value="">Choose your name</option><option>Cường</option><option>Hiếu</option><option>An</option><option>Hải</option><option>Huy</option><option>Khánh</option></select></label><button id="switch">Open workspace</button><button id="theme" aria-pressed="false">Dark mode</button>
-<details id="view-menu" class="view-menu"><summary>View</summary><div class="view-panel">
-<div class="view-row"><span id="text-size-label">Text size</span><div class="segmented" role="group" aria-labelledby="text-size-label"><button id="text-smaller" type="button" aria-label="Smaller text">A−</button><output id="text-size" aria-live="polite">100%</output><button id="text-larger" type="button" aria-label="Larger text">A+</button></div></div>
-<label class="check-label"><input id="show-tex" type="checkbox"> Show LaTeX source under formulas <kbd>T</kbd></label>
-<label class="check-label"><input id="focus-mode" type="checkbox"> Focus mode: hide the sidebar</label>
-</div></details>
-<button id="shortcuts-open" type="button" aria-haspopup="dialog">Shortcuts <kbd>?</kbd></button></div>
-<div class="export-controls"><strong id="saved" role="status">Choose your name to begin</strong><button id="export" class="primary">Export review package</button><button id="decisions">Export finalized decisions</button></div>
-<div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="undo" type="button" hidden>Undo decision</button></div>
+  <span class="brand">DSA review</span>
+  <select id="reviewer" aria-label="Reviewer"><option value="">Choose your name</option><option>Cường</option><option>Hiếu</option><option>An</option><option>Hải</option><option>Huy</option><option>Khánh</option></select>
+  <span id="progress" class="muted"></span>
+  <span id="saved" role="status" class="muted"></span>
+  <button id="export" class="primary" title="Download your notes and decisions as a file to send to the owner">Export</button>
+  <details id="view-menu" class="view-menu"><summary aria-label="Menu">⋯</summary><div class="view-panel">
+    <button id="theme" type="button" aria-pressed="false">Dark mode</button>
+    <div class="view-row"><span id="text-size-label">Text size</span><div class="segmented" role="group" aria-labelledby="text-size-label"><button id="text-smaller" type="button" aria-label="Smaller text">A−</button><output id="text-size" aria-live="polite">100%</output><button id="text-larger" type="button" aria-label="Larger text">A+</button></div></div>
+    <label class="check-label"><input id="show-tex" type="checkbox"> Show LaTeX source <kbd>T</kbd></label>
+    <label class="check-label"><input id="focus-mode" type="checkbox"> Hide the queue</label>
+    <button id="shortcuts-open" type="button" aria-haspopup="dialog">Keyboard shortcuts <kbd>?</kbd></button>
+    <hr>
+    <button id="decisions" type="button">Export finalized decisions</button>
+    <label class="file-label">Import review package <input id="import" type="file" accept=".json"></label>
+    <label class="file-label">Load newer dataset files <input id="files" type="file" multiple accept=".jsonl"></label>
+    <section class="team" aria-label="Team and dataset"><p id="dataset-summary" class="muted"></p><div id="team-summary"></div></section>
+  </div></details>
+  <div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="undo" type="button" hidden>Undo</button></div>
 </header>
 <main id="drop" class="app-layout">
-<aside class="sidebar" aria-label="Assignment and review navigation">
-<section class="workspace-summary" aria-label="Review progress"><h2>Your workspace</h2><p class="sidebar-help">Choose your name. Your assigned DSA content loads automatically.</p><div id="progress"></div><button id="continue">Continue reviewing</button></section>
-<nav class="queue-nav" aria-label="Review queue"><h2>Review queue</h2>
-<div class="filters">
-<label>Review type <select id="type"><option value="lesson">Reading guides — priority</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
-<label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Not started</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option><option value="changed">Changed since last version</option></select></label>
-<label>Topic <select id="topic"><option value="">All topics</option></select></label>
-<label>Assignment <select id="assignment-scope"><option value="mine">My assignment</option><option value="all">All assignments (owner overview)</option></select></label>
-<label class="check-label"><input id="extras" type="checkbox"> Include resources and activities</label>
-</div>
-<div class="search-row"><label for="search" class="sr-only">Search this queue</label><input id="search" type="search" placeholder="Search ID, text or notes  ( / )" autocomplete="off"><button id="clear-filters" type="button">Clear</button></div>
-<p id="queue-count" class="queue-count" aria-live="polite"></p>
-<div id="queue"></div></nav>
-<details><summary>Team allocation and dataset</summary><p id="dataset-summary"></p><div id="team-summary"></div></details>
-<details><summary>Import saved reviews or newer data</summary><label>Import review package <input id="import" type="file" accept=".json"></label><label>Load newer / additional dataset files <input id="files" type="file" multiple accept=".jsonl"></label><p class="sidebar-help">You can also drop JSONL files onto this window. A record that replaces a bundled one shows what changed.</p></details>
+<aside class="sidebar" aria-label="Review queue">
+  <div class="rail-tab" aria-hidden="true"><span class="rail-icon">☰</span><span id="rail-count"></span></div>
+  <div class="rail-panel">
+    <div class="filters">
+      <label>Type <select id="type"><option value="lesson">Reading guides</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
+      <label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Not started</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option><option value="changed">Changed since last version</option></select></label>
+      <label>Topic <select id="topic"><option value="">All topics</option></select></label>
+      <label>Assignment <select id="assignment-scope"><option value="mine">Mine</option><option value="all">Whole team</option></select></label>
+      <label class="check-label"><input id="extras" type="checkbox"> Include resources and activities</label>
+    </div>
+    <div class="search-row"><label for="search" class="sr-only">Search this queue</label><input id="search" type="search" placeholder="Search  ( / )" autocomplete="off"><button id="clear-filters" type="button" aria-label="Clear search">✕</button></div>
+    <p id="queue-count" class="queue-count" aria-live="polite"></p>
+    <div id="queue"></div>
+  </div>
 </aside>
-<article id="item" tabindex="-1" aria-label="Current review"><section class="empty-state"><p class="eyebrow">Your team's review workspace</p><h2>Choose your name to start</h2><p>Read the guide or question, open its sources, and record what needs fixing. Notes and decisions save automatically in this browser.</p></section></article>
+<article id="item" tabindex="-1" aria-label="Current review"><section class="empty-state"><h2>Choose your name to start</h2></section></article>
 </main>
 <p id="live" class="sr-only" aria-live="polite"></p>
 <dialog id="shortcuts" aria-labelledby="shortcuts-title"><h2 id="shortcuts-title">Keyboard shortcuts</h2>
-<p class="sidebar-help">Single-key shortcuts work when you are not typing in a box. None of them makes a final decision.</p>
 <table class="shortcut-table"><tbody>
-<tr><td><kbd>Alt</kbd> + <kbd>→</kbd> or <kbd>J</kbd></td><td>Next item in this queue</td></tr>
+<tr><td><kbd>Alt</kbd> + <kbd>→</kbd> or <kbd>J</kbd></td><td>Next item</td></tr>
 <tr><td><kbd>Alt</kbd> + <kbd>←</kbd> or <kbd>K</kbd></td><td>Previous item</td></tr>
-<tr><td><kbd>U</kbd></td><td>Next item not finished yet</td></tr>
-<tr><td><kbd>/</kbd> or <kbd>Ctrl</kbd> + <kbd>K</kbd></td><td>Search this queue (<kbd>Esc</kbd> clears it)</td></tr>
-<tr><td><kbd>N</kbd></td><td>Write overall notes</td></tr>
-<tr><td><kbd>F</kbd></td><td>Flag or unflag an issue</td></tr>
-<tr><td><kbd>T</kbd></td><td>Show or hide the LaTeX source under formulas</td></tr>
+<tr><td><kbd>U</kbd></td><td>Next unfinished item</td></tr>
+<tr><td><kbd>/</kbd> or <kbd>Ctrl</kbd> + <kbd>K</kbd></td><td>Search (<kbd>Esc</kbd> clears)</td></tr>
+<tr><td><kbd>N</kbd></td><td>Write notes</td></tr>
+<tr><td><kbd>F</kbd></td><td>Flag or unflag</td></tr>
+<tr><td><kbd>T</kbd></td><td>Show or hide LaTeX source</td></tr>
 <tr><td><kbd>?</kbd></td><td>This list</td></tr>
 </tbody></table>
 <form method="dialog"><button class="primary">Close</button></form></dialog>

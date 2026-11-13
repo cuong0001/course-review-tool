@@ -67,12 +67,12 @@ const ReviewRender = (() => {
     }grid.append(tr);}wrap.append(grid);parent.append(wrap);
   }
   function block(parent,block){
-    const section=el('section');section.className='block'+(block.variant?' callout-'+block.variant:'');const heading=el('h3');inline(heading,block.title||block.caption||block.id);section.append(heading);
+    const section=el('section');section.className='block'+(block.variant?' callout-'+block.variant:'');if(block.title||block.caption){const heading=el('h3');inline(heading,block.title||block.caption);section.append(heading);}
     if(block.body_md)prose(section,block.body_md);if(block.description)prose(section,block.description);if(block.source)code(section,block.source,block.language||'cpp');
     if(block.prompt){section.append(el('h4','Checkpoint'));prose(section,block.prompt);}if(block.reveal_md){section.append(el('h4','Answer'));prose(section,block.reveal_md);}
     if(Array.isArray(block.rows))table(section,block.rows);
     for(const [index,step]of(block.steps||[]).entries()){const item=el('section');item.className='trace-step';item.append(el('h4',`Step ${index+1}${step.decision?': '+step.decision:''}`));if(step.explanation)prose(item,step.explanation);if(step.active_index!==undefined)item.append(el('p',`Active index: ${step.active_index}`));if(Array.isArray(step.slots))table(item,step.slots);if(Array.isArray(step.nodes))table(item,step.nodes);section.append(item);}
-    const metadata=el('details');metadata.className='block-metadata';metadata.append(el('summary','View original block data'));code(metadata,JSON.stringify(block,null,2));section.append(metadata);parent.append(section);return section;
+    parent.append(section);return section;
   }
   return {block,prose,inline,math,table,code};
 })();

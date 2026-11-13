@@ -13,7 +13,7 @@ const A=require('../../review-assignments.js');
   assert.deepEqual(await page.locator('#reviewer option').allTextContents(),['Choose your name',...data.members]);
   for(const member of data.members){
    await page.locator('#reviewer').selectOption(member);
-   await page.getByText(member+' — your assigned work',{exact:true}).waitFor();
+   await page.locator('#progress').filter({hasText:new RegExp('^'+member+' · ')}).waitFor();
    const counts=A.counts(data,member);
    assert.equal(await page.locator('#queue button').count(),counts.lesson);
    for(const label of await page.locator('#queue button').allTextContents()){const id=label.split(' · ')[0];assert.equal(data.assignments.lesson[id],member);}
@@ -23,7 +23,7 @@ const A=require('../../review-assignments.js');
   }
   await page.locator('#reviewer').selectOption('Cường');await page.locator('#type').selectOption('question');
   const first=await page.locator('#item h2').innerText();await page.getByLabel('Overall notes / what should be fixed').fill('Ghi chú của Cường');
-  await page.reload();await page.getByText('Cường — your assigned work',{exact:true}).waitFor();await page.locator('#item h2').filter({hasText:first}).waitFor();
+  await page.reload();await page.locator('#progress').filter({hasText:/^Cường · /}).waitFor();await page.locator('#item h2').filter({hasText:first}).waitFor();
   assert.equal(await page.getByLabel('Overall notes / what should be fixed').inputValue(),'Ghi chú của Cường');
   await page.locator('#reviewer').selectOption('Hiếu');assert.equal(await page.getByLabel('Overall notes / what should be fixed').inputValue(),'');
   await page.locator('#assignment-scope').selectOption('all');await page.locator('#type').selectOption('question');assert.equal(await page.locator('#queue button').count(),data.summary.pending_questions+data.summary.revise_questions);

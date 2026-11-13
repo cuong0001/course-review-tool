@@ -1,3 +1,36 @@
+# Minimal review layout — 2026-11-13
+
+**Layout changes:**
+- one slim header row; everything else in the ⋯ menu;
+- the queue is a thin rail that opens on hover or focus;
+- the item takes most of the width, with a small notes-and-decision panel beside it.
+
+**Removed:**
+- the before/after "What changed" panel;
+- the REQUIRED banner, the Copy ID button and the verification-method line;
+- the raw block data;
+- the distractor headings;
+- the checklist, because **Approve** now records all checks as confirmed and lists them in its tooltip. The decision export format is unchanged.
+
+**Guide notes:** section notes appear through a hover **+ Note** button.
+
+**LaTeX fix:** inline formulas were `inline-block` with `overflow-x:auto` and `vertical-align:middle`, which sat them off the text baseline. They are now `inline` on the baseline.
+
+**Tests:**
+- `npm test`: 12/12 passed.
+- All four browser suites passed. They were updated for the new layout: hover the rail before clicking queue entries, open the ⋯ menu for menu actions, no checklist, no "Open workspace" button.
+- New checks:
+  - the rail stays hidden until hovered;
+  - the content is wider than 1000 px at 1440 px;
+  - no before/after panel;
+  - inline math is `inline/baseline`;
+  - Approve records all four checks in the export;
+  - section notes take no space until "+ Note" is used.
+
+**Screenshots inspected:** question, guide, open queue, menu, dark mode and 375 px. Every page reported no errors.
+
+**Not done:** no Edge/Firefox/Safari run, no physical phone, and no screen-reader session.
+
 # Review workspace verification — 2026-11-13
 
 - **`npm test`:** 12 unit tests passed, 0 failed. The 4 new tests cover:

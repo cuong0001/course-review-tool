@@ -5,7 +5,7 @@ const storeKey = 'course-review-workspaces-v1', prefsKey = 'course-review-prefs-
 let db = {reviewer: '', people: {}}, loaded = {}, active = '', session = new Set(), storageBroken = false;
 let lastRows = [], undo = null, prefs = {scale: 1, showTex: false, focus: false};
 const STATUS_LABEL = {unreviewed: 'Not started', 'in-progress': 'In progress', flagged: 'Flagged', finished: 'Finished'};
-const DECISION_LABEL = {approve: 'Verified', revise: 'Needs fixes', reject: 'Rejected'};
+const DECISION_LABEL = {approve: 'Approved', revise: 'Needs changes', reject: 'Rejected'};
 
 function message(text) { $('message').textContent = text; if (!text) $('undo').hidden = true; }
 try {
@@ -21,8 +21,9 @@ function save() {
     const remote = JSON.parse(localStorage.getItem(storeKey) || 'null');
     if (remote?.people && db.reviewer) db.people = {...remote.people, [db.reviewer]: workspace()};
     localStorage.setItem(storeKey, JSON.stringify(db)); storageBroken = false;
-    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'});
-    $('saved').textContent = `Saved locally at ${time} — export a backup before leaving`; $('saved').className = 'save-ok';
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    $('saved').textContent = `Saved ${time}`; $('saved').className = 'muted';
+    $('saved').title = 'Saved in this browser only. Export a backup before leaving.';
   } catch (e) { storageBroken = true; $('saved').textContent = 'Not saved—export a backup'; $('saved').className = 'save-error'; }
 }
 function nameRequired() { if (!db.reviewer) { message('Choose your name to open your assigned DSA workspace.'); return false; } return true; }
@@ -113,27 +114,25 @@ function chip(k) {
   return node('span', text, `chip chip-${s.decision || st}`);
 }
 function progress() {
-  const target = $('progress'); target.replaceChildren();
-  target.append(node('h3', db.reviewer + ($('assignment-scope').value === 'mine' ? ' — your assigned work' : ' — viewing all team assignments')));
-  const all = eligible();
-  for (const kind of ['overall', ...Object.keys(C.ids).filter(kind => all.some(([, item]) => item.kind === kind))]) {
-    const rows = all.filter(([, i]) => kind === 'overall' || i.kind === kind), done = rows.filter(([k]) => state(k).decision).length;
-    const row = node('div', `${kind}: ${done} / ${rows.length} finished`, 'progress-row'), bar = node('progress');
-    bar.max = rows.length || 1; bar.value = done; bar.setAttribute('aria-label', `${kind} completion`); row.append(bar); target.append(row);
-  }
-  target.append(node('p', `${session.size} items finalized this session`));
+  // One line in the header: whose work, and how much of it is finished. Per-type counts are in the tooltip.
+  const all = eligible(), done = all.filter(([k]) => state(k).decision).length;
+  const perKind = Object.keys(C.ids).map(kind => [kind, all.filter(([, i]) => i.kind === kind)]).filter(([, rows]) => rows.length)
+    .map(([kind, rows]) => `${kind}: ${rows.filter(([k]) => state(k).decision).length} / ${rows.length}`);
+  const team = $('assignment-scope').value === 'all' ? ' · whole team' : '';
+  $('progress').textContent = `${db.reviewer}${team} · ${done} / ${all.length} done`;
+  $('progress').title = perKind.join('\n') + `\n${session.size} finished this session`;
 }
 function drawQueue(rows) {
   const queue = $('queue'); queue.replaceChildren();
   const filtered = $('search').value.trim() || $('filter').value !== 'all' || $('topic').value;
   const finished = rows.filter(([k]) => state(k).decision).length;
   $('queue-count').textContent = rows.length ? `${rows.length} ${filtered ? 'matching ' : ''}item${rows.length === 1 ? '' : 's'} · ${finished} finished` : '';
+  $('rail-count').textContent = rows.length ? `${finished} / ${rows.length}` : '';
   let current = null;
   for (const [k, i] of rows) {
     const b = button('', () => open(k), 'queue-item');
     b.append(document.createTextNode(`${i.id} · `), chip(k));
-    if (state(k).flag) b.append(node('span', ' ⚑ flagged', 'queue-flag'));
-    if (changesFor(k)) b.append(node('span', ' changed', 'queue-changed'));
+    if (state(k).flag) b.append(node('span', ' ⚑', 'queue-flag'));
     const preview = node('span', undefined, 'queue-preview'); ReviewRender.inline(preview, i.record.title || i.record.stem || i.record.lecture_title || ''); b.append(preview);
     b.setAttribute('aria-current', String(k === active)); if (k === active) current = b;
     queue.append(b);
@@ -175,18 +174,18 @@ function nextOpen() { const k = nextOpenKey(); if (k) open(k); else message('Eve
 function clearFilters() { $('search').value = ''; $('filter').value = 'all'; $('topic').value = ''; render(); }
 
 // ------------------------------------------------------------------ the current item
-function autosize(t) { t.style.height = 'auto'; t.style.height = `${Math.max(t.scrollHeight + 2, 90)}px`; }
-function note(parent, label, value, onchange, id) {
-  const l = node('label', label), t = node('textarea'); t.value = value; if (id) t.id = id;
-  t.addEventListener('input', () => { onchange(t.value); autosize(t); }); l.append(t); parent.append(l);
-  requestAnimationFrame(() => autosize(t)); return t;
+function autosize(t, min = 120) { t.style.height = 'auto'; t.style.height = `${Math.max(t.scrollHeight + 2, min)}px`; }
+function note(parent, label, value, onchange, {id, placeholder = '', cls = '', min = 120} = {}) {
+  // The label is for screen readers; the placeholder says what to write.
+  const t = node('textarea', undefined, cls); t.rows = 1; t.value = value; t.placeholder = placeholder; t.setAttribute('aria-label', label); if (id) t.id = id;
+  t.addEventListener('input', () => { onchange(t.value); autosize(t, min); }); parent.append(t);
+  requestAnimationFrame(() => autosize(t, min)); return t;
 }
 function edited(k, field, value) {
   const s = state(k); C.edit(s, field, value); s.fingerprint = loaded[k].fingerprint; session.delete(k);
   // Undo restores a whole saved state, so it must never be offered after newer edits to the same item.
   if (undo?.key === k) { undo = null; $('undo').hidden = true; }
-  save(); progress(); updateActions();
-  $('decision-status').textContent = 'In progress';
+  save(); progress(); updateActions(); decisionStatus(s);
   const entry = [...$('queue').children].find(b => b.getAttribute('aria-current') === 'true');
   if (entry) entry.querySelector('.chip').replaceWith(chip(k));
 }
@@ -196,104 +195,93 @@ function detail(parent, value, label = 'Details') {
   else parent.append(node('strong', label), rich(String(value)));
 }
 function drawBlock(parent, block) {
-  const section = ReviewRender.block(parent, block);
-  note(section, 'Notes for section ' + block.id, state(active).sections[block.id] || '', value => edited(active, 'sections', {...state(active).sections, [block.id]: value}));
+  // A section note takes no space until it is used: "+ Note" appears on hover, the box stays once it has text.
+  const section = ReviewRender.block(parent, block), value = state(active).sections[block.id] || '';
+  const t = note(section, 'Notes for section ' + block.id, value, v => edited(active, 'sections', {...state(active).sections, [block.id]: v}),
+    {placeholder: 'Note on this section…', cls: 'section-note', min: 38});
+  const add = button('+ Note', () => { section.classList.add('noting'); autosize(t, 38); t.focus(); }, 'add-note');
+  add.setAttribute('aria-label', 'Add a note for section ' + block.id); section.prepend(add);
+  if (value.trim()) section.classList.add('noting');
+  t.addEventListener('blur', () => { if (!t.value.trim()) section.classList.remove('noting'); });
 }
 function rich(text, className = '') { const element = node('div', undefined, className); ReviewRender.prose(element, text); return element; }
-function sourceDiff(before, after) {
-  const line = node('div', undefined, 'source-diff');
-  if (!globalThis.ReviewDiff) { line.textContent = 'review-diff.js is missing from this folder.'; return line; }
-  for (const part of ReviewDiff.words(before, after)) line.append(part.op === 'same' ? document.createTextNode(part.text) : node(part.op === 'del' ? 'del' : 'ins', part.text));
-  return line;
-}
-function drawChanges(content, changes) {
-  const box = node('details', undefined, 'changes'); box.open = true;
-  const was = changes.status_before === 'approved' ? ` · was approved${changes.approved_by_before ? ' by ' + changes.approved_by_before : ''}` : '';
-  box.append(node('summary', `What changed · ${changes.fields.length} field${changes.fields.length === 1 ? '' : 's'} · compared with ${changes.compared_with}${was}`));
-  box.append(node('p', 'Check that each change says the same thing as before, or that the fix is right. The full item is shown below.', 'sidebar-help'));
-  for (const f of changes.fields) {
-    const row = node('section', undefined, 'change-field'); row.append(node('h4', f.label));
-    const pair = node('div', undefined, 'change-pair');
-    const before = node('div', undefined, 'change-before'), after = node('div', undefined, 'change-after');
-    before.append(node('span', 'Before', 'change-tag')); after.append(node('span', 'After', 'change-tag'));
-    before.append(f.before === null ? node('p', '(not present)', 'sidebar-help') : rich(String(f.before)));
-    after.append(f.after === null ? node('p', '(removed)', 'sidebar-help') : rich(String(f.after)));
-    pair.append(before, after); row.append(pair);
-    const raw = node('details', undefined, 'change-source'); raw.append(node('summary', 'Exact text changes'), sourceDiff(f.before, f.after)); row.append(raw);
-    box.append(row);
-  }
-  content.append(box);
+function decisionStatus(s) {
+  const el = $('decision-status'); if (!el) return;
+  el.textContent = s.decision ? `${DECISION_LABEL[s.decision]} · ${new Date(s.decided_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}` : '';
+  el.className = 'status' + (s.decision === 'approve' ? ' done' : '');
 }
 function drawItem(rows) {
   const {kind, id, record: r} = loaded[active], s = state(active); s.fingerprint = loaded[active].fingerprint;
   const panel = $('item'), content = node('section', undefined, 'review-content'), review = node('aside', undefined, 'review-panel');
-  panel.className = 'item-layout'; panel.replaceChildren(content, review); review.setAttribute('aria-label', 'Notes and verification');
-  const index = rows.findIndex(([k]) => k === active), nav = node('div', undefined, 'content-navigation');
-  const prev = button('Previous', () => step(-1)), next = button('Next', () => step(1));
-  prev.disabled = index <= 0; next.disabled = index >= rows.length - 1; prev.title = 'Alt + ←'; next.title = 'Alt + →';
-  const openKey = nextOpenKey(), nextUnfinished = button('Next not finished', nextOpen, 'next-open'); nextUnfinished.disabled = !openKey; nextUnfinished.title = 'U';
-  const where = node('span', `${index + 1} of ${rows.length}${rows.length !== eligible().filter(([, i]) => i.kind === kind).length ? ' (filtered)' : ''}`, 'position');
-  nav.append(prev, where, nextUnfinished, next); content.append(nav);
-  const kicker = node('p', `${kind === 'lesson' ? 'Reading guide' : kind === 'question' ? 'Question' : kind} · ${r.topic_id || (r.topic_ids || []).join(', ')}`, 'content-kicker');
-  kicker.append(' ', chip(active)); content.append(kicker);
-  const title = node('h2', r.title || r.lecture_title || r.title_en || id), copy = button('Copy ID', () => copyText(id), 'copy-id'); copy.setAttribute('aria-label', `Copy ID ${id}`);
-  const head = node('div', undefined, 'item-title'); head.append(title, copy); content.append(head);
-  if (kind === 'lesson') content.append(node('p', 'REQUIRED: shown to learners now', 'warning'));
-  const changes = changesFor(active); if (changes) drawChanges(content, changes);
+  panel.className = 'item-layout'; panel.replaceChildren(content, review); review.setAttribute('aria-label', 'Your review');
+
+  // One quiet line: what this is, where it is in the queue, and how to move.
+  const index = rows.findIndex(([k]) => k === active), nav = node('div', undefined, 'content-navigation'), meta = node('div', undefined, 'meta');
+  const topic = r.topic_id || (r.topic_ids || []).join(', ');
+  if (kind === 'question') { const h = node('h2', id, 'item-id'); h.title = topic; meta.append(h); }
+  else meta.append(node('span', `${id}${topic ? ' · ' + topic : ''}`));
+  meta.append(chip(active));
+  const prev = button('‹', () => step(-1)), next = button('›', () => step(1));
+  prev.setAttribute('aria-label', 'Previous'); next.setAttribute('aria-label', 'Next'); prev.title = 'Previous (Alt + ←)'; next.title = 'Next (Alt + →)';
+  prev.disabled = index <= 0; next.disabled = index >= rows.length - 1;
+  const nextUnfinished = button('Next unfinished', nextOpen, 'next-open'); nextUnfinished.disabled = !nextOpenKey(); nextUnfinished.title = 'U';
+  nav.append(meta, prev, node('span', `${index + 1} / ${rows.length}`, 'position'), next, nextUnfinished); content.append(nav);
+  if (kind !== 'question') content.append(node('h2', r.title || r.lecture_title || r.title_en || id));
+
   if (kind === 'question') {
     content.append(rich(r.stem, 'question-stem')); const options = node('div', undefined, 'answer-options');
     for (const option of r.options || []) {
       const correct = option.option_id === r.correct_option_id, card = node('section', undefined, correct ? 'correct' : 'option'), heading = node('div', undefined, 'option-heading'), body = node('div', undefined, 'option-copy');
-      if (correct) body.append(node('strong', 'Correct answer', 'correct-badge'));
-      body.append(rich(option.text)); heading.append(node('span', option.option_id, 'option-letter'), body); card.append(heading);
-      if (!correct) { const reason = node('div', undefined, 'distractor-note'); reason.append(node('strong', 'Why this distractor is wrong'), rich(r.distractor_explanations?.[option.option_id] || 'Missing distractor explanation')); card.append(reason); }
+      const letter = node('span', correct ? `${option.option_id} ✓` : option.option_id, 'option-letter'); if (correct) letter.title = 'Correct answer';
+      body.append(rich(option.text)); heading.append(letter, body); card.append(heading);
+      if (!correct) card.append(rich(r.distractor_explanations?.[option.option_id] || 'Missing distractor explanation', 'distractor-note'));
       options.append(card);
     }
-    content.append(options); const explanation = node('section', undefined, 'explanation'); explanation.append(node('h3', 'Answer explanation'), rich(r.answer_explanation)); content.append(explanation, node('p', `Verification method: ${r.verification_method || 'Not provided'}`, 'verification-method'));
+    const explanation = node('section', undefined, 'explanation'); explanation.append(node('h3', 'Explanation'), rich(r.answer_explanation));
+    content.append(options, explanation);
   } else if (kind === 'lesson') { for (const block of r.blocks || []) drawBlock(content, block); }
   else for (const [field, value] of Object.entries(r)) if (!['approved_by', 'approved_at', 'reviewer_comment', 'human_review_status', 'review_status'].includes(field)) {
     if (/code|solution_cpp/.test(field) && typeof value === 'string') { content.append(node('h3', field.replaceAll('_', ' '))); ReviewRender.code(content, value); }
     else detail(content, value, field.replaceAll('_', ' '));
   }
-  const refs = node('section', undefined, 'sources'); refs.append(node('h3', 'Sources and references')); const sourceUrls = urls(r); sourceUrls.forEach(url => link(refs, url));
+  const refs = node('section', undefined, 'sources'); refs.append('Sources: '); const sourceUrls = urls(r); sourceUrls.forEach(url => link(refs, url));
   if (kind === 'video' && r.video_id) link(refs, `https://www.youtube.com/watch?v=${encodeURIComponent(r.video_id)}&t=${r.start_seconds || 0}s`);
   if (!sourceUrls.length || (r.source_ids || []).some(value => value.startsWith('editorial_source_'))) refs.append(node('p', `NO REAL SOURCE${r.source_ids?.length ? ': ' + r.source_ids.join(', ') : ''}`, 'warning'));
   if (['video', 'resource'].includes(kind)) refs.append(node('p', `License: ${r.license_name || r.license?.name || 'MISSING — verify permitted use'}`, r.license_name || r.license?.name ? '' : 'warning'));
   content.append(refs);
 
-  review.append(node('h3', 'Your review'), node('p', 'Notes save automatically in this browser. Export a package before you finish.', 'sidebar-help'));
-  const flagLabel = node('label', 'Flag an issue '), flag = node('input'); flagLabel.className = 'check-label flag-label'; flag.type = 'checkbox'; flag.id = 'flag'; flag.checked = s.flag; flag.onchange = () => edited(active, 'flag', flag.checked); flagLabel.prepend(flag); flagLabel.append(node('kbd', 'F')); review.append(flagLabel);
-  note(review, 'Overall notes / what should be fixed', s.notes, value => edited(active, 'notes', value), 'overall-notes');
-  const checks = node('fieldset', undefined, 'checks'); checks.append(node('legend', 'Verification checks'));
-  for (const [key, label] of Object.entries(C.checks[kind])) { const l = node('label', label + ' '), input = node('input'); input.type = 'checkbox'; input.checked = s.checks[key] === true; input.onchange = () => edited(active, 'checks', {...state(active).checks, [key]: input.checked}); l.prepend(input); checks.append(l); }
-  review.append(checks);
-  const current = node('p', s.decision ? `Final decision: ${DECISION_LABEL[s.decision]} by ${db.reviewer} at ${new Date(s.decided_at).toLocaleString()}` : 'In progress', 'status'); current.id = 'decision-status'; current.setAttribute('aria-live', 'polite'); review.append(current);
+  // Review: a note, an optional flag, and the decision. Approving confirms the checklist in the button's tooltip.
+  note(review, 'Overall notes / what should be fixed', s.notes, value => edited(active, 'notes', value), {id: 'overall-notes', placeholder: 'Notes: what should change? (N)'});
+  const flagLabel = node('label', ' Flag an issue'), flag = node('input'); flagLabel.className = 'check-label flag-label';
+  flag.type = 'checkbox'; flag.id = 'flag'; flag.checked = s.flag; flag.onchange = () => edited(active, 'flag', flag.checked); flagLabel.prepend(flag); review.append(flagLabel);
   const actions = node('div', undefined, 'toolbar');
-  for (const [choice, label] of [['approve', 'Verified'], ['revise', 'Needs fixes'], ['reject', 'Reject']]) {
+  for (const [choice, label] of [['approve', 'Approve'], ['revise', 'Needs changes'], ['reject', 'Reject']]) {
     const action = button(label, () => decide(kind, choice)); action.id = choice; if (choice === 'approve') action.className = 'primary'; actions.append(action);
   }
+  actions.querySelector('#approve').title = 'Approving confirms:\n• ' + Object.values(C.checks[kind]).join('\n• ');
   const help = node('p', '', 'decision-help'); help.id = 'decision-help'; help.setAttribute('aria-live', 'polite');
-  review.append(actions, help);
-  review.append(button('Next not finished →', nextOpen, 'next-open next-open-panel'));
-  updateActions();
+  const current = node('p', '', 'status'); current.id = 'decision-status'; current.setAttribute('aria-live', 'polite');
+  review.append(actions, help, current);
+  decisionStatus(s); updateActions();
 }
 function decide(kind, choice) {
   const before = structuredClone(state(active));
   try {
-    C.finalize(state(active), kind, choice); session.add(active);
+    const s = state(active);
+    // "Approve" is the reviewer confirming every check for this item type; a flag still blocks it.
+    if (choice === 'approve' && !s.flag) C.edit(s, 'checks', Object.fromEntries(Object.keys(C.checks[kind]).map(k => [k, true])));
+    C.finalize(s, kind, choice); session.add(active);
     undo = {key: active, state: before, reviewer: db.reviewer};
     save(); render();
-    message(`Decision saved: ${DECISION_LABEL[choice]}. Export your review package when finished.`); $('undo').hidden = false;
+    message(`${DECISION_LABEL[choice]}.`); $('undo').hidden = false;
   } catch (error) { message(error.message); }
 }
 function updateActions() {
   if (!active || !$('approve')) return;
-  const s = state(active), kind = loaded[active].kind, missing = Object.keys(C.checks[kind]).filter(k => s.checks[k] !== true).length, hasNote = !!C.comment(s).trim();
-  $('approve').disabled = s.flag || missing > 0; $('revise').disabled = $('reject').disabled = !hasNote;
-  const help = [];
-  if (s.flag) help.push('Clear the flag to verify.'); else if (missing) help.push(`Tick ${missing} more check${missing === 1 ? '' : 's'} to verify.`);
-  if (!hasNote) help.push('Write a note to choose Needs fixes or Reject.');
-  $('decision-help').textContent = help.join(' ');
+  const s = state(active), hasNote = !!C.comment(s).trim();
+  $('approve').disabled = s.flag; $('revise').disabled = $('reject').disabled = !hasNote;
+  $('decision-help').textContent = s.flag ? 'Clear the flag to approve.' : '';
+  for (const b of [$('revise'), $('reject')]) b.title = hasNote ? '' : 'Write a note first';
 }
 async function copyText(text) { try { await navigator.clipboard.writeText(text); message(`Copied ${text}.`); } catch { message(`Copy is blocked here; the ID is ${text}.`); } }
 function download(value, filename) { try { const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2) + '\n'], {type: 'application/json;charset=utf-8'})); const a = node('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); message(`Export requested: ${filename}. Check your downloads and send the file to the owner.`); } catch (e) { message(`Export failed: ${e.message}. Keep this window open.`); } }
@@ -314,7 +302,7 @@ async function loadBundled() {
   try {
     for (const record of DSAReviewData.records) { const kind = record.question_id ? 'question' : 'lesson', id = record[C.ids[kind]]; loaded[C.key(kind, id)] = {kind, id, record, fingerprint: await fingerprint(record), bundled: true}; }
     const summary = DSAReviewData.summary, changed = Object.keys(DSAReviewData.changes || {}).length;
-    $('dataset-summary').textContent = `Bundled DSA snapshot: ${summary.approved_questions} approved questions excluded; ${summary.pending_questions} pending + ${summary.revise_questions} needing revision; ${summary.lessons} reading guides requiring real review.` + (changed ? ` ${changed} items changed since the previous version; choose Show → Changed since last version.` : '');
+    $('dataset-summary').textContent = `${summary.approved_questions} approved questions excluded; ${summary.pending_questions + summary.revise_questions} questions and ${summary.lessons} reading guides to review.` + (changed ? ` ${changed} changed since the previous version.` : '');
     const table = node('table'), head = node('tr'); for (const title of ['Member', 'Questions', 'Reading guides']) head.append(node('th', title)); table.append(head);
     for (const member of DSAReviewData.members) { const count = ReviewAssignments.counts(DSAReviewData, member), row = node('tr'); for (const value of [member, count.question, count.lesson]) row.append(node('td', String(value))); table.append(row); }
     $('team-summary').append(table);
@@ -322,13 +310,13 @@ async function loadBundled() {
   } catch (error) { message('Could not load bundled DSA content: ' + error.message); }
 }
 const bundledReady = loadBundled();
-$('reviewer').onchange = async () => { await $('switch').onclick(); if (matchMedia('(max-width:760px)').matches) $('item').scrollIntoView({block: 'start'}); };
-$('switch').onclick = async () => {
+$('reviewer').onchange = async () => { await openWorkspace(); if (matchMedia('(max-width:760px)').matches) $('item').scrollIntoView({block: 'start'}); };
+async function openWorkspace() {
   await bundledReady; const name = $('reviewer').value.trim(); if (!name) { message('Choose your name.'); return; }
   db.reviewer = name; if (!Object.hasOwn(db.people, name)) Object.defineProperty(db.people, name, {value: {states: {}, position: ''}, enumerable: true, writable: true, configurable: true});
   $('assignment-scope').value = 'mine'; reconcileWorkspace(); active = workspace().position; $('topic').value = ''; $('filter').value = 'all'; $('search').value = ''; $('type').value = loaded[active]?.kind || 'lesson';
   session = new Set(); undo = null; $('undo').hidden = true; lastRows = []; save(); render();
-};
+}
 $('files').onchange = e => loadFiles(e.target.files); $('drop').ondragover = e => e.preventDefault(); $('drop').ondrop = e => { e.preventDefault(); loadFiles(e.dataTransfer.files); };
 $('export').onclick = () => { if (!nameRequired()) return; download({format: 'course-review-package', version: 1, reviewer: db.reviewer, exported_at: new Date().toISOString(), position: workspace().position, items: Object.entries(workspace().states).filter(([, s]) => s.fingerprint).map(([k, s]) => ({item_type: k.split(':')[0], id: k.slice(k.indexOf(':') + 1), state: s}))}, `review-${db.reviewer.replace(/[^\p{L}\p{N}_-]/gu, '_')}.json`); };
 $('decisions').onclick = () => { if (!nameRequired()) return; download(C.decisions(db.reviewer, workspace().states, Object.fromEntries(eligible())), 'decisions.json'); };
@@ -348,7 +336,6 @@ let searchTimer = 0;
 $('search').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(render, 120); });
 $('search').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); if ($('search').value) { $('search').value = ''; render(); } else $('search').blur(); } if (e.key === 'Enter' && lastRows[0]) { e.preventDefault(); open(lastRows[0], {focus: true}); } });
 $('clear-filters').onclick = () => { if (nameRequired()) clearFilters(); };
-$('continue').onclick = () => { if (!nameRequired()) return; const k = workspace().position; if (loaded[k]) { $('type').value = loaded[k].kind; $('filter').value = 'all'; $('topic').value = ''; $('search').value = ''; open(k); } else render(); };
 $('undo').onclick = () => {
   if (!undo || undo.reviewer !== db.reviewer) { $('undo').hidden = true; return; }
   workspace().states[undo.key] = undo.state; session.delete(undo.key); active = undo.key; undo = null;
@@ -358,7 +345,7 @@ $('undo').onclick = () => {
 const originalRender = render;
 render = function () { const previous = $('topic').value; const topics = [...new Set(eligible().flatMap(([, i]) => [i.record.topic_id, ...(i.record.topic_ids || [])]).filter(Boolean))].sort(); $('topic').replaceChildren(new Option('All topics', ''), ...topics.map(t => new Option(t, t))); $('topic').value = topics.includes(previous) ? previous : ''; originalRender(); };
 selectReviewer(db.reviewer || ''); $('assignment-scope').value = workspace()?.scope || 'mine';
-if (db.reviewer) { active = workspace()?.position || ''; if (storageBroken) $('saved').textContent = 'Not saved—export a backup'; else $('saved').textContent = 'Local workspace restored — loading assigned DSA content'; render(); }
+if (db.reviewer) { active = workspace()?.position || ''; if (storageBroken) $('saved').textContent = 'Not saved—export a backup'; else $('saved').textContent = 'Restored'; render(); }
 
 // ------------------------------------------------------------------ view options, shortcuts, theme
 $('text-smaller').onclick = () => { prefs.scale -= 0.05; applyPrefs(); savePrefs(); };
@@ -369,7 +356,7 @@ $('shortcuts-open').onclick = () => $('shortcuts').showModal();
 // The View menu behaves like a menu: a click elsewhere or Escape closes it.
 document.addEventListener('click', e => { if ($('view-menu').open && !$('view-menu').contains(e.target)) $('view-menu').open = false; });
 $('view-menu').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); $('view-menu').open = false; $('view-menu').querySelector('summary').focus(); } });
-function toggleFlag() { const f = $('flag'); if (!f) return; f.checked = !f.checked; f.dispatchEvent(new Event('change')); message(f.checked ? 'Flagged. Write a note about the issue.' : 'Flag cleared.'); }
+function toggleFlag() { const f = $('flag'); if (!f) return; f.checked = !f.checked; f.dispatchEvent(new Event('change')); message(f.checked ? 'Flagged.' : 'Flag cleared.'); }
 document.addEventListener('keydown', e => {
   if (e.defaultPrevented || $('shortcuts').open) return;
   if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
