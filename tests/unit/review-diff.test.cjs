@@ -51,3 +51,28 @@ test('snapshot builder records changes against an older dataset without altering
   assert.deepEqual(snapshot.records.find(r => r.question_id === 'Q_T05_1_01'), changed);
   assert.equal(build(now, null).changes, undefined);
 });
+
+test('source-only diffs detected cleanly and recorded across multiple prior dirs', () => {
+  const before = question({reference_sources: ['https://example.org/old'], version: '1.0.0'});
+  const mid = question({reference_sources: ['https://example.org/mid'], version: '1.0.1'});
+  const after = question({reference_sources: ['https://example.org/new'], version: '1.0.2'});
+  assert.equal(D.isSourceOnlyChange(before, after), true);
+  assert.equal(D.isSourceField('reference_sources[0]'), true);
+  assert.deepEqual(D.stripSourcesAndIgnored(before), D.stripSourcesAndIgnored(after));
+  const edited = question({reference_sources: ['https://example.org/new'], stem: 'Edited stem'});
+  assert.equal(D.isSourceOnlyChange(before, edited), false);
+  assert.notDeepEqual(D.stripSourcesAndIgnored(before), D.stripSourcesAndIgnored(edited));
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'review-src-build-'));
+  const write = (sub, records) => {
+    const d = path.join(dir, sub); fs.mkdirSync(d);
+    fs.writeFileSync(path.join(d, 'course.json'), JSON.stringify({course_id: 'CSC10004'}));
+    fs.writeFileSync(path.join(d, 'question_bank.jsonl'), records.map(q => JSON.stringify(q)).join('\n') + '\n');
+    fs.writeFileSync(path.join(d, 'lesson_content.jsonl'), '');
+    return d;
+  };
+  const d1 = write('d1', [before]), d2 = write('d2', [mid]), d3 = write('d3', [after]);
+  const snap = build(d3, null, {dir: d1, label: 'd1'}, [d2]);
+  assert.equal(snap.changes['question:Q_T05_1_01'].source_only, true);
+  assert.equal(snap.prior_source_only_fingerprints['question:Q_T05_1_01'].length, 2);
+});
