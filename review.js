@@ -4,8 +4,10 @@ const C = ReviewCore, $ = id => document.getElementById(id);
 const storeKey = 'course-review-workspaces-v1', prefsKey = 'course-review-prefs-v1';
 let db = {reviewer: '', people: {}}, loaded = {}, active = '', session = new Set(), storageBroken = false;
 let lastRows = [], undo = null, prefs = {scale: 1, showTex: false, focus: false};
-const STATUS_LABEL = {unreviewed: 'Not started', 'in-progress': 'In progress', flagged: 'Flagged', finished: 'Finished'};
+const STATUS_LABEL = {unreviewed: 'Not started', 'in-progress': 'In progress', flagged: 'Flagged', 'stale-sources': 'Needs source check', finished: 'Finished'};
 const DECISION_LABEL = {approve: 'Approved', revise: 'Needs changes', reject: 'Rejected'};
+const isDone = s => Boolean(s.decision && !s.source_recheck_needed);
+const formatStamp = iso => new Date(iso).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'});
 
 function message(text) { $('message').textContent = text; if (!text) $('undo').hidden = true; }
 try {
@@ -32,7 +34,32 @@ function node(tag, text, cls) { const e = document.createElement(tag); if (text 
 function button(text, fn, cls) { const b = node('button', text, cls); b.type = 'button'; b.onclick = fn; return b; }
 function link(parent, url) { try { const u = new URL(url); if (!['https:', 'http:'].includes(u.protocol)) return false; const a = node('a', url); a.href = u.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; parent.append(a, node('br')); return true; } catch { return false; } }
 function urls(value) { const found = []; (function walk(v) { if (typeof v === 'string') found.push(...(v.match(/https?:\/\/[^\s<>"\\]+/g) || [])); else if (v && typeof v === 'object') Object.values(v).forEach(walk); })(value); return [...new Set(found)]; }
-async function fingerprint(record) { const bytes = new TextEncoder().encode(JSON.stringify(record)); const hash = await crypto.subtle.digest('SHA-256', bytes); return Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join(''); }
+async function digest(value) { const bytes = new TextEncoder().encode(JSON.stringify(value)); const hash = await crypto.subtle.digest('SHA-256', bytes); return Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join(''); }
+async function fingerprint(record) { return digest(record); }
+async function contentFingerprint(record) { return digest(globalThis.ReviewDiff ? ReviewDiff.stripSourcesAndIgnored(record) : record); }
+function isSourceOnlyMatch(k, s, item, previousLoadedItem = null) {
+  if (s.content_fingerprint && item.content_fingerprint && s.content_fingerprint === item.content_fingerprint) return true;
+  if (previousLoadedItem && (!s.fingerprint || s.fingerprint === previousLoadedItem.fingerprint) && globalThis.ReviewDiff && ReviewDiff.isSourceOnlyChange(previousLoadedItem.record, item.record)) return true;
+  const ch = changesFor(k);
+  if (!s.content_fingerprint && ch?.source_only && ch?.fingerprint_before && s.fingerprint === ch.fingerprint_before) return true;
+  const priors = item.bundled ? DSAReviewData.prior_source_only_fingerprints?.[k] : null;
+  if (!s.content_fingerprint && Array.isArray(priors) && priors.includes(s.fingerprint)) return true;
+  return false;
+}
+function reconcileRecordState(k, item, previousLoadedItem = null) {
+  const s = workspace()?.states?.[k];
+  if (!s || !item || !s.fingerprint) return 'unchanged';
+  if (s.fingerprint === item.fingerprint) {
+    if (!s.content_fingerprint && item.content_fingerprint) { s.content_fingerprint = item.content_fingerprint; return 'backfilled'; }
+    return 'unchanged';
+  }
+  if (isSourceOnlyMatch(k, s, item, previousLoadedItem)) {
+    C.markSourcesStale(s); s.fingerprint = item.fingerprint; s.content_fingerprint = item.content_fingerprint; session.delete(k);
+    return 'sources';
+  }
+  C.resetForContentChange(s); s.fingerprint = item.fingerprint; s.content_fingerprint = item.content_fingerprint; session.delete(k);
+  return 'content';
+}
 
 // ------------------------------------------------------------------ preferences (display only, never content)
 function savePrefs() { try { localStorage.setItem(prefsKey, JSON.stringify(prefs)); } catch { /* display preference only */ } }
@@ -61,28 +88,46 @@ async function loadFiles(files) {
         if (kinds.length !== 1) throw Error(`${file.name}, line ${number}: unsupported record`);
         const kind = kinds[0], id = record[C.ids[kind]], k = C.key(kind, id);
         if (pending[k]) throw Error(`Duplicate ID ${id}`);
-        pending[k] = {kind, id, record, fingerprint: await fingerprint(record)};
+        pending[k] = {kind, id, record, fingerprint: await fingerprint(record), content_fingerprint: await contentFingerprint(record)};
       }
     }
-    let changed = 0;
+    let changed = 0, staleCount = 0, resetCount = 0, notice = '';
     for (const [k, item] of Object.entries(pending)) {
       const before = loaded[k];
       if (before && before.fingerprint !== item.fingerprint) {
         // Without review-diff.js (an incomplete copy of the folder) files still load; only the comparison is skipped.
-        if (globalThis.ReviewDiff) { item.changes = {compared_with: before.bundled ? 'the bundled snapshot' : 'the previously loaded file', fields: ReviewDiff.diffRecords(before.record, item.record)}; changed++; }
+        if (globalThis.ReviewDiff) { item.changes = {compared_with: before.bundled ? 'the bundled snapshot' : 'the previously loaded file', source_only: ReviewDiff.isSourceOnlyChange(before.record, item.record), fingerprint_before: before.fingerprint, fields: ReviewDiff.diffRecords(before.record, item.record)}; changed++; }
       } else if (before?.changes) item.changes = before.changes;
       loaded[k] = item;
-      const s = workspace().states[k];
-      if (s && s.fingerprint !== item.fingerprint) { C.edit(s, 'checks', {}); s.fingerprint = item.fingerprint; session.delete(k); message(`${item.id}: source content changed; notes retained, verification reset.`); }
+      const outcome = reconcileRecordState(k, item, before);
+      if (outcome === 'sources') { staleCount++; notice = `${item.id}: references changed; prior decision retained — recheck sources.`; }
+      else if (outcome === 'content') { resetCount++; notice = `${item.id}: source content changed; notes retained, verification reset.`; }
     }
-    if (changed && !$('message').textContent) message(`${changed} loaded records differ from what was shown before; open one to see what changed.`);
+    if (staleCount > 1 && !resetCount) notice = `${staleCount} items have updated references; prior decisions retained — recheck sources.`;
+    if (notice) message(notice);
+    else if (changed && !$('message').textContent) message(`${changed} loaded records differ from what was shown before; open one to see what changed.`);
     save(); render();
   } catch (e) { message(`Import failed: ${e.message}`); } finally { $('files').value = ''; }
 }
 
 // ------------------------------------------------------------------ queue
-function status(s) { return s.decision ? 'finished' : s.flag ? 'flagged' : s.updated_at ? 'in-progress' : 'unreviewed'; }
+function status(s) { return s.source_recheck_needed ? 'stale-sources' : s.decision ? 'finished' : s.flag ? 'flagged' : s.updated_at ? 'in-progress' : 'unreviewed'; }
 function changesFor(k) { const item = loaded[k]; return item?.changes || (item?.bundled ? DSAReviewData.changes?.[k] : null) || null; }
+function auditFor(k) {
+  const item = loaded[k], entry = globalThis.DSAReviewData?.audit_overlay?.issues?.[k];
+  // Never show an old finding against a changed/imported record.
+  return entry && item && JSON.stringify(entry.record) === JSON.stringify(item.record) ? entry : null;
+}
+function drawAudit(parent, k) {
+  const audit = auditFor(k); if (!audit) return;
+  const box = node('section', undefined, 'audit-notice'); box.setAttribute('aria-label', 'Audit findings');
+  box.append(node('h3', 'Audit: needs clarification'), node('p', 'AI audit · 14 Nov 2026. Check these findings before approving. Your saved decision and notes have not been changed.'));
+  for (const finding of audit.findings) {
+    const detail = node('details'), summary = node('summary', finding.field.replace('distractor_explanations.', 'Why option ') + (finding.status === 'contradicted' ? ' · Contradiction found' : ' · Clarification needed'));
+    detail.append(summary, rich(finding.reason)); box.append(detail);
+  }
+  parent.append(box);
+}
 function eligible() {
   return Object.entries(loaded)
     .filter(([, i]) => $('assignment-scope').value === 'all' || ReviewAssignments.belongs(DSAReviewData, i, db.reviewer))
@@ -98,40 +143,45 @@ function searchable(k, item) {
     recordText.set(item.record, fold(parts.filter(Boolean).join('\n')));
   }
   const s = workspace().states[k];
-  return recordText.get(item.record) + (s ? '\n' + fold([s.notes, ...Object.values(s.sections)].join('\n')) : '');
+  return recordText.get(item.record) + (auditFor(k) ? '\n' + fold(auditFor(k).findings.map(f => f.reason).join(' ')) : '') + (s ? '\n' + fold([s.notes, ...Object.values(s.sections)].join('\n')) : '');
 }
 function items() {
   const topic = $('topic').value, filter = $('filter').value, query = fold($('search').value).trim();
   return eligible().filter(([k, i]) => i.kind === $('type').value
       && (!topic || [i.record.topic_id, ...(i.record.topic_ids || [])].includes(topic))
-      && (filter === 'all' || (filter === 'flagged' ? state(k).flag : filter === 'changed' ? !!changesFor(k) : status(state(k)) === filter))
+      && (filter === 'all' || (filter === 'flagged' ? state(k).flag : filter === 'audit-issues' ? !!auditFor(k) : filter === 'changed' ? !!changesFor(k) : filter === 'stale-sources' ? !!state(k).source_recheck_needed : status(state(k)) === filter))
       && (!query || query.split(/\s+/).every(word => searchable(k, i).includes(word))))
     .sort((a, b) => { const rank = i => i.record.human_review_status === 'revise' ? 1 : 0; return rank(a[1]) - rank(b[1]) || (a[1].record.topic_id || '').localeCompare(b[1].record.topic_id || '') || a[1].id.localeCompare(b[1].id); });
 }
 function chip(k) {
   const s = state(k), st = status(s);
+  if (s.source_recheck_needed) {
+    const text = s.decision ? `${DECISION_LABEL[s.decision]} · Recheck sources` : STATUS_LABEL[st];
+    return node('span', text, `chip chip-${s.decision || st} chip-stale`);
+  }
   const text = s.decision ? DECISION_LABEL[s.decision] : STATUS_LABEL[st];
   return node('span', text, `chip chip-${s.decision || st}`);
 }
 function progress() {
   // One line in the header: whose work, and how much of it is finished. Per-type counts are in the tooltip.
-  const all = eligible(), done = all.filter(([k]) => state(k).decision).length;
+  const all = eligible(), done = all.filter(([k]) => isDone(state(k))).length, stale = all.filter(([k]) => state(k).source_recheck_needed).length;
   const perKind = Object.keys(C.ids).map(kind => [kind, all.filter(([, i]) => i.kind === kind)]).filter(([, rows]) => rows.length)
-    .map(([kind, rows]) => `${kind}: ${rows.filter(([k]) => state(k).decision).length} / ${rows.length}`);
+    .map(([kind, rows]) => `${kind}: ${rows.filter(([k]) => isDone(state(k))).length} / ${rows.length}`);
   const team = $('assignment-scope').value === 'all' ? ' · whole team' : '';
-  $('progress').textContent = `${db.reviewer}${team} · ${done} / ${all.length} done`;
-  $('progress').title = perKind.join('\n') + `\n${session.size} finished this session`;
+  $('progress').textContent = `${db.reviewer}${team} · ${done} / ${all.length} done` + (stale ? ` · ${stale} need source check` : '');
+  $('progress').title = perKind.join('\n') + `\n${session.size} finished this session` + (stale ? `\n${stale} awaiting source recheck` : '');
 }
 function drawQueue(rows) {
   const queue = $('queue'); queue.replaceChildren();
   const filtered = $('search').value.trim() || $('filter').value !== 'all' || $('topic').value;
-  const finished = rows.filter(([k]) => state(k).decision).length;
+  const finished = rows.filter(([k]) => isDone(state(k))).length;
   $('queue-count').textContent = rows.length ? `${rows.length} ${filtered ? 'matching ' : ''}item${rows.length === 1 ? '' : 's'} · ${finished} finished` : '';
   $('rail-count').textContent = rows.length ? `${finished} / ${rows.length}` : '';
   let current = null;
   for (const [k, i] of rows) {
     const b = button('', () => open(k), 'queue-item');
     b.append(document.createTextNode(`${i.id} · `), chip(k));
+    if (auditFor(k)) b.append(node('span', ' Audit finding', 'chip chip-audit'));
     if (state(k).flag) b.append(node('span', ' ⚑', 'queue-flag'));
     const preview = node('span', undefined, 'queue-preview'); ReviewRender.inline(preview, i.record.title || i.record.stem || i.record.lecture_title || ''); b.append(preview);
     b.setAttribute('aria-current', String(k === active)); if (k === active) current = b;
@@ -168,7 +218,7 @@ function open(k, {focus = false} = {}) {
 function step(delta) { const i = lastRows.indexOf(active), k = lastRows[i + delta]; if (k) open(k); }
 function nextOpenKey() {
   const i = lastRows.indexOf(active);
-  return [...lastRows.slice(i + 1), ...lastRows.slice(0, Math.max(i, 0))].find(k => !state(k).decision) || null;
+  return [...lastRows.slice(i + 1), ...lastRows.slice(0, Math.max(i, 0))].find(k => !isDone(state(k))) || null;
 }
 function nextOpen() { const k = nextOpenKey(); if (k) open(k); else message('Everything in this queue is finished.'); }
 function clearFilters() { $('search').value = ''; $('filter').value = 'all'; $('topic').value = ''; render(); }
@@ -182,12 +232,14 @@ function note(parent, label, value, onchange, {id, placeholder = '', cls = '', m
   requestAnimationFrame(() => autosize(t, min)); return t;
 }
 function edited(k, field, value) {
-  const s = state(k); C.edit(s, field, value); s.fingerprint = loaded[k].fingerprint; session.delete(k);
+  const s = state(k); C.edit(s, field, value); s.fingerprint = loaded[k].fingerprint; s.content_fingerprint = loaded[k].content_fingerprint; session.delete(k);
   // Undo restores a whole saved state, so it must never be offered after newer edits to the same item.
   if (undo?.key === k) { undo = null; $('undo').hidden = true; }
   save(); progress(); updateActions(); decisionStatus(s);
+  $('stale-source-banner')?.remove();
   const entry = [...$('queue').children].find(b => b.getAttribute('aria-current') === 'true');
-  if (entry) entry.querySelector('.chip').replaceWith(chip(k));
+  if (entry) entry.querySelector('.chip')?.replaceWith(chip(k));
+  document.querySelector('#item .content-navigation .meta .chip')?.replaceWith(chip(k));
 }
 function detail(parent, value, label = 'Details') {
   if (value === undefined || value === null) return;
@@ -207,11 +259,21 @@ function drawBlock(parent, block) {
 function rich(text, className = '') { const element = node('div', undefined, className); ReviewRender.prose(element, text); return element; }
 function decisionStatus(s) {
   const el = $('decision-status'); if (!el) return;
-  el.textContent = s.decision ? `${DECISION_LABEL[s.decision]} · ${new Date(s.decided_at).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}` : '';
-  el.className = 'status' + (s.decision === 'approve' ? ' done' : '');
+  if (!s.decision) { el.textContent = ''; el.className = 'status'; return; }
+  const stamp = formatStamp(s.decided_at);
+  if (s.source_recheck_needed) {
+    el.textContent = `Previous decision: ${DECISION_LABEL[s.decision]} · ${stamp} (references changed — recheck needed)`;
+    el.className = 'status stale';
+  } else {
+    el.textContent = `${DECISION_LABEL[s.decision]} · ${stamp}` + (s.source_rechecked_at ? ` · Sources confirmed ${formatStamp(s.source_rechecked_at)}` : '');
+    el.className = 'status' + (s.decision === 'approve' ? ' done' : '');
+  }
 }
 function drawItem(rows) {
-  const {kind, id, record: r} = loaded[active], s = state(active); s.fingerprint = loaded[active].fingerprint;
+  reconcileRecordState(active, loaded[active]);
+  const {kind, id, record: r} = loaded[active], s = state(active);
+  if (!s.fingerprint) { s.fingerprint = loaded[active].fingerprint; s.content_fingerprint = loaded[active].content_fingerprint; }
+  else if (!s.content_fingerprint && loaded[active].content_fingerprint) s.content_fingerprint = loaded[active].content_fingerprint;
   const panel = $('item'), content = node('section', undefined, 'review-content'), review = node('aside', undefined, 'review-panel');
   panel.className = 'item-layout'; panel.replaceChildren(content, review); review.setAttribute('aria-label', 'Your review');
 
@@ -228,6 +290,7 @@ function drawItem(rows) {
   nav.append(meta, prev, node('span', `${index + 1} / ${rows.length}`, 'position'), next, nextUnfinished); content.append(nav);
   if (kind !== 'question') content.append(node('h2', r.title || r.lecture_title || r.title_en || id));
 
+  drawAudit(content, active);
   if (kind === 'question') {
     content.append(rich(r.stem, 'question-stem')); const options = node('div', undefined, 'answer-options');
     for (const option of r.options || []) {
@@ -261,8 +324,34 @@ function drawItem(rows) {
   actions.querySelector('#approve').title = 'Approving confirms:\n• ' + Object.values(C.checks[kind]).join('\n• ');
   const help = node('p', '', 'decision-help'); help.id = 'decision-help'; help.setAttribute('aria-live', 'polite');
   const current = node('p', '', 'status'); current.id = 'decision-status'; current.setAttribute('aria-live', 'polite');
+  if (s.source_recheck_needed) {
+    const banner = node('div', undefined, 'stale-source-banner'); banner.id = 'stale-source-banner';
+    const summary = s.decision
+      ? `Retained prior decision: ${DECISION_LABEL[s.decision]} (${formatStamp(s.decided_at)}). The references have changed and need to be checked again.`
+      : 'The references have changed and need to be checked again.';
+    banner.append(node('p', summary));
+    if (s.decision === 'approve') banner.append(node('p', 'Content checks preserved; source verification reset.', 'stale-source-meta'));
+    if (s.decision) {
+      const confirmBtn = button('Confirm new sources', () => confirmSourcesAction(kind), 'confirm-sources');
+      confirmBtn.id = 'confirm-sources'; confirmBtn.classList.add('primary');
+      banner.append(confirmBtn);
+    }
+    review.append(banner);
+  }
   review.append(actions, help, current);
   decisionStatus(s); updateActions();
+}
+function confirmSourcesAction(kind) {
+  const before = structuredClone(state(active));
+  try {
+    const s = state(active);
+    C.confirmSources(s, kind);
+    s.fingerprint = loaded[active].fingerprint; s.content_fingerprint = loaded[active].content_fingerprint;
+    session.add(active);
+    undo = {key: active, state: before, reviewer: db.reviewer};
+    save(); render();
+    message('New references confirmed; original decision and timestamp kept.'); $('undo').hidden = false;
+  } catch (error) { message(error.message); }
 }
 function decide(kind, choice) {
   const before = structuredClone(state(active));
@@ -270,7 +359,9 @@ function decide(kind, choice) {
     const s = state(active);
     // "Approve" is the reviewer confirming every check for this item type; a flag still blocks it.
     if (choice === 'approve' && !s.flag) C.edit(s, 'checks', Object.fromEntries(Object.keys(C.checks[kind]).map(k => [k, true])));
-    C.finalize(s, kind, choice); session.add(active);
+    C.finalize(s, kind, choice);
+    s.fingerprint = loaded[active].fingerprint; s.content_fingerprint = loaded[active].content_fingerprint;
+    session.add(active);
     undo = {key: active, state: before, reviewer: db.reviewer};
     save(); render();
     message(`${DECISION_LABEL[choice]}.`); $('undo').hidden = false;
@@ -293,14 +384,21 @@ function selectReviewer(name) {
 }
 function reconcileWorkspace() {
   if (!workspace()) return;
-  for (const [key, s] of Object.entries(workspace().states)) if (loaded[key] && s.fingerprint && s.fingerprint !== loaded[key].fingerprint) {
-    C.edit(s, 'checks', {}); s.fingerprint = loaded[key].fingerprint; session.delete(key);
-    message('Source content changed; notes retained, verification reset.');
+  let staleCount = 0, resetCount = 0, backfilled = 0;
+  for (const key of Object.keys(workspace().states)) {
+    const outcome = reconcileRecordState(key, loaded[key]);
+    if (outcome === 'sources') staleCount++;
+    else if (outcome === 'content') resetCount++;
+    else if (outcome === 'backfilled') backfilled++;
   }
+  if (staleCount && resetCount) message(`${staleCount} items have updated references (prior decisions retained for recheck); ${resetCount} had content changes (notes retained, verification reset).`);
+  else if (staleCount) message('References changed; prior decision retained — recheck sources.');
+  else if (resetCount) message('Source content changed; notes retained, verification reset.');
+  if (staleCount || resetCount || backfilled) save();
 }
 async function loadBundled() {
   try {
-    for (const record of DSAReviewData.records) { const kind = record.question_id ? 'question' : 'lesson', id = record[C.ids[kind]]; loaded[C.key(kind, id)] = {kind, id, record, fingerprint: await fingerprint(record), bundled: true}; }
+    for (const record of DSAReviewData.records) { const kind = record.question_id ? 'question' : 'lesson', id = record[C.ids[kind]]; loaded[C.key(kind, id)] = {kind, id, record, fingerprint: await fingerprint(record), content_fingerprint: await contentFingerprint(record), bundled: true}; }
     const summary = DSAReviewData.summary, changed = Object.keys(DSAReviewData.changes || {}).length;
     $('dataset-summary').textContent = `${summary.approved_questions} approved questions excluded; ${summary.pending_questions + summary.revise_questions} questions and ${summary.lessons} reading guides to review.` + (changed ? ` ${changed} changed since the previous version.` : '');
     const table = node('table'), head = node('tr'); for (const title of ['Member', 'Questions', 'Reading guides']) head.append(node('th', title)); table.append(head);
@@ -326,9 +424,18 @@ $('import').onchange = async e => {
     const conflicts = p.items.filter(i => existing[C.key(i.item_type, i.id)] && JSON.stringify(existing[C.key(i.item_type, i.id)]) !== JSON.stringify(i.state));
     if (conflicts.length) throw Error(`Conflicting saved reviews: ${conflicts.map(i => i.id).join(', ')}. Export the local workspace first; use another browser profile to inspect this package separately.`);
     db.reviewer = p.reviewer; if (!Object.hasOwn(db.people, p.reviewer)) Object.defineProperty(db.people, p.reviewer, {value: {states: {}, position: p.position || ''}, enumerable: true, writable: true, configurable: true});
-    for (const i of p.items) { const k = C.key(i.item_type, i.id), s = structuredClone(i.state); if (loaded[k] && s.fingerprint !== loaded[k].fingerprint) { C.edit(s, 'checks', {}); s.fingerprint = loaded[k].fingerprint; } workspace().states[k] = s; }
+    let staleCount = 0, resetCount = 0;
+    for (const i of p.items) {
+      const k = C.key(i.item_type, i.id), s = structuredClone(i.state);
+      workspace().states[k] = s;
+      const outcome = reconcileRecordState(k, loaded[k]);
+      if (outcome === 'sources') staleCount++;
+      else if (outcome === 'content') resetCount++;
+    }
     selectReviewer(p.reviewer); active = workspace().position; session = new Set(); undo = null; save(); render();
-    message('Package restored. Assigned DSA content is ready; load matching files only for additional content.');
+    const extra = staleCount ? ` ${staleCount} item(s) retained prior decisions for source recheck.` : '';
+    const resetNote = resetCount ? ` ${resetCount} item(s) had content changes (notes retained, verification reset).` : '';
+    message(`Package restored.${extra}${resetNote} Assigned DSA content is ready; load matching files only for additional content.`);
   } catch (err) { message(`Import failed: ${err.message}`); } finally { e.target.value = ''; }
 };
 for (const id of ['type', 'topic', 'filter', 'extras', 'assignment-scope']) $(id).onchange = () => render();
@@ -380,3 +487,16 @@ document.addEventListener('keydown', e => {
 function applyTheme(theme) { document.documentElement.dataset.theme = theme; $('theme').textContent = theme === 'dark' ? 'Light mode' : 'Dark mode'; $('theme').setAttribute('aria-pressed', String(theme === 'dark')); }
 try { applyTheme(localStorage.getItem('course-review-theme') || 'light'); } catch { applyTheme('light'); }
 $('theme').onclick = () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; applyTheme(theme); try { localStorage.setItem('course-review-theme', theme); } catch { message('Theme changed for this visit. Browser storage is unavailable.'); } };
+
+// Audit overview does not edit reviewer state.
+{
+ const data = globalThis.DSAReviewData?.audit_overlay, overview = $('audit-overview-content');
+ if (data && overview) {
+  overview.append(node('p', `${data.total_questions_with_findings} questions have findings; ${Object.keys(data.issues).length} are in the review queue. Choose Questions, Whole team, then Audit findings to see them all.`));
+  for (const entry of data.outside_queue || []) {
+   const item = node('section'); item.append(node('strong', `${entry.question_id} · previously ${entry.status}, outside this queue`));
+   for (const reason of entry.reasons) item.append(rich(reason));
+   overview.append(item);
+  }
+ }
+}

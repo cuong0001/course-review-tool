@@ -3,6 +3,7 @@
   'use strict';
   // Fields that describe review state rather than content are never shown as content changes.
   const IGNORED = /^(version|revision|human_review_status|approved_by|approved_at|reviewer_comment|agent_check_status|provenance\.(human_review_status|approved_by|approved_at|version))$/;
+  const SOURCE_FIELD = /^reference_sources(?:\[\d+\])?$/;
 
   function flatten(value, path = '', out = {}) {
     if (Array.isArray(value)) value.forEach((v, i) => flatten(v, `${path}[${i}]`, out));
@@ -49,6 +50,27 @@
     return out;
   }
 
-  root.ReviewDiff = {flatten, label, diffRecords, words};
+  function isSourceField(path) { return SOURCE_FIELD.test(path); }
+
+  function isSourceOnlyChange(before, after) {
+    const fields = diffRecords(before, after);
+    return fields.length > 0 && fields.every(f => SOURCE_FIELD.test(f.path));
+  }
+
+  function stripSourcesAndIgnored(value, prefix = '') {
+    if (Array.isArray(value)) return value.map((v, i) => stripSourcesAndIgnored(v, `${prefix}[${i}]`));
+    if (value && typeof value === 'object') {
+      const out = {};
+      for (const [k, v] of Object.entries(value)) {
+        const path = prefix ? `${prefix}.${k}` : k;
+        if (SOURCE_FIELD.test(path) || IGNORED.test(path)) continue;
+        out[k] = stripSourcesAndIgnored(v, path);
+      }
+      return out;
+    }
+    return value;
+  }
+
+  root.ReviewDiff = {flatten, label, diffRecords, words, isSourceField, isSourceOnlyChange, stripSourcesAndIgnored};
   if (typeof module !== 'undefined') module.exports = root.ReviewDiff;
 })(globalThis);

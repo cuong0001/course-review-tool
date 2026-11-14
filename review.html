@@ -23,7 +23,7 @@
     <button id="decisions" type="button">Export finalized decisions</button>
     <label class="file-label">Import review package <input id="import" type="file" accept=".json"></label>
     <label class="file-label">Load newer dataset files <input id="files" type="file" multiple accept=".jsonl"></label>
-    <section class="team" aria-label="Team and dataset"><p id="dataset-summary" class="muted"></p><div id="team-summary"></div></section>
+    <section class="team" aria-label="Team and dataset"><p id="dataset-summary" class="muted"></p><div id="team-summary"></div><section id="audit-overview"><h4>Latest AI audit · 14 Nov 2026</h4><div id="audit-overview-content"></div></section></section>
   </div></details>
   <div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="undo" type="button" hidden>Undo</button></div>
 </header>
@@ -33,7 +33,7 @@
   <div class="rail-panel">
     <div class="filters">
       <label>Type <select id="type"><option value="lesson">Reading guides</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
-      <label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Not started</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="finished">Finished</option><option value="changed">Changed since last version</option></select></label>
+      <label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Not started</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="stale-sources">Needs source check</option><option value="finished">Finished</option><option value="changed">Changed since last version</option><option value="audit-issues">Audit findings</option></select></label>
       <label>Topic <select id="topic"><option value="">All topics</option></select></label>
       <label>Assignment <select id="assignment-scope"><option value="mine">Mine</option><option value="all">Whole team</option></select></label>
       <label class="check-label"><input id="extras" type="checkbox"> Include resources and activities</label>

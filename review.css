@@ -100,7 +100,7 @@ summary { cursor:pointer }
 .queue-flag { color:var(--warning) }
 .chip { display:inline-block; font-size:.72rem; font-weight:650; line-height:1.2; padding:2px 7px; border-radius:999px; background:var(--soft); color:var(--muted); vertical-align:1px; white-space:nowrap }
 .chip-in-progress { background:var(--selected); color:var(--ink) }
-.chip-flagged,.chip-revise,.chip-reject { background:var(--warning-bg); color:var(--warning) }
+.chip-flagged,.chip-revise,.chip-reject,.chip-stale { background:var(--warning-bg); color:var(--warning) }
 .chip-approve { background:var(--success-bg); color:var(--success) }
 
 /* ---------------------------------------------------------------- item header */
@@ -159,6 +159,10 @@ th { background:var(--soft); font-weight:600 }
 .decision-help,.status { font-size:.85rem; color:var(--muted); margin:0 }
 .decision-help:empty,.status:empty { display:none }
 .status.done { color:var(--success); font-weight:600 }
+.status.stale { color:var(--warning); font-weight:600 }
+.stale-source-banner { border:1px solid var(--warning); background:var(--warning-bg); color:var(--warning); border-radius:8px; padding:10px 12px; display:grid; gap:8px; font-size:.86rem }
+.stale-source-banner p { margin:0 }
+.stale-source-meta { color:var(--muted); font-size:.82rem }
 
 /* ---------------------------------------------------------------- math: inline formulas sit on the text baseline */
 .learning-math { position:relative }
@@ -204,3 +208,11 @@ dialog form { margin-top:14px; text-align:right }
   .view-menu { position:static }
   .view-panel { left:12px; right:12px; width:auto }
 }
+
+/* Read-only audit annotations */
+.audit-notice { margin:0 0 24px; padding:16px 20px; border:1px solid var(--warning); border-radius:10px; background:var(--warning-bg); }
+.audit-notice h3 { color:var(--warning); margin-bottom:8px; }
+.audit-notice p { font-size:.9em; margin:0 0 10px; }
+.audit-notice summary { cursor:pointer; font-weight:600; padding:6px 0; }
+.audit-notice details > div { margin:6px 0 14px; overflow-wrap:anywhere; }
+.chip-audit { color:var(--warning); background:var(--warning-bg); margin-left:6px; }
