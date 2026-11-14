@@ -1,12 +1,10 @@
 # Course review tool
 
-A standalone offline review workspace for the Intelligent Study Companion team. Each person works independently and sends an exported file to the owner. The tool never edits the course dataset.
+A standalone offline review workspace for the Intelligent Study Companion team. Each person works independently and sends an exported file to the owner.
 
 ## Download and open
 
-Download this private repository using **Code > Download ZIP**, extract the ZIP, then double-click `review.html`. Keep the extracted files together. Reviewing requires no installation, server, or internet connection. The owner must give teammates access to this private repository before they can download it.
-
-If you used the old tool inside the course project, export a review package there before switching folders. Browser saves are tied to the old HTML location. Import that package here to resume. The package and finalized-decision formats are unchanged.
+Download this private repository using **Code > Download ZIP**, extract the ZIP, then double-click `review.html`. Keep the extracted files together.
 
 ## Review in five steps
 
