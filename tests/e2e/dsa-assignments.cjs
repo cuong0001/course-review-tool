@@ -31,7 +31,7 @@ const A=require('../../review-assignments.js');
   await page.setViewportSize({width:375,height:812});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   const output=fs.mkdtempSync(path.join(os.tmpdir(),'dsa-assignment-browser-'));await page.screenshot({path:path.join(output,'member-mobile.png'),fullPage:true});
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
-  console.log('PASS: all six DSA assignments load without a file picker, balanced counts, approved exclusions, member isolation, reload recovery, owner overview, 375px; no network requests.');
+  console.log('PASS: all five DSA assignments load without a file picker, balanced counts, approved exclusions, member isolation, reload recovery, owner overview, 375px; no network requests.');
   console.log('Screenshot: '+path.join(output,'member-mobile.png'));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

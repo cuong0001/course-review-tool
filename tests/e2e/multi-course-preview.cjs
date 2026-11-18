@@ -53,12 +53,12 @@ function makeSandboxApp(dir) {
     // 1. Seed a sentinel in DSA localStorage to verify zero cross-contamination
     await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
     await page.evaluate(() => {
-      localStorage.setItem('course-review-workspaces-v1', JSON.stringify({ reviewer: 'An', people: { An: { states: { 'question:Q_T00_1_01': { notes: 'DSA sentinel', decision: 'approve' } }, position: '' } } }));
+      localStorage.setItem('course-review-workspaces-v1', JSON.stringify({ reviewer: 'Hải', people: { 'Hải': { states: { 'question:Q_T00_1_01': { notes: 'DSA sentinel', decision: 'approve' } }, position: '' } } }));
     });
 
     // 2. Open OOP preview, verify course title, lesson rendering, question rendering, and source links
     await page.goto(pathToFileURL(path.join(app, 'review-oop.html')).href);
-    await page.locator('#reviewer').selectOption('An');
+    await page.locator('#reviewer').selectOption('Hải');
     await page.locator('#item h2, #item .item-id').first().waitFor();
     assert.match(await page.locator('header .brand').innerText(), /CSC10003/);
 
@@ -94,17 +94,17 @@ function makeSandboxApp(dir) {
 
     // 3. Open CN preview and verify isolation + cross-course rejection
     await page.goto(pathToFileURL(path.join(app, 'review-cn.html')).href);
-    await page.locator('#reviewer').selectOption('An');
+    await page.locator('#reviewer').selectOption('Hải');
     assert.match(await page.locator('header .brand').innerText(), /CSC10008/);
     // Must not see OOP workspace items or any decisions/notes in CN localStorage
-    const cnStates = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v2:CSC10008')).people.An.states);
+    const cnStates = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v2:CSC10008')).people['Hải'].states);
     assert.ok(Object.keys(cnStates).every(k => !k.includes('OOP_') && !cnStates[k].decision && !cnStates[k].notes));
 
     // Attempt to import OOP package into CN -> must reject
     await page.locator('#view-menu summary').click();
     await page.locator('#import').setInputFiles(oopPkgPath);
     await page.getByText(/Course mismatch/).waitFor();
-    const cnStatesAfterReject = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v2:CSC10008')).people.An.states);
+    const cnStatesAfterReject = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v2:CSC10008')).people['Hải'].states);
     assert.ok(Object.keys(cnStatesAfterReject).every(k => !k.includes('OOP_') && !cnStatesAfterReject[k].decision && !cnStatesAfterReject[k].notes));
 
     // Check CN question KaTeX / code / sources rendering
@@ -147,9 +147,9 @@ function makeSandboxApp(dir) {
     await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
     const dsaRaw = await page.evaluate(() => localStorage.getItem('course-review-workspaces-v1'));
     const dsaParsed = JSON.parse(dsaRaw);
-    assert.equal(dsaParsed.people.An.states['question:Q_T00_1_01'].notes, 'DSA sentinel');
-    assert.equal(dsaParsed.people.An.states['question:Q_T00_1_01'].decision, 'approve');
-    assert.equal(dsaParsed.people.An.states[`question:${firstQId}`], undefined);
+    assert.equal(dsaParsed.people['Hải'].states['question:Q_T00_1_01'].notes, 'DSA sentinel');
+    assert.equal(dsaParsed.people['Hải'].states['question:Q_T00_1_01'].decision, 'approve');
+    assert.equal(dsaParsed.people['Hải'].states[`question:${firstQId}`], undefined);
 
     assert.deepEqual(errors, []);
     assert.deepEqual(network, []);

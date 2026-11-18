@@ -13,12 +13,13 @@ test('DSA snapshot excludes all 90 approved questions and covers remaining work 
  assert.ok(questions.every(q=>['pending','revise'].includes(q.human_review_status)));
  for(const r of data.records){const item={kind:r.question_id?'question':'lesson',id:r.question_id||r.lesson_id};assert.equal(MEMBERS.filter(name=>A.belongs(data,item,name)).length,1);}
 });
-test('six exact names have balanced explicit assignments',()=>{
+test('five exact names have balanced explicit assignments',()=>{
  assert.deepEqual(data.members,MEMBERS);
- assert.deepEqual(MEMBERS.map(name=>A.counts(data,name).question),[81,81,81,81,81,81]);
- assert.deepEqual(MEMBERS.map(name=>A.counts(data,name).lesson),[4,4,4,3,3,3]);
+ assert.deepEqual(MEMBERS.map(name=>A.counts(data,name).question),[98,97,97,97,97]);
+ assert.deepEqual(MEMBERS.map(name=>A.counts(data,name).lesson),[5,4,4,4,4]);
  assert.equal(A.canonical(data,'Hieu'),'Hiếu');assert.equal(A.canonical(data,'Cuong'),'Cường');
- assert.equal(A.belongs(data,{kind:'question',id:'not_assigned'},'An'),false);
+ assert.equal(A.belongs(data,{kind:'question',id:'not_assigned'},'Hải'),false);
+ assert.equal(A.canonical(data,'An'),null);
 });
 test('refresh preserves assignments and removes newly approved content from work',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'assignment-build-'));

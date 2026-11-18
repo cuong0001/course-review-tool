@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const ReviewDiff = require('../review-diff.js');
-const MEMBERS = ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 'Khánh'];
+const MEMBERS = ['Cường', 'Hiếu', 'Hải', 'Huy', 'Khánh'];
 const byTopic = (a,b) => (a.topic_id || '').localeCompare(b.topic_id || '') || (a.question_id || a.lesson_id).localeCompare(b.question_id || b.lesson_id);
 function distribute(records, idField) {
   const assignment = {};

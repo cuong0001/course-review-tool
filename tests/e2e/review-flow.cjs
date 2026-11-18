@@ -9,8 +9,8 @@ const q = (n, over = {}) => ({question_id: `Q_T05_1_0${n}`, topic_id: 'T05_1', s
   distractor_explanations: {A: 'No.'}, human_review_status: 'pending', approved_by: null, approved_at: null, version: '1.0.1',
   reference_sources: [{url: 'https://example.org/source'}], ...over});
 const changed = q(1, {stem: String.raw`Question 1: why is it $\Theta(n^2)$?`, answer_explanation: String.raw`Two nested loops give $\Theta(n^2)$.`});
-const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 'Khánh'],
-  assignments: {question: {Q_T05_1_01: 'An', Q_T05_1_02: 'An', Q_T05_1_03: 'An'}, lesson: {}},
+const data = {version: 1, members: ['Cường', 'Hiếu', 'Hải', 'Huy', 'Khánh'],
+  assignments: {question: {Q_T05_1_01: 'Hải', Q_T05_1_02: 'Hải', Q_T05_1_03: 'Hải'}, lesson: {}},
   records: [changed, q(2), q(3, {stem: 'Question 3: unique needle word.'})],
   summary: {approved_questions: 0, pending_questions: 3, revise_questions: 0, lessons: 0},
   changes: {'question:Q_T05_1_01': {compared_with: 'run TEST', status_before: 'approved', approved_by_before: 'An', version_before: '1.0.0',
@@ -27,7 +27,7 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'An', 'Hải', 'Huy', 
     const context = await browser.newContext({viewport: {width: 1440, height: 950}}), page = await context.newPage(), errors = [], network = [];
     page.on('pageerror', e => errors.push(e.message)); page.on('request', r => { if (/^https?:/.test(r.url())) network.push(r.url()); });
     await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
-    await page.locator('#reviewer').selectOption('An'); await page.locator('#type').selectOption('question');
+    await page.locator('#reviewer').selectOption('Hải'); await page.locator('#type').selectOption('question');
     const h2 = () => page.locator('#item h2').first().textContent();
     // The queue is a rail that opens on hover; hover it before clicking an entry.
     const pick = async n => { await page.locator('.rail-tab').hover({force: true}); await page.locator('#queue button').nth(n).click(); };

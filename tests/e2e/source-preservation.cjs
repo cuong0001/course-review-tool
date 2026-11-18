@@ -55,9 +55,9 @@ function writeSnapshot(app, data) {
   const d1 = path.join(tmp, 'v1');
   writeDataset(d1, [q1, q2, q3, q4, q5, q6], [baseLesson]);
   const snap1 = build(d1);
-  // Assign all items to An (plus q5, q6 accessible under whole team or explicit assignment)
-  for (const q of [q1, q2, q3, q4, q5, q6]) snap1.assignments.question[q.question_id] = 'An';
-  snap1.assignments.lesson[baseLesson.lesson_id] = 'An';
+  // Assign all items to Hải (plus q5, q6 accessible under whole team or explicit assignment)
+  for (const q of [q1, q2, q3, q4, q5, q6]) snap1.assignments.question[q.question_id] = 'Hải';
+  snap1.assignments.lesson[baseLesson.lesson_id] = 'Hải';
 
   // V2: source-only changes on q1..q5 and lesson; substantive stem change on q6; leave q4 unchanged in d1->d2 OR test both
   const v2Q = (q, ref, over = {}) => ({...q, reference_sources: [ref], ...over});
@@ -88,7 +88,7 @@ function writeSnapshot(app, data) {
     page.on('request', r => { if (/^https?:/.test(r.url())) network.push(r.url()); });
 
     await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
-    await page.locator('#reviewer').selectOption('An');
+    await page.locator('#reviewer').selectOption('Hải');
 
     // Scenario 4 & 1 & 2 & 3 & 6 setup on V1:
     // Lesson: section comment + flag
@@ -120,9 +120,9 @@ function writeSnapshot(app, data) {
 
     // Capture original decided_at timestamps & checks in storage BEFORE V3 upgrade
     const beforeDb = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')));
-    const origQ1 = beforeDb.people.An.states['question:Q_T01_1_01'].decided_at;
-    const origQ2 = beforeDb.people.An.states['question:Q_T01_1_02'].decided_at;
-    const origQ3 = beforeDb.people.An.states['question:Q_T01_1_03'].decided_at;
+    const origQ1 = beforeDb.people['Hải'].states['question:Q_T01_1_01'].decided_at;
+    const origQ2 = beforeDb.people['Hải'].states['question:Q_T01_1_02'].decided_at;
+    const origQ3 = beforeDb.people['Hải'].states['question:Q_T01_1_03'].decided_at;
     assert.ok(origQ1 && origQ2 && origQ3);
 
     // Scenario 7 & 8a: Inject a LEGACY stored state for reviewer 'Hiếu' (no content_fingerprint, no source_recheck_needed)
@@ -153,7 +153,7 @@ function writeSnapshot(app, data) {
     await page.reload();
     await page.locator('#item h2').first().waitFor();
 
-    // Verify Scenarios 1, 2, 3, 4, 5 for An:
+    // Verify Scenarios 1, 2, 3, 4, 5 for Hải:
     await page.locator('#type').selectOption('question');
     await pickQ('Q_T01_1_01');
     assert.match(await page.locator('#stale-source-banner').innerText(), /Retained prior decision: Approved/);
@@ -206,7 +206,7 @@ function writeSnapshot(app, data) {
     assert.equal(decBeforeConfirm.stale_source_decisions.find(d => d.id === 'Q_T01_1_03').decided_at, origQ3);
 
     // Inspect localStorage directly for Q1 checks & timestamps
-    const afterReconcile = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people.An.states);
+    const afterReconcile = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people['Hải'].states);
     assert.equal(afterReconcile['question:Q_T01_1_01'].decision, 'approve');
     assert.equal(afterReconcile['question:Q_T01_1_01'].decided_at, origQ1);
     assert.equal(afterReconcile['question:Q_T01_1_01'].checks.source_supports, false);
@@ -218,7 +218,7 @@ function writeSnapshot(app, data) {
     await page.locator('#confirm-sources').click();
     assert.equal(await page.locator('#stale-source-banner').count(), 0);
     assert.match(await page.locator('#decision-status').innerText(), /Approved · .* · Sources confirmed/);
-    const afterConfirm = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people.An.states['question:Q_T01_1_01']);
+    const afterConfirm = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people['Hải'].states['question:Q_T01_1_01']);
     assert.equal(afterConfirm.decided_at, origQ1);
     assert.ok(afterConfirm.source_rechecked_at);
     assert.equal(afterConfirm.checks.source_supports, true);
@@ -260,12 +260,12 @@ function writeSnapshot(app, data) {
     const q1_v4 = v2Q(q1_v2, 'https://example.org/new-1-fileload');
     const jsonl4 = path.join(tmp, 'v4.jsonl');
     fs.writeFileSync(jsonl4, JSON.stringify(q1_v4) + '\n');
-    await page.locator('#reviewer').selectOption('An');
+    await page.locator('#reviewer').selectOption('Hải');
     await page.locator('#type').selectOption('question');
     await page.locator('#files').setInputFiles(jsonl4);
     await pickQ('Q_T01_1_01');
     assert.match(await page.locator('#stale-source-banner').innerText(), /Retained prior decision: Approved/);
-    const afterFileLoad = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people.An.states['question:Q_T01_1_01']);
+    const afterFileLoad = await page.evaluate(() => JSON.parse(localStorage.getItem('course-review-workspaces-v1')).people['Hải'].states['question:Q_T01_1_01']);
     assert.equal(afterFileLoad.decided_at, origQ1);
     assert.equal(afterFileLoad.source_recheck_needed, true);
     assert.equal(afterFileLoad.checks.source_supports, false);
