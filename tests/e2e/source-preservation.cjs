@@ -21,10 +21,11 @@ function writeDataset(dir, questions, lessons) {
 function makeApp(baseDir, data) {
   const app = path.join(baseDir, 'app');
   fs.mkdirSync(path.join(app, 'data'), {recursive: true});
-  for (const f of ['review.html', 'review.css', 'review-core.js', 'review-diff.js', 'review-renderers.js', 'review-assignments.js', 'review.js']) {
+  for (const f of ['review.css', 'review-core.js', 'review-diff.js', 'review-renderers.js', 'review-assignments.js', 'review.js']) {
     fs.copyFileSync(path.join(root, f), path.join(app, f));
   }
   fs.cpSync(path.join(root, 'vendor'), path.join(app, 'vendor'), {recursive: true});
+  fs.cpSync(path.join(root, 'review-pages'), path.join(app, 'review-pages'), {recursive: true});
   writeSnapshot(app, data);
   return app;
 }
@@ -87,7 +88,7 @@ function writeSnapshot(app, data) {
     page.on('pageerror', e => errors.push(e.message));
     page.on('request', r => { if (/^https?:/.test(r.url())) network.push(r.url()); });
 
-    await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'dsa.html')).href);
     await page.locator('#reviewer').selectOption('Hải');
 
     // Scenario 4 & 1 & 2 & 3 & 6 setup on V1:
@@ -289,7 +290,7 @@ function writeSnapshot(app, data) {
     const freshCtx = await browser.newContext();
     const fresh = await freshCtx.newPage();
     fresh.on('pageerror', e => errors.push(e.message));
-    await fresh.goto(pathToFileURL(path.join(app, 'review.html')).href);
+    await fresh.goto(pathToFileURL(path.join(app, 'review-pages', 'dsa.html')).href);
     await fresh.locator('#view-menu summary').click();
     await fresh.locator('#import').setInputFiles(pkgPath);
     await fresh.getByText(/retained prior decisions for source recheck/).waitFor();

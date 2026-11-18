@@ -2,17 +2,17 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DSA review · Study Companion</title>
-<link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="review.css">
+<title>OOP (CSC10003) preview review · Study Companion</title>
+<link rel="stylesheet" href="../vendor/katex/katex.min.css"><link rel="stylesheet" href="../review.css">
 </head>
 <body>
 <a class="skip-link" href="#item">Skip to current review</a>
 <header class="app-header">
-  <span class="brand">DSA review</span>
+  <span class="brand">OOP preview review · CSC10003</span>
   <select id="reviewer" aria-label="Reviewer"><option value="">Choose your name</option><option>Cường</option><option>Hiếu</option><option>Hải</option><option>Huy</option><option>Khánh</option></select>
   <span id="progress" class="muted"></span>
   <span id="saved" role="status" class="muted"></span>
-  <button id="export" class="primary" title="Download your notes and decisions as a file to send to the owner">Export</button>
+  <button id="export" class="primary" title="Download your notes and decisions for CSC10003">Export</button>
   <details id="view-menu" class="view-menu"><summary aria-label="Menu">⋯</summary><div class="view-panel">
     <button id="theme" type="button" aria-pressed="false">Dark mode</button>
     <div class="view-row"><span id="text-size-label">Text size</span><div class="segmented" role="group" aria-labelledby="text-size-label"><button id="text-smaller" type="button" aria-label="Smaller text">A−</button><output id="text-size" aria-live="polite">100%</output><button id="text-larger" type="button" aria-label="Larger text">A+</button></div></div>
@@ -23,7 +23,7 @@
     <button id="decisions" type="button">Export finalized decisions</button>
     <label class="file-label">Import review package <input id="import" type="file" accept=".json"></label>
     <label class="file-label">Load newer dataset files <input id="files" type="file" multiple accept=".jsonl"></label>
-    <section class="team" aria-label="Team and dataset"><p id="dataset-summary" class="muted"></p><div id="team-summary"></div><section id="audit-overview"><h4>Latest AI audit · 14 Nov 2026</h4><div id="audit-overview-content"></div></section></section>
+    <section class="team" aria-label="Course and dataset"><p id="dataset-summary" class="muted"></p></section>
   </div></details>
   <div class="message-row"><p id="message" role="status" aria-live="polite"></p><button id="undo" type="button" hidden>Undo</button></div>
 </header>
@@ -32,31 +32,23 @@
   <div class="rail-tab" aria-hidden="true"><span class="rail-icon">☰</span><span id="rail-count"></span></div>
   <div class="rail-panel">
     <div class="filters">
-      <label>Type <select id="type"><option value="lesson">Reading guides</option><option value="question">Questions</option><option value="video">Videos</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
+      <label>Type <select id="type"><option value="lesson">Reading guides</option><option value="question">Questions</option><option value="resource">Resources</option><option value="activity">Activities</option></select></label>
       <label>Show <select id="filter"><option value="all">All</option><option value="unreviewed">Not started</option><option value="in-progress">In progress</option><option value="flagged">Flagged</option><option value="stale-sources">Needs source check</option><option value="finished">Finished</option><option value="changed">Changed since last version</option><option value="audit-issues">Audit findings</option></select></label>
       <label>Topic <select id="topic"><option value="">All topics</option></select></label>
-      <label>Assignment <select id="assignment-scope"><option value="mine">Mine</option><option value="all">Whole team</option></select></label>
-      <label class="check-label"><input id="extras" type="checkbox"> Include resources and activities</label>
+      <label>Assignment <select id="assignment-scope"><option value="all">Whole team</option><option value="mine">Mine</option></select></label>
+      <label class="check-label"><input id="extras" type="checkbox" checked> Include resources and activities</label>
     </div>
     <div class="search-row"><label for="search" class="sr-only">Search this queue</label><input id="search" type="search" placeholder="Search  ( / )" autocomplete="off"><button id="clear-filters" type="button" aria-label="Clear search">✕</button></div>
     <p id="queue-count" class="queue-count" aria-live="polite"></p>
     <div id="queue"></div>
   </div>
 </aside>
-<article id="item" tabindex="-1" aria-label="Current review"><section class="empty-state"><h2>Choose your name to start</h2></section></article>
+<article id="item" tabindex="-1" aria-label="Current review"><section class="empty-state"><h2>Choose your name to preview CSC10003 OOP</h2><p>Isolated workspace — DSA review state is untouched.</p></section></article>
 </main>
 <p id="live" class="sr-only" aria-live="polite"></p>
-<dialog id="shortcuts" aria-labelledby="shortcuts-title"><h2 id="shortcuts-title">Keyboard shortcuts</h2>
-<table class="shortcut-table"><tbody>
-<tr><td><kbd>Alt</kbd> + <kbd>→</kbd> or <kbd>J</kbd></td><td>Next item</td></tr>
-<tr><td><kbd>Alt</kbd> + <kbd>←</kbd> or <kbd>K</kbd></td><td>Previous item</td></tr>
-<tr><td><kbd>U</kbd></td><td>Next unfinished item</td></tr>
-<tr><td><kbd>/</kbd> or <kbd>Ctrl</kbd> + <kbd>K</kbd></td><td>Search (<kbd>Esc</kbd> clears)</td></tr>
-<tr><td><kbd>N</kbd></td><td>Write notes</td></tr>
-<tr><td><kbd>F</kbd></td><td>Flag or unflag</td></tr>
-<tr><td><kbd>T</kbd></td><td>Show or hide LaTeX source</td></tr>
-<tr><td><kbd>?</kbd></td><td>This list</td></tr>
-</tbody></table>
-<form method="dialog"><button class="primary">Close</button></form></dialog>
-<script src="vendor/katex/katex.min.js"></script><script src="data/dsa-review-data.js"></script><script src="review-assignments.js"></script><script src="review-core.js"></script><script src="review-diff.js"></script><script src="review-renderers.js"></script><script src="review.js"></script>
+<dialog id="shortcuts" aria-labelledby="shortcuts-title"><h2 id="shortcuts-title">Keyboard shortcuts</h2><form method="dialog"><button class="primary">Close</button></form></dialog>
+<script>
+globalThis.CourseReviewConfig = { courseId: 'CSC10003', idPrefix: 'OOP_', globalDataVar: 'OOPReviewData' };
+</script>
+<script src="../vendor/katex/katex.min.js"></script><script src="../data/oop-review-data.js"></script><script src="../review-assignments.js"></script><script src="../review-core.js"></script><script src="../course-review-core.js"></script><script src="../review-diff.js"></script><script src="../review-renderers.js"></script><script src="../course-review.js"></script>
 </body></html>

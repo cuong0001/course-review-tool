@@ -7,7 +7,7 @@ const {pathToFileURL}=require('node:url');
  try{
   const context=await browser.newContext({viewport:{width:1600,height:1000}}),page=await context.newPage(),errors=[],failed=[],network=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push(r.url()));page.on('request',r=>{if(/^https?:/.test(r.url()))network.push(r.url());});
-  await page.goto(pathToFileURL(path.resolve(__dirname,'../../review.html')).href);
+  await page.goto(pathToFileURL(path.resolve(__dirname,'../../review-pages/dsa.html')).href);
   await page.locator('#reviewer').selectOption('Cường');await page.locator('#progress').filter({hasText:/^Cường · /}).waitFor();
   const all=await page.evaluate(()=>{
     let formulas=0;const failures=[];

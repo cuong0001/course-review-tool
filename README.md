@@ -4,11 +4,19 @@ A standalone offline review workspace for the Intelligent Study Companion team. 
 
 ## Download and open
 
-Download this private repository using **Code > Download ZIP**, extract the ZIP, then double-click `review.html`. Keep the extracted files together.
+Download this private repository using **Code > Download ZIP**, extract the ZIP, open the `review-pages` folder, and double-click the page for your course:
+
+| Course | Page |
+|---|---|
+| Data Structures and Algorithms | `review-pages/dsa.html` |
+| Object-Oriented Programming (CSC10003) | `review-pages/oop.html` |
+| Computer Networks (CSC10008) | `review-pages/cn.html` |
+
+Keep the extracted files together: the pages load their styles, scripts and data from the folder above them.
 
 ## Review in five steps
 
-1. Keep this folder together: `review.html`, `review.css`, `review-core.js`, `review-diff.js`, `review-renderers.js`, `review-assignments.js`, `review.js`, and the `data/` and `vendor/` folders. Double-click **review.html** to open it in a current Chrome or Edge browser.
+1. Keep the extracted folder whole: the `review-pages/`, `data/` and `vendor/` folders and the `.css` and `.js` files next to them. Double-click a page in **review-pages** (for DSA, `dsa.html`) to open it in a current Chrome or Edge browser.
 2. Choose your name at the top: **Cường**, **Hiếu**, **Hải**, **Huy** or **Khánh**. Your assigned items load automatically.
 3. Read the item. The question (or reading guide) fills most of the screen. The correct answer is marked **✓**, and the reason each wrong answer is wrong is shown under it.
 4. Decide, in the panel on the right:
@@ -98,8 +106,8 @@ This reads the canonical files without changing them, updates source hashes and 
 ## OOP and Computer Networks preview
 
 Two more courses can be reviewed the same way:
-- **Object-Oriented Programming (CSC10003):** double-click `review-oop.html`.
-- **Computer Networks (CSC10008):** double-click `review-cn.html`.
+- **Object-Oriented Programming (CSC10003):** double-click `review-pages/oop.html`.
+- **Computer Networks (CSC10008):** double-click `review-pages/cn.html`.
 
 Each course page keeps its own saves and its own export file, separate from DSA. Export from each page you worked on and send every file to the owner.
 
@@ -148,6 +156,6 @@ The apply script accepts only this decision export, not the richer review packag
 
 Reviewers do not need Node or npm. Developers can run the dependency-free state tests with `npm test` (or `node --test tests/unit/*.test.cjs`).
 
-For browser tests only, install Node 20+, run `npm ci`, install Chrome, and run `npm run test:browser`. On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is disabled; no policy change is needed. Import/export tests use synthetic fixtures under `tests/fixtures/`; assignment tests inspect the bundled read-only DSA snapshot. No course checkout is needed. They open `review.html` through `file://` and write samples and screenshots to the system temporary directory.
+For browser tests only, install Node 20+, run `npm ci`, install Chrome, and run `npm run test:browser`. On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is disabled; no policy change is needed. Import/export tests use synthetic fixtures under `tests/fixtures/`; assignment tests inspect the bundled read-only DSA snapshot. No course checkout is needed. They open the pages in `review-pages/` through `file://` and write samples and screenshots to the system temporary directory.
 
 Do not commit real review exports or personal notes. `review-*.json` and `decisions*.json` are ignored. See `TEST_RESULTS.md` for verification and known limits.

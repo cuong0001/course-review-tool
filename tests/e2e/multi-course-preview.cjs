@@ -15,9 +15,6 @@ function makeSandboxApp(dir) {
   const app = path.join(dir, 'app');
   fs.mkdirSync(path.join(app, 'data'), { recursive: true });
   for (const f of [
-    'review-oop.html',
-    'review-cn.html',
-    'review.html',
     'review.css',
     'review-assignments.js',
     'review-core.js',
@@ -30,6 +27,7 @@ function makeSandboxApp(dir) {
     fs.copyFileSync(path.join(root, f), path.join(app, f));
   }
   fs.cpSync(path.join(root, 'vendor'), path.join(app, 'vendor'), { recursive: true });
+  fs.cpSync(path.join(root, 'review-pages'), path.join(app, 'review-pages'), { recursive: true });
   for (const snap of ['data/oop-review-data.js', 'data/cn-review-data.js', 'data/dsa-review-data.js']) {
     if (fs.existsSync(path.join(root, snap))) {
       fs.copyFileSync(path.join(root, snap), path.join(app, snap));
@@ -51,13 +49,13 @@ function makeSandboxApp(dir) {
     page.on('request', r => { if (/^https?:/.test(r.url())) network.push(r.url()); });
 
     // 1. Seed a sentinel in DSA localStorage to verify zero cross-contamination
-    await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'dsa.html')).href);
     await page.evaluate(() => {
       localStorage.setItem('course-review-workspaces-v1', JSON.stringify({ reviewer: 'Hải', people: { 'Hải': { states: { 'question:Q_T00_1_01': { notes: 'DSA sentinel', decision: 'approve' } }, position: '' } } }));
     });
 
     // 2. Open OOP preview, verify course title, lesson rendering, question rendering, and source links
-    await page.goto(pathToFileURL(path.join(app, 'review-oop.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'oop.html')).href);
     await page.locator('#reviewer').selectOption('Hải');
     await page.locator('#item h2, #item .item-id').first().waitFor();
     assert.match(await page.locator('header .brand').innerText(), /CSC10003/);
@@ -93,7 +91,7 @@ function makeSandboxApp(dir) {
     assert.equal(oopPkg.version, 2);
 
     // 3. Open CN preview and verify isolation + cross-course rejection
-    await page.goto(pathToFileURL(path.join(app, 'review-cn.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'cn.html')).href);
     await page.locator('#reviewer').selectOption('Hải');
     assert.match(await page.locator('header .brand').innerText(), /CSC10008/);
     // Must not see OOP workspace items or any decisions/notes in CN localStorage
@@ -114,7 +112,7 @@ function makeSandboxApp(dir) {
     assert.ok(cnSourceCount >= 1, 'CN question must render clickable source URLs');
 
     // Check source-only vs content-change in OOP
-    await page.goto(pathToFileURL(path.join(app, 'review-oop.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'oop.html')).href);
     const vm = require('node:vm');
     const oopCtx = {};
     vm.runInNewContext(fs.readFileSync(path.join(app, 'data/oop-review-data.js'), 'utf8'), oopCtx);
@@ -144,7 +142,7 @@ function makeSandboxApp(dir) {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
 
     // 5. Verify DSA sentinel localStorage is 100% untouched
-    await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'dsa.html')).href);
     const dsaRaw = await page.evaluate(() => localStorage.getItem('course-review-workspaces-v1'));
     const dsaParsed = JSON.parse(dsaRaw);
     assert.equal(dsaParsed.people['Hải'].states['question:Q_T00_1_01'].notes, 'DSA sentinel');

@@ -19,14 +19,15 @@ const data = {version: 1, members: ['Cường', 'Hiếu', 'Hải', 'Huy', 'Khán
 
 (async () => {
   const app = fs.mkdtempSync(path.join(os.tmpdir(), 'review-flow-app-')), shots = fs.mkdtempSync(path.join(os.tmpdir(), 'review-flow-shots-'));
-  for (const f of ['review.html', 'review.css', 'review-core.js', 'review-diff.js', 'review-renderers.js', 'review-assignments.js', 'review.js']) fs.copyFileSync(path.join(root, f), path.join(app, f));
+  for (const f of ['review.css', 'review-core.js', 'review-diff.js', 'review-renderers.js', 'review-assignments.js', 'review.js']) fs.copyFileSync(path.join(root, f), path.join(app, f));
   fs.cpSync(path.join(root, 'vendor'), path.join(app, 'vendor'), {recursive: true});
+  fs.cpSync(path.join(root, 'review-pages'), path.join(app, 'review-pages'), {recursive: true});
   fs.mkdirSync(path.join(app, 'data')); fs.writeFileSync(path.join(app, 'data/dsa-review-data.js'), 'globalThis.DSAReviewData = ' + JSON.stringify(data) + ';');
   const browser = await chromium.launch({channel: 'chrome', headless: true});
   try {
     const context = await browser.newContext({viewport: {width: 1440, height: 950}}), page = await context.newPage(), errors = [], network = [];
     page.on('pageerror', e => errors.push(e.message)); page.on('request', r => { if (/^https?:/.test(r.url())) network.push(r.url()); });
-    await page.goto(pathToFileURL(path.join(app, 'review.html')).href);
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'dsa.html')).href);
     await page.locator('#reviewer').selectOption('Hải'); await page.locator('#type').selectOption('question');
     const h2 = () => page.locator('#item h2').first().textContent();
     // The queue is a rail that opens on hover; hover it before clicking an entry.
