@@ -96,6 +96,40 @@ Each changed question or guide then carries a field-level change list (`DSARevie
 
 This reads the canonical files without changing them, updates source hashes and the assignment report, preserves existing owners, excludes newly approved questions, and assigns new pending IDs to the least-loaded member. Changed content requires renewed verification while retaining notes. Commit and distribute the refreshed tool; offline copies cannot detect later course changes automatically.
 
+## OOP and Computer Networks preview
+
+Two more courses can be reviewed the same way:
+- **Object-Oriented Programming (CSC10003):** double-click `review-oop.html`.
+- **Computer Networks (CSC10008):** double-click `review-cn.html`.
+
+Each course page keeps its own saves and its own export file, separate from DSA. Export from each page you worked on and send every file to the owner.
+
+These are candidate datasets from run `20261117T111338Z`. They are not yet in the course project. Every item is pending: nothing is approved yet.
+
+**Before this review, the content was checked automatically:**
+- an independent agent re-solved every question;
+- all C++ was compiled with `g++ -std=c++17` and its output compared with the stated output;
+- source links were reopened.
+
+That does not replace your check. Approve only what you have verified yourself.
+
+| Member | OOP questions | OOP reading guides | CN questions | CN reading guides |
+|---|---:|---:|---:|---:|
+| Cường | 38 | 5 | 49 | 7 |
+| Hiếu | 38 | 5 | 49 | 6 |
+| An | 38 | 5 | 49 | 6 |
+| Hải | 38 | 5 | 49 | 6 |
+| Huy | 38 | 5 | 48 | 6 |
+| Khánh | 38 | 5 | 48 | 6 |
+
+Resources and activities (OOP 167 and 12, CN 161 and 4) appear after ticking **Include resources and activities**.
+
+**Read these items with extra care:**
+- topics `OOP_T04_2`, `OOP_T04_3` and `OOP_T06_1`, and topics `CN_T04_1`, `CN_T04_2`, `CN_T05_3` and `CN_T05_4`. These were not re-reviewed by an independent agent in the last repair;
+- `Q_CN_T10_1_04` and `Q_CN_T10_1_08`, whose automatic re-solve was not fully blind.
+
+In some questions the correct option is still noticeably longer than the others. This is a known style issue, not an error. Note it if you like, but it is not a reason to reject.
+
 ## Owner handoff
 
 The dataset, apply script, validator, Excel workbooks, and manifest stay in [Intelligent-Study-Companion](https://github.com/cuong0001/Intelligent-Study-Companion). See its [review workflow](https://github.com/cuong0001/Intelligent-Study-Companion/blob/review-tool/docs/REVIEW_WORKFLOW.md) for the owner-controlled apply steps. Run those commands from the course project, not this repository. This repository never writes the dataset.
