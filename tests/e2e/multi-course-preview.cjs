@@ -62,6 +62,24 @@ function makeSandboxApp(dir) {
 
     await page.locator('#type').selectOption('question');
     await page.locator('.question-stem').waitFor();
+    // Choosing a name shows only that member's questions, also after a reload.
+    for (const [course, file] of [['oop', 'oop-review-data.js'], ['cn', 'cn-review-data.js']]) {
+      const sandbox = {}; require('node:vm').runInNewContext(fs.readFileSync(path.join(root, 'data', file), 'utf8'), sandbox);
+      const data = Object.values(sandbox)[0];
+      if (course === 'cn') await page.goto(pathToFileURL(path.join(app, 'review-pages', 'cn.html')).href);
+      for (const member of data.members) {
+        await page.locator('#reviewer').selectOption(member); await page.locator('#type').selectOption('question');
+        const mine = Object.values(data.assignments.question).filter(o => o === member).length;
+        assert.equal(await page.locator('#assignment-scope').inputValue(), 'mine', `${course}: choosing ${member} must show only their items`);
+        assert.match(await page.locator('#queue-count').innerText(), new RegExp(`^${mine} items`), `${course}: ${member} must see their ${mine} questions`);
+      }
+      await page.reload();
+      assert.equal(await page.locator('#assignment-scope').inputValue(), 'mine', `${course}: reload must keep the member's own scope`);
+    }
+    await page.goto(pathToFileURL(path.join(app, 'review-pages', 'oop.html')).href);
+    await page.locator('#reviewer').selectOption('Hải');
+    await page.locator('#type').selectOption('question');
+    await page.locator('.question-stem').waitFor();
     const firstQId = await page.locator('#item .item-id').innerText();
     const oopSourceCount = await page.locator('#item .sources a').count();
     assert.ok(oopSourceCount >= 1, 'OOP question must render clickable source URLs');

@@ -477,7 +477,7 @@ async function openWorkspace() {
   await bundledReady; const name = $('reviewer').value.trim(); if (!name) return;
   db.reviewer = name;
   if (!Object.hasOwn(db.people, name)) Object.defineProperty(db.people, name, { value: { states: {}, position: '' }, enumerable: true, writable: true, configurable: true });
-  $('assignment-scope').value = 'all';
+  $('assignment-scope').value = 'mine';
   reconcileWorkspace(); active = workspace().position; $('topic').value = ''; $('filter').value = 'all'; $('search').value = ''; $('type').value = loaded[active]?.kind || 'lesson';
   session = new Set(); undo = null; $('undo').hidden = true; lastRows = []; save(); render();
 }
@@ -534,5 +534,5 @@ $('view-menu').addEventListener('keydown', e => { if (e.key === 'Escape') { e.st
 function applyTheme(theme) { document.documentElement.dataset.theme = theme; $('theme').textContent = theme === 'dark' ? 'Light mode' : 'Dark mode'; $('theme').setAttribute('aria-pressed', String(theme === 'dark')); }
 try { applyTheme(localStorage.getItem('course-review-theme-v2') || 'light'); } catch { applyTheme('light'); }
 $('theme').onclick = () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; applyTheme(theme); try { localStorage.setItem('course-review-theme-v2', theme); } catch { /* ignore */ } };
-selectReviewer(db.reviewer || '');
+selectReviewer(db.reviewer || ''); $('assignment-scope').value = workspace()?.scope || 'mine';
 if (db.reviewer) { active = workspace()?.position || ''; render(); }
