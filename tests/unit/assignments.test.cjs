@@ -19,7 +19,7 @@ test('five exact names have balanced explicit assignments',()=>{
  assert.deepEqual(MEMBERS.map(name=>A.counts(data,name).lesson),[5,4,4,4,4]);
  assert.equal(A.canonical(data,'Hieu'),'Hiếu');assert.equal(A.canonical(data,'Cuong'),'Cường');
  assert.equal(A.belongs(data,{kind:'question',id:'not_assigned'},'Hải'),false);
- assert.equal(A.canonical(data,'An'),null);
+ assert.equal(A.canonical(data,'Huy'),null);
 });
 test('refresh preserves assignments and removes newly approved content from work',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'assignment-build-'));

@@ -9,7 +9,7 @@ const q = (n, over = {}) => ({question_id: `Q_T05_1_0${n}`, topic_id: 'T05_1', s
   distractor_explanations: {A: 'No.'}, human_review_status: 'pending', approved_by: null, approved_at: null, version: '1.0.1',
   reference_sources: [{url: 'https://example.org/source'}], ...over});
 const changed = q(1, {stem: String.raw`Question 1: why is it $\Theta(n^2)$?`, answer_explanation: String.raw`Two nested loops give $\Theta(n^2)$.`});
-const data = {version: 1, members: ['Cường', 'Hiếu', 'Hải', 'Huy', 'Khánh'],
+const data = {version: 1, members: ['Cường', 'Hiếu', 'Hải', 'An', 'Khánh'],
   assignments: {question: {Q_T05_1_01: 'Hải', Q_T05_1_02: 'Hải', Q_T05_1_03: 'Hải'}, lesson: {}},
   records: [changed, q(2), q(3, {stem: 'Question 3: unique needle word.'})],
   summary: {approved_questions: 0, pending_questions: 3, revise_questions: 0, lessons: 0},

@@ -8,7 +8,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const ReviewDiff = require('../review-diff.js');
 
-const MEMBERS = ['Cường', 'Hiếu', 'Hải', 'Huy', 'Khánh'];
+const MEMBERS = ['Cường', 'Hiếu', 'Hải', 'An', 'Khánh'];
 
 const recordId = r => r.question_id || r.lesson_id || r.resource_id || r.activity_id || r.clip_id;
 const recordKind = r => {

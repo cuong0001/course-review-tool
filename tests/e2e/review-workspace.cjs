@@ -21,7 +21,7 @@ const {pathToFileURL}=require('node:url');
     for(const filename of ['review.css','review-core.js','review-diff.js','review-renderers.js','review-assignments.js','review.js'])fs.copyFileSync(path.join(root,filename),path.join(app,filename));
     fs.cpSync(path.join(root,'vendor'),path.join(app,'vendor'),{recursive:true});
     fs.cpSync(path.join(root,'review-pages'),path.join(app,'review-pages'),{recursive:true});
-    fs.writeFileSync(path.join(app,'data/dsa-review-data.js'),'globalThis.DSAReviewData = '+JSON.stringify({members:['Cường','Hiếu','Hải','Hải','Huy','Khánh'],assignments:{question:{},lesson:{}},records:[],summary:{approved_questions:0,pending_questions:0,revise_questions:0,lessons:0}})+';');
+    fs.writeFileSync(path.join(app,'data/dsa-review-data.js'),'globalThis.DSAReviewData = '+JSON.stringify({members:['Cường','Hiếu','Hải','Hải','An','Khánh'],assignments:{question:{},lesson:{}},records:[],summary:{approved_questions:0,pending_questions:0,revise_questions:0,lessons:0}})+';');
     await page.goto(pathToFileURL(path.join(app,'review-pages', 'dsa.html')).href);
     await page.locator('#assignment-scope').selectOption('all');
     await page.locator('#reviewer').selectOption('Hải');await page.locator('#assignment-scope').selectOption('all');

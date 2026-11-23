@@ -17,7 +17,7 @@ Keep the extracted files together: the pages load their styles, scripts and data
 ## Review in five steps
 
 1. Keep the extracted folder whole: the `review-pages/`, `data/` and `vendor/` folders and the `.css` and `.js` files next to them. Double-click a page in **review-pages** (for DSA, `dsa.html`) to open it in a current Chrome or Edge browser.
-2. Choose your name at the top: **Cường**, **Hiếu**, **Hải**, **Huy** or **Khánh**. Your assigned items load automatically.
+2. Choose your name at the top: **Cường**, **Hiếu**, **Hải**, **An** or **Khánh**. Your assigned items load automatically.
 3. Read the item. The question (or reading guide) fills most of the screen. The correct answer is marked **✓**, and the reason each wrong answer is wrong is shown under it.
 4. Decide, in the panel on the right:
    - **Approve** if it is correct. Approving confirms the checklist shown when you hover the button: the source supports it, the answer is correct, each wrong answer is wrong for a stated reason, and the facts and code are accurate.
@@ -80,10 +80,10 @@ Choose **Show → Changed since last version** to see only the changed items. Th
 | Cường | 98 | 5 |
 | Hiếu | 97 | 4 |
 | Hải | 97 | 4 |
-| Huy | 97 | 4 |
+| An | 97 | 4 |
 | Khánh | 97 | 4 |
 
-Questions were first split by topic into contiguous, balanced batches. When the snapshot was refreshed, existing owners were kept. The 139 newly pending questions went to the least-loaded members, 23–24 each. Reading guides are split by topic. When An left the team (2026-11-18), An's 81 questions and 4 reading guides went to the least-loaded remaining members, and everyone else kept their items. See [DSA_ASSIGNMENTS.md](DSA_ASSIGNMENTS.md) for every assigned ID. Assignments do not modify course approval status.
+Questions were first split by topic into contiguous, balanced batches. When the snapshot was refreshed, existing owners were kept. The 139 newly pending questions went to the least-loaded members, 23–24 each. Reading guides are split by topic. When An left the team (2026-11-18), An's 81 questions and 4 reading guides went to the least-loaded remaining members, and everyone else kept their items. On 2026-11-23 An returned and took over all of Huy's items, unchanged, in every course; Huy is no longer on the team. See [DSA_ASSIGNMENTS.md](DSA_ASSIGNMENTS.md) for every assigned ID. Assignments do not modify course approval status.
 
 **All assignments (owner overview)** shows the team's full workload. Switching names returns to that member's assignment. Previous saved notes outside the new allocation are preserved and can be inspected in the owner overview. Existing unaccented saved/imported names such as `Hieu` remain accessible and match the corresponding member's allocation without rewriting authorship.
 
@@ -125,7 +125,7 @@ That does not replace your check. Approve only what you have verified yourself.
 | Cường | 46 | 6 | 59 | 8 |
 | Hiếu | 46 | 6 | 59 | 8 |
 | Hải | 46 | 6 | 58 | 7 |
-| Huy | 45 | 6 | 58 | 7 |
+| An | 45 | 6 | 58 | 7 |
 | Khánh | 45 | 6 | 58 | 7 |
 
 Resources and activities (OOP 167 and 12, CN 161 and 4) appear after ticking **Include resources and activities**.
