@@ -14,6 +14,8 @@ Download this private repository using **Code > Download ZIP**, extract the ZIP,
 
 Keep the extracted files together: the pages load their styles, scripts and data from the folder above them.
 
+**An's follow-up (2026-11-25):** `review-pages/an-followup.html` lists only the 66 items An has not finished (1 DSA, 34 OOP, 31 CN), in their current version. Tick the checks, approve or note each item, then click **Export decisions**: it downloads one `decisions-An-<course>-followup.json` per course in the finalized decision format below. Rebuild it from the course project with `node scripts/build-an-followup.cjs "PATH_TO_COURSE_PROJECT"`.
+
 ## Review in five steps
 
 1. Keep the extracted folder whole: the `review-pages/`, `data/` and `vendor/` folders and the `.css` and `.js` files next to them. Double-click a page in **review-pages** (for DSA, `dsa.html`) to open it in a current Chrome or Edge browser.

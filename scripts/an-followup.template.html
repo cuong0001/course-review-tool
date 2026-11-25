@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>An follow-up review</title>
+<link rel="stylesheet" href="../vendor/katex/katex.min.css">
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --ink: #1d2430; --muted: #5d6673; --line: #d9dee5;
+  --accent: #1f5f9e; --accent-ink: #ffffff; --ok: #2e7d4f; --ok-bg: #e3f2e8; --warn: #9a5b00; --warn-bg: #fff3dc;
+  --bad: #b03a2e; --bad-bg: #fbe5e2; --code: #f1f3f6; --note: #eef4fb;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161c; --card: #1b2129; --ink: #e6eaf0; --muted: #9aa4b1; --line: #2d3541;
+    --accent: #6aa8e8; --accent-ink: #0d1117; --ok: #6cc28f; --ok-bg: #18301f; --warn: #e0a64a; --warn-bg: #33270f;
+    --bad: #ec8a7f; --bad-bg: #3a1d1a; --code: #232a34; --note: #1b2a3b;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Segoe UI", Arial, sans-serif; }
+header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+header h1 { font-size: 17px; margin: 0; }
+#progress { color: var(--muted); font-size: 14px; }
+#saved { color: var(--muted); font-size: 13px; margin-left: auto; }
+button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr) 320px; gap: 16px; padding: 16px; max-width: 1500px; margin: 0 auto; }
+nav, .item, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+nav { padding: 8px; max-height: calc(100vh - 90px); overflow: auto; position: sticky; top: 70px; align-self: start; }
+nav h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 12px 8px 4px; }
+nav button { display: flex; width: 100%; justify-content: space-between; gap: 8px; text-align: left; border: 0;
+  padding: 5px 8px; font-size: 13px; border-radius: 6px; }
+nav button[aria-current="true"] { background: var(--note); }
+.tag { font-size: 11px; border-radius: 10px; padding: 1px 7px; white-space: nowrap; }
+.tag.todo { color: var(--muted); border: 1px solid var(--line); }
+.tag.approve { color: var(--ok); background: var(--ok-bg); }
+.tag.revise, .tag.reject { color: var(--bad); background: var(--bad-bg); }
+.item { padding: 20px 24px; min-width: 0; }
+.item:focus { outline: none; }
+.item .meta { color: var(--muted); font-size: 13px; margin: 0 0 4px; }
+.item h2 { margin: 0 0 12px; font-size: 21px; }
+.item h3 { font-size: 15px; margin: 18px 0 6px; color: var(--accent); }
+.why { background: var(--note); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 6px; margin: 0 0 14px; }
+.why b { display: block; font-size: 13px; color: var(--accent); }
+dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; }
+dt { color: var(--muted); font-size: 14px; }
+dd { margin: 0; overflow-wrap: anywhere; }
+.warning { color: var(--warn); background: var(--warn-bg); padding: 0 6px; border-radius: 4px; }
+pre { background: var(--code); padding: 10px 12px; border-radius: 6px; overflow-x: auto; font-size: 13.5px; line-height: 1.45; }
+code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .92em; }
+p code, li code, dd code { background: var(--code); padding: 0 4px; border-radius: 4px; }
+.option { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+.option.correct { border-color: var(--ok); background: var(--ok-bg); }
+.option .why-wrong { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.block { border-top: 1px solid var(--line); padding-top: 6px; }
+.panel { padding: 16px; position: sticky; top: 70px; align-self: start; }
+.panel h2 { font-size: 15px; margin: 0 0 8px; }
+.panel label.check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; margin: 6px 0; }
+.panel textarea { width: 100%; min-height: 90px; font: inherit; font-size: 14px; padding: 8px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.decide { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.decide .ok { border-color: var(--ok); color: var(--ok); }
+.decide .bad { border-color: var(--bad); color: var(--bad); }
+#status { font-size: 14px; margin: 10px 0 0; min-height: 1.5em; }
+.navrow { display: flex; justify-content: space-between; gap: 8px; margin-top: 20px; }
+.help { color: var(--muted); font-size: 13px; }
+.katex-error { color: var(--warn); }
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: minmax(0, 1fr); padding: 12px 16px; }
+  nav, .panel { position: static; max-height: 260px; }
+  .panel { max-height: none; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>An: follow-up review</h1>
+  <span id="progress"></span>
+  <span id="saved" role="status"></span>
+  <button id="export" class="primary" type="button">Export decisions</button>
+</header>
+<div class="layout">
+  <nav aria-label="Items to review" id="nav"></nav>
+  <main class="item" id="item" tabindex="-1"></main>
+  <aside class="panel" aria-label="Decision">
+    <h2>Your decision</h2>
+    <p class="help">Tick each check only after you have checked it yourself. Approve needs every check; Needs changes and Reject need a note.</p>
+    <div id="checks"></div>
+    <label for="notes" class="help">Notes</label>
+    <textarea id="notes" placeholder="What should change, if anything"></textarea>
+    <div class="decide">
+      <button id="approve" class="ok" type="button">Approve</button>
+      <button id="revise" class="bad" type="button">Needs changes</button>
+      <button id="reject" class="bad" type="button">Reject</button>
+      <button id="clear" type="button">Clear decision</button>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+    <div class="navrow">
+      <button id="prev" type="button">‹ Previous</button>
+      <button id="next" type="button">Next unfinished ›</button>
+    </div>
+  </aside>
+</div>
+<script src="../vendor/katex/katex.min.js"></script>
+<script>
+'use strict';
+const DATA = /*__DATA__*/null;
+// The same checklists as review-core.js, so the export matches the review tool's decision files.
+const CHECKS = {
+  lesson: { source_supports: 'I opened the source and it supports this', claims_match_source: 'Each claim matches the source', code_runs: 'Code runs as written', no_copied_passages: 'No copied passages' },
+  question: { source_supports: 'I opened the source and it supports this', correct_answer: 'The correct answer is correct', distractors_explained: 'Each distractor is wrong for a stated reason', facts_code_accurate: 'Facts and code are accurate' },
+  resource: { source_supports: 'I opened the source and it supports this', content_accurate: 'Content is accurate and relevant', license_checked: 'I checked the license and permitted use' },
+  activity: { source_supports: 'I opened the source and it supports this', facts_code_accurate: 'Facts and code are accurate', code_runs: 'Code runs as written' },
+};
+const STORE = 'an-followup-review-v1';
+const ITEMS = DATA.courses.flatMap(c => c.items.map(it => ({ ...it, course: c.key, courseName: c.name, key: `${c.key}:${it.kind}:${it.id}` })));
+let state = {};
+let current = 0;
+
+function load() {
+  try { state = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch { state = {}; }
+}
+function save() {
+  const el = document.getElementById('saved');
+  try { localStorage.setItem(STORE, JSON.stringify(state)); el.textContent = 'Saved in this browser'; }
+  catch { el.textContent = 'Not saved: export a backup now'; }
+}
+function st(it) { return state[it.key] || (state[it.key] = { checks: {}, notes: '', decision: null, decided_at: null }); }
+
+// ---- safe rendering: DOM nodes only, never innerHTML with content ----
+function el(tag, text, cls) { const n = document.createElement(tag); if (text != null) n.textContent = String(text); if (cls) n.className = cls; return n; }
+function link(url) {
+  let ok = false;
+  try { ok = ['http:', 'https:'].includes(new URL(url).protocol); } catch { ok = false; }
+  if (!ok) return el('span', url || 'missing link', 'warning');
+  const a = el('a', url); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a;
+}
+function inline(parent, text) {
+  // `code`, $math$, **bold**, *italic*
+  const re = /(`[^`]+`)|(\$[^$\n]+\$)|(\*\*[^*\n]+\*\*)|(\*[^*\s][^*\n]*\*)/g;
+  let last = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > last) parent.append(document.createTextNode(text.slice(last, m.index)));
+    const t = m[0];
+    if (m[1]) parent.append(el('code', t.slice(1, -1)));
+    else if (m[2]) {
+      const span = el('span');
+      try { katex.render(t.slice(1, -1), span, { throwOnError: true, output: 'html' }); }
+      catch { span.textContent = t; span.className = 'katex-error'; }
+      parent.append(span);
+    } else if (m[3]) parent.append(el('strong', t.slice(2, -2)));
+    else parent.append(el('em', t.slice(1, -1)));
+    last = m.index + t.length;
+  }
+  if (last < text.length) parent.append(document.createTextNode(text.slice(last)));
+}
+function md(text) {
+  const box = el('div');
+  const parts = String(text || '').split(/```[a-zA-Z+]*\n?/);
+  parts.forEach((part, i) => {
+    if (i % 2 === 1) { const pre = el('pre'); pre.append(el('code', part.replace(/\n$/, ''))); box.append(pre); return; }
+    let list = null;
+    for (const raw of part.split('\n')) {
+      const line = raw.trimEnd();
+      const bullet = line.match(/^\s*(?:[-*]|\d+\.)\s+(.*)$/);
+      if (bullet) { if (!list) { list = el('ul'); box.append(list); } const li = el('li'); inline(li, bullet[1]); list.append(li); continue; }
+      list = null;
+      if (!line.trim()) continue;
+      const h = line.match(/^#{1,6}\s+(.*)$/);
+      const p = el(h ? 'h4' : 'p'); inline(p, h ? h[1] : line); box.append(p);
+    }
+  });
+  return box;
+}
+function field(dl, label, value) {
+  if (value == null || value === '') return;
+  dl.append(el('dt', label));
+  const dd = el('dd');
+  if (value instanceof Node) dd.append(value); else inline(dd, String(value));
+  dl.append(dd);
+}
+
+function renderQuestion(box, q) {
+  box.append(el('h3', 'Question')); box.append(md(q.stem));
+  for (const o of q.options || []) {
+    const ok = o.option_id === q.correct_option_id;
+    const d = el('div', null, 'option' + (ok ? ' correct' : ''));
+    const head = el('div'); head.append(el('strong', `${ok ? '✓ ' : ''}${o.option_id}. `)); inline(head, o.text); d.append(head);
+    const why = (q.distractor_explanations || {})[o.option_id];
+    if (!ok && why) { const w = el('div', null, 'why-wrong'); inline(w, 'Why wrong: ' + why); d.append(w); }
+    box.append(d);
+  }
+  box.append(el('h3', 'Explanation')); box.append(md(q.answer_explanation));
+  if (q.reviewer_comment) { box.append(el('h3', 'What changed')); box.append(md(q.reviewer_comment)); }
+}
+function renderLesson(box, l) {
+  for (const b of l.blocks || []) {
+    const d = el('section', null, 'block');
+    d.append(el('h3', `${b.title || b.section || b.type} (${b.id})`));
+    if (b.body_md) d.append(md(b.body_md));
+    if (b.description) d.append(md(b.description));
+    if (b.source) { const pre = el('pre'); pre.append(el('code', b.source)); d.append(pre); }
+    if (b.prompt) { d.append(el('p', 'Prompt:', 'help')); d.append(md(b.prompt)); }
+    if (b.reveal_md) { d.append(el('p', 'Answer:', 'help')); d.append(md(b.reveal_md)); }
+    box.append(d);
+  }
+}
+function renderResource(box, r) {
+  const dl = el('dl');
+  field(dl, 'Link', link(r.url));
+  field(dl, 'Author', r.author_or_publisher);
+  field(dl, 'Cited section', r.relevant_section);
+  field(dl, 'Why chosen', r.selection_reason);
+  field(dl, 'Type', r.resource_type);
+  field(dl, 'Role', r.learning_role);
+  field(dl, 'License', r.license_name && r.license_name !== 'unknown' ? r.license_name : el('span', 'not stated: the app only links to it', 'warning'));
+  field(dl, 'Use in app', r.usage_mode);
+  field(dl, 'Access', r.access_requirements);
+  box.append(dl);
+}
+function renderActivity(box, a) {
+  box.append(el('h3', 'Problem')); box.append(md(a.problem_statement));
+  if (a.constraints) { box.append(el('h3', 'Constraints')); box.append(md(a.constraints)); }
+  if (a.reference_solution) { box.append(el('h3', 'Reference solution')); box.append(md(a.reference_solution.content)); }
+  if (a.rubric) {
+    box.append(el('h3', 'Rubric'));
+    const ul = el('ul');
+    for (const r of a.rubric) { const li = el('li'); inline(li, `${r.description} (${r.max_points} points)`); ul.append(li); }
+    box.append(ul);
+  }
+  if (a.reference_sources) {
+    box.append(el('h3', 'Sources'));
+    const ul = el('ul'); for (const u of a.reference_sources) { const li = el('li'); li.append(link(u)); ul.append(li); } box.append(ul);
+  }
+  if (a.verification) { box.append(el('h3', 'Verification so far')); box.append(md(a.verification.actual)); }
+}
+
+function title(it) {
+  const r = it.record;
+  return r.title || r.title_en || (it.kind === 'question' ? it.id : it.id);
+}
+function renderNav() {
+  const nav = document.getElementById('nav'); nav.replaceChildren();
+  for (const c of DATA.courses) {
+    nav.append(el('h2', `${c.name} (${c.items.length})`));
+    ITEMS.forEach((it, i) => {
+      if (it.course !== c.key) return;
+      const b = el('button'); b.type = 'button';
+      b.setAttribute('aria-current', String(i === current));
+      b.append(el('span', `${it.kind}: ${it.id}`));
+      const d = st(it).decision;
+      b.append(el('span', d === 'approve' ? 'Approved' : d === 'revise' ? 'Needs changes' : d === 'reject' ? 'Rejected' : 'To do', 'tag ' + (d || 'todo')));
+      b.addEventListener('click', () => show(i));
+      nav.append(b);
+    });
+  }
+  const done = ITEMS.filter(it => st(it).decision).length;
+  document.getElementById('progress').textContent = `${done} of ${ITEMS.length} decided`;
+}
+function show(i) {
+  current = Math.max(0, Math.min(ITEMS.length - 1, i));
+  const it = ITEMS[current], box = document.getElementById('item');
+  box.replaceChildren();
+  box.append(el('p', `${it.courseName} · ${it.kind} · ${it.id} · item ${current + 1} of ${ITEMS.length}`, 'meta'));
+  box.append(el('h2', title(it)));
+  if (it.note) { const w = el('div', null, 'why'); w.append(el('b', 'Why this is here')); inline(w, it.note); box.append(w); }
+  ({ question: renderQuestion, lesson: renderLesson, resource: renderResource, activity: renderActivity })[it.kind](box, it.record);
+  renderPanel(); renderNav();
+  box.focus({ preventScroll: true }); window.scrollTo({ top: 0 });
+}
+function renderPanel() {
+  const it = ITEMS[current], s = st(it), box = document.getElementById('checks');
+  box.replaceChildren();
+  for (const [k, label] of Object.entries(CHECKS[it.kind])) {
+    const lab = el('label', null, 'check'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = s.checks[k] === true;
+    cb.addEventListener('change', () => { s.checks[k] = cb.checked; save(); });
+    lab.append(cb, el('span', label)); box.append(lab);
+  }
+  document.getElementById('notes').value = s.notes;
+  const d = s.decision;
+  document.getElementById('status').textContent = d ? `Decision: ${d === 'approve' ? 'Approved' : d === 'revise' ? 'Needs changes' : 'Rejected'}` : 'Not decided yet';
+}
+function decide(decision) {
+  const it = ITEMS[current], s = st(it), status = document.getElementById('status');
+  s.notes = document.getElementById('notes').value;
+  if (decision === 'approve' && Object.keys(CHECKS[it.kind]).some(k => s.checks[k] !== true)) { status.textContent = 'Tick every check before approving.'; return; }
+  if (decision !== 'approve' && !s.notes.trim()) { status.textContent = 'Write a note saying what to fix.'; return; }
+  s.decision = decision; s.decided_at = new Date().toISOString(); save(); renderNav(); renderPanel();
+  nextUnfinished();
+}
+function nextUnfinished() {
+  for (let k = 1; k <= ITEMS.length; k++) { const i = (current + k) % ITEMS.length; if (!st(ITEMS[i]).decision) return show(i); }
+  document.getElementById('status').textContent = 'All items are decided. Click Export decisions.';
+}
+function exportAll() {
+  const now = new Date().toISOString();
+  let files = 0;
+  for (const c of DATA.courses) {
+    const decisions = ITEMS.filter(it => it.course === c.key && st(it).decision).map(it => {
+      const s = st(it);
+      return { item_type: it.kind, id: it.id, decision: s.decision, comment: s.notes.trim(), checks: { ...s.checks }, decided_at: s.decided_at };
+    });
+    if (!decisions.length) continue;
+    const blob = new Blob([JSON.stringify({ version: 1, reviewer: DATA.reviewer, exported_at: now, decisions }, null, 2) + '\n'], { type: 'application/json' });
+    const a = el('a'); a.href = URL.createObjectURL(blob); a.download = `decisions-An-${c.key}-followup.json`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    files++;
+  }
+  document.getElementById('status').textContent = files ? `Downloaded ${files} file(s), one per course. Send them to Cường.` : 'Nothing decided yet.';
+}
+
+load();
+document.getElementById('notes').addEventListener('input', e => { st(ITEMS[current]).notes = e.target.value; save(); });
+document.getElementById('approve').addEventListener('click', () => decide('approve'));
+document.getElementById('revise').addEventListener('click', () => decide('revise'));
+document.getElementById('reject').addEventListener('click', () => decide('reject'));
+document.getElementById('clear').addEventListener('click', () => { const s = st(ITEMS[current]); s.decision = null; s.decided_at = null; save(); renderNav(); renderPanel(); });
+document.getElementById('prev').addEventListener('click', () => show(current - 1));
+document.getElementById('next').addEventListener('click', nextUnfinished);
+document.getElementById('export').addEventListener('click', exportAll);
+const first = ITEMS.findIndex(it => !st(it).decision);
+show(first < 0 ? 0 : first);
+</script>
+</body>
+</html>
